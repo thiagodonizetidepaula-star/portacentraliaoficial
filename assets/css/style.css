@@ -617,3 +617,10 @@ button,input,textarea,select,.btn,.ghost,.secondary,.chip,.badge,.ticker,.menu,.
 .news-controls .chip{font-size:15px;}
 .result h3{font-weight:600;}
 .footer{background:#111827;}
+
+/* Páginas institucionais */
+.institutional-page{max-width:980px;margin:0 auto}
+.institutional-page ul{padding-left:22px}
+.institutional-page li{margin:7px 0}
+.institutional-page a{color:var(--blue);font-weight:800}
+.institutional-page .box{height:100%}
