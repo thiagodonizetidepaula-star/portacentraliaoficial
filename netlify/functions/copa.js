@@ -92,7 +92,7 @@ function fallbackGames() {
     },
     {
       liga: 'Futebol - próximos jogos',
-      nome: 'Próximas partidas serão atualizadas automaticamente',
+      nome: 'Próximas partidas da Copa',
       data: tomorrow.toISOString(),
       status: 'A confirmar',
       estado: 'pre',

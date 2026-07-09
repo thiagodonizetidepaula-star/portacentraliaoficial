@@ -571,3 +571,49 @@ a{color:inherit;text-decoration:none}.wrap{width:min(1180px,92%);margin:auto}.to
     grid-template-columns:1fr !important;
   }
 }
+
+
+/* v31 — acabamento editorial inspirado em jornais tradicionais */
+:root{
+  --bg:#fbfaf7;
+  --card:#fffefa;
+  --text:#111827;
+  --muted:#4b5563;
+  --line:#ddd6ca;
+  --blue:#173b72;
+  --cyan:#173b72;
+  --purple:#173b72;
+  --grad:linear-gradient(135deg,#172554,#173b72);
+  --shadow:0 12px 32px rgba(17,24,39,.08);
+}
+body{
+  font-family:Georgia,'Times New Roman',Times,serif;
+  background:var(--bg);
+  color:var(--text);
+}
+button,input,textarea,select,.btn,.ghost,.secondary,.chip,.badge,.ticker,.menu,.nav-actions{
+  font-family:Georgia,'Times New Roman',Times,serif;
+}
+.brand,.hero h1,.section h2,.page-hero h1,.news-page-title,.content-card h2,.panel h2,.dash-card h3,.cat-card h3,.tool-card h3,.prompt-card h3,.news-body h3,.home-news-overlay h3{
+  font-family:Georgia,'Times New Roman',Times,serif;
+  letter-spacing:-.025em;
+  font-weight:600;
+}
+.brand{font-weight:600;letter-spacing:-.03em;text-transform:none;}
+.brand-ia{color:#173b72;background:none;-webkit-background-clip:initial;background-clip:initial;}
+.nav{background:rgba(255,254,250,.94);border-bottom:1px solid #d8d0c3;}
+.topbar{background:#111827;color:#f8fafc;}
+.menu{font-weight:500;font-size:15px;color:#1f2937;}
+.badge{font-weight:500;background:#f7f3eb;color:#173b72;border-color:#d8d0c3;}
+.btn,.ghost,.secondary,.chip{font-weight:500;}
+.btn{box-shadow:none;}
+.hero h1{font-weight:600;}
+.hero p,.lead,.prose,.cat-card p,.tool-card p,.prompt-card p,.news-body p{font-size:17px;line-height:1.6;color:#374151;}
+.news-source,.prompt-label{font-weight:500;color:#173b72;letter-spacing:.04em;}
+.news-card,.content-card,.panel,.cat-card,.tool-card,.prompt-card,.info-card,.dash-card,.hero-card{box-shadow:none;border-color:#d8d0c3;background:#fffefa;}
+.news-card:hover,.cat-card:hover,.tool-card:hover,.prompt-card:hover{box-shadow:0 10px 24px rgba(17,24,39,.08);border-color:#b8aa96;}
+.news-page-title{font-size:clamp(40px,6vw,68px);font-weight:600;}
+.news-page-clean .breadcrumb{font-family:Georgia,'Times New Roman',Times,serif;}
+.news-controls .chip{font-size:15px;}
+.result h3{font-weight:600;}
+.footer{background:#111827;}
