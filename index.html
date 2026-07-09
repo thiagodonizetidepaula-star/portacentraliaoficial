@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Central IA - Ferramentas Gratuitas para Empreendedores</title>
+<meta name="description" content="Central IA reúne ferramentas gratuitas para documentos, finanças, veículos, saúde, clima, moedas, produtividade e prompts de inteligência artificial.">
+<meta property="og:title" content="Central IA - Ferramentas Gratuitas">
+<meta property="og:description" content="Portal brasileiro com ferramentas online úteis para facilitar o dia a dia.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="assets/img/logo-central-ia.svg" type="image/svg+xml">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Central IA","description":"Ferramentas gratuitas para empreendedores e utilidades online.","potentialAction":{"@type":"SearchAction","target":"/?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+</head>
+<body>
+<div class="topbar"><div class="ticker">
+<span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span><span>🤖 Novidade: Biblioteca Prompt IA</span><span>🚗 Controle do Carro com relatório</span>
+<span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span>
+</div></div>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="brand-mark"><img class="logo-svg" src="assets/img/logo-central-ia.svg" alt=""></span><span class="brand-name">Central <span class="brand-ia">IA</span></span></a><div class="menu"><a href="index.html#ferramentas">Ferramentas</a><a href="noticias.html">Notícias</a><a href="calculadora-financiamento.html">Financiamento</a><a href="calculadora-cdi.html">CDI</a><a href="controle-manutencao-carro.html">Carro</a><a href="calculadora-imc.html">IMC</a><a href="biblioteca-prompts-ia.html">Prompt IA</a><a href="gerador-prompt-ia.html">Gerador Prompt</a><a href="index.html#mentor-ia">Mentor IA</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div><div class="nav-actions"><a class="icon-btn" href="index.html#ferramentas" aria-label="Buscar ferramentas">🔎</a><button class="icon-btn" type="button" onclick="surpreenda()" aria-label="Me surpreenda">🎲</button></div></div></nav>
+<header class="hero"><div class="wrap hero-grid"><div class="hero-card"><span class="badge">Conecta • Facilita • Transforma</span><h1>Ferramentas gratuitas para resolver tarefas do dia a dia.</h1><p>Documentos, finanças, veículos, saúde, clima, moedas, produtividade e prompts de IA em um portal rápido, visual e pensado para celular.</p><div class="searchbar"><input id="search" placeholder="Procure: PDF, carro, dólar, recibo, bula, prompts..."><button class="btn" onclick="document.getElementById('ferramentas').scrollIntoView({behavior:'smooth'})">Buscar</button></div><div class="quick-title">🔥 Ferramentas em alta</div><div class="quick-grid"><a class="quick" href="#pdf">📄 PDF</a><a class="quick" href="controle-manutencao-carro.html">🚗 Carro</a><a class="quick" href="bula-online.html">💊 Bula</a><a class="quick" href="#mentor-ia">🧠 Mentor IA</a><a class="quick" href="biblioteca-prompts-ia.html">🤖 Prompt IA</a><a class="quick" href="previsao-tempo.html">🌦️ Clima</a><a class="quick" href="conversor-moedas.html">💱 Moedas</a><a class="quick" href="noticias.html">📰 Notícias</a></div></div>
+<div class="dashboard"><div class="dash-card"><div class="big-weather"><div><h3 id="weather_city_title">Tempo em São Paulo</h3><p id="weather_text" class="lead">Consultando clima em tempo real...</p></div><div><div id="weather_temp" class="temp">--°C</div><small id="weather_desc">Atualizando</small></div></div></div><div class="dash-card"><h3>Mercado agora</h3><div class="market-line"><div class="market">💵 Dólar<b data-usd>--</b></div><div class="market">💶 Euro<b data-eur>--</b></div><div class="market">₿ Bitcoin<b data-btc>--</b></div></div></div><div class="dash-card tool-day"><h3>⭐ Ferramenta do dia</h3><p>Controle de manutenção do carro: registre gastos, organize histórico e gere relatório para imprimir ou enviar por e-mail.</p><a class="btn" href="controle-manutencao-carro.html">Abrir ferramenta</a></div></div></div></header>
+
+<section class="breaking-news-home top-news-showcase" id="ultimas-noticias-home">
+  <div class="wrap">
+    <div class="section-head news-headline-head">
+      <div>
+        <span class="badge">📰 Última hora</span>
+        <h2>Notícias para acompanhar agora</h2>
+        <p class="lead">Manchetes recentes em cards visuais. Toque na imagem para abrir a matéria completa.</p>
+      </div>
+      <a class="ghost" href="noticias.html">Ver todas</a>
+    </div>
+    <div class="news-mini-filters" aria-label="Filtros rápidos de notícias">
+      <button class="chip active" type="button" data-home-news-query="">Principais</button>
+      <button class="chip" type="button" data-home-news-query="inteligência artificial OR tecnologia">IA e tecnologia</button>
+      <button class="chip" type="button" data-home-news-query="economia OR negócios">Economia</button>
+      <button class="chip" type="button" data-home-news-query="Brasil">Brasil</button>
+    </div>
+    <div id="home-news-status" class="result compact-news-status"><h3>Carregando últimas notícias...</h3><small>Aguarde alguns segundos.</small></div>
+    <div id="home-news-grid" class="home-news-grid" aria-live="polite"></div>
+  </div>
+</section>
+
+<main>
+<section class="section"><div class="wrap feature-strip"><div class="highlight"><div><span class="badge">✨ Descubra algo útil</span><h2>Um portal com cara de aplicativo.</h2><p class="lead">A primeira tela agora mostra ferramentas para usar de imediato, recomendações, clima, cotações e atalhos para resolver problemas com poucos toques.</p><div class="mini-actions"><button class="btn" onclick="surpreenda()">🎲 Me surpreenda</button><a class="ghost" href="biblioteca-prompts-ia.html">Ver Prompt IA</a></div></div><div class="highlight-visual">🧠⚙️</div></div><div class="info-card"><h3>📌 Status do projeto</h3><p><b>35+</b> ferramentas e módulos em construção.</p><p><b>100%</b> focado em celular, SEO e utilidade real.</p><p><b>Grátis</b> para atrair uso recorrente e tráfego orgânico.</p></div></div></section>
+<section class="section" id="categorias"><div class="wrap"><div class="section-head"><div><h2>Categorias principais</h2><p class="lead">Organização visual para o usuário encontrar rapidamente o que precisa.</p></div></div><div class="cat-grid">
+<a class="cat-card" href="#ferramentas" onclick="filtrar('financeiro')"><div class="icon">💰</div><h3>Finanças</h3><p>CDI, lucro e financiamento.</p><span class="cat-art">💹</span></a>
+<a class="cat-card" href="#veiculos" onclick="filtrar('veiculos')"><div class="icon">🚗</div><h3>Veículos</h3><p>Gastos, manutenção e consumo.</p><span class="cat-art">🚘</span></a>
+<a class="cat-card" href="#ferramentas" onclick="filtrar('documentos')"><div class="icon">📄</div><h3>Documentos</h3><p>Recibo, orçamento e PDF.</p><span class="cat-art">🧾</span></a>
+<a class="cat-card" href="#ferramentas" onclick="filtrar('saude')"><div class="icon">🏥</div><h3>Saúde</h3><p>Bula, IMC e água diária.</p><span class="cat-art">💊</span></a>
+<a class="cat-card" href="#ferramentas" onclick="filtrar('utilidades')"><div class="icon">🌦️</div><h3>Utilidades</h3><p>Clima, moedas e lembretes.</p><span class="cat-art">☀️</span></a>
+
+<a class="cat-card" href="noticias.html"><div class="icon">📰</div><h3>Notícias</h3><p>Manchetes recentes com link para fontes originais.</p><span class="cat-art">🗞️</span></a>
+<a class="cat-card" href="#ferramentas" onclick="filtrar('beleza')"><div class="icon">💅</div><h3>Beleza</h3><p>Agenda e organização.</p><span class="cat-art">✨</span></a>
+<a class="cat-card" href="#ferramentas" onclick="filtrar('negocios')"><div class="icon">🏢</div><h3>Negócios</h3><p>Fluxo, clientes e gestão.</p><span class="cat-art">📊</span></a>
+<a class="cat-card" href="biblioteca-prompts-ia.html" onclick="filtrar('ia')"><div class="icon">🤖</div><h3>Prompt IA</h3><p>Imagens, vendas e produtividade.</p><span class="cat-art">⚙️</span></a>
+</div></div></section>
+<section class="section" id="ferramentas"><div class="wrap"><div class="section-head"><div><h2>Ferramentas online</h2><p class="lead">Use agora as principais ferramentas da Central IA.</p></div></div><div class="chips"><button class="chip active" data-filter="todos">Todas</button><button class="chip" data-filter="financeiro">Finanças</button><button class="chip" data-filter="veiculos">Veículos</button><button class="chip" data-filter="documentos">Documentos</button><button class="chip" data-filter="saude">Saúde</button><button class="chip" data-filter="utilidades">Utilidades</button><button class="chip" data-filter="beleza">Beleza</button><button class="chip" data-filter="negocios">Negócios</button><button class="chip" data-filter="ia">IA</button><button class="chip" data-filter="noticias">Notícias</button></div>
+<div class="tools-list"><a class="tool-card" data-cat="financeiro" href="calculadora-financiamento.html"><span class="tool-icon">🏦</span><div><h3>Calculadora de Financiamento</h3><p>Parcela, juros e total pago.</p></div></a><a class="tool-card" data-cat="financeiro" href="calculadora-cdi.html"><span class="tool-icon">📈</span><div><h3>Calculadora CDI</h3><p>Rendimento bruto e líquido.</p></div></a><a class="tool-card" data-cat="financeiro" href="calculadora-lucro.html"><span class="tool-icon">💸</span><div><h3>Calculadora de Lucro</h3><p>Margem e faturamento.</p></div></a><a class="tool-card" data-cat="veiculos" href="controle-manutencao-carro.html"><span class="tool-icon">🔧</span><div><h3>Manutenção do Carro</h3><p>Relatório completo em PDF.</p></div></a><a class="tool-card" data-cat="documentos" href="gerador-recibo.html"><span class="tool-icon">🧾</span><div><h3>Gerador de Recibo</h3><p>Imprimir, baixar e enviar.</p></div></a><a class="tool-card" data-cat="documentos" href="gerador-orcamento.html"><span class="tool-icon">📑</span><div><h3>Gerador de Orçamento</h3><p>Documento simples para serviço.</p></div></a><a class="tool-card" data-cat="utilidades" href="conversor-moedas.html"><span class="tool-icon">💱</span><div><h3>Conversor de Moedas</h3><p>Dólar, euro, libra e bitcoin.</p></div></a><a class="tool-card" data-cat="utilidades" href="previsao-tempo.html"><span class="tool-icon">🌦️</span><div><h3>Previsão do Tempo</h3><p>Temperatura e condição atual.</p></div></a><a class="tool-card" data-cat="noticias" href="noticias.html"><span class="tool-icon">📰</span><div><h3>Últimas Notícias</h3><p>Manchetes recentes com fonte e link original.</p></div></a><a class="tool-card" data-cat="saude" href="bula-online.html"><span class="tool-icon">💊</span><div><h3>Bula Online</h3><p>Consulta com caminhos oficiais.</p></div></a><a class="tool-card" data-cat="ia" href="biblioteca-prompts-ia.html"><span class="tool-icon">🎨</span><div><h3>Prompt para Imagens</h3><p>Realista, desenho, robótica e mais.</p></div></a><a class="tool-card" data-cat="ia" href="gerador-prompt-ia.html"><span class="tool-icon">✍️</span><div><h3>Gerador de Prompt</h3><p>Crie comandos personalizados.</p></div></a><a class="tool-card" data-cat="utilidades" href="lembrete-email.html"><span class="tool-icon">📅</span><div><h3>Lembrete por E-mail</h3><p>Gmail e Google Agenda.</p></div></a></div></div></section>
+
+<section class="section mentor-section" id="mentor-ia">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="badge">🧠 Novo módulo</span>
+        <h2>Central IA Mentor</h2>
+        <p class="lead">Receba uma orientação organizada em diagnóstico, conselho, plano de ação e próximos passos. Não substitui atendimento profissional, mas ajuda a clarear ideias e decidir por onde começar.</p>
+        <p class="lead"><small><b>Aviso importante:</b> este é um mentor automatizado com respostas organizadas por tema, não um profissional de saúde, psicólogo, advogado ou consultor financeiro. Se você estiver passando por sofrimento intenso, pensamentos de se machucar ou risco imediato, ligue agora para o <b>CVV: 188</b> (gratuito, 24h) ou procure um pronto-socorro.</small></p>
+      </div>
+    </div>
+
+    <div class="mentor-layout">
+      <div class="mentor-panel">
+        <h3>1. Escolha o tema</h3>
+        <div class="mentor-topics" id="mentor_topics">
+          <button class="mentor-topic active" data-topic="dinheiro"><span>💰</span><b>Dinheiro</b><small>Dívidas, renda e organização.</small></button>
+          <button class="mentor-topic" data-topic="trabalho"><span>💼</span><b>Trabalho</b><small>Carreira, emprego e rotina.</small></button>
+          <button class="mentor-topic" data-topic="negocios"><span>🚀</span><b>Negócios</b><small>Ideias, vendas e crescimento.</small></button>
+          <button class="mentor-topic" data-topic="familia"><span>👨‍👩‍👧</span><b>Família</b><small>Diálogo, limites e convivência.</small></button>
+          <button class="mentor-topic" data-topic="relacionamento"><span>❤️</span><b>Relacionamento</b><small>Conversa, respeito e decisões.</small></button>
+          <button class="mentor-topic" data-topic="estudos"><span>📚</span><b>Estudos</b><small>Foco, plano e disciplina.</small></button>
+          <button class="mentor-topic" data-topic="saude"><span>💪</span><b>Saúde e hábitos</b><small>Rotina, corpo e constância.</small></button>
+          <button class="mentor-topic" data-topic="emocional"><span>🧘</span><b>Emocional</b><small>Ansiedade leve, clareza e calma.</small></button>
+          <button class="mentor-topic" data-topic="objetivos"><span>🎯</span><b>Objetivos</b><small>Metas, direção e próximos passos.</small></button>
+        </div>
+
+        <div class="mentor-form">
+          <label>2. Conte o que está acontecendo</label>
+          <textarea id="mentor_problem" rows="5" placeholder="Exemplo: estou com muitas dívidas, desempregado e não sei por onde começar..."></textarea>
+
+          <div class="mentor-row">
+            <div>
+              <label>Como você está se sentindo?</label>
+              <select id="mentor_feeling">
+                <option value="perdido">Perdido(a)</option>
+                <option value="ansioso">Ansioso(a)</option>
+                <option value="cansado">Cansado(a)</option>
+                <option value="motivado">Motivado(a)</option>
+                <option value="triste">Triste</option>
+                <option value="pressionado">Pressionado(a)</option>
+              </select>
+            </div>
+            <div>
+              <label>Estilo do mentor</label>
+              <select id="mentor_style">
+                <option value="pratico">Prático e direto</option>
+                <option value="professor">Professor</option>
+                <option value="empreendedor">Empreendedor</option>
+                <option value="produtividade">Produtividade</option>
+                <option value="biblico">Princípios bíblicos</option>
+                <option value="calmo">Calmo e acolhedor</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn wide" onclick="gerarMentor()">Gerar conselho</button>
+        </div>
+      </div>
+
+      <div class="mentor-output">
+        <div class="mentor-illustration" id="mentor_visual">
+          <div class="orb">🧠</div>
+          <h3>Seu conselho aparecerá aqui</h3>
+          <p>Escolha um tema, descreva sua situação e gere uma orientação organizada para copiar, imprimir, baixar ou enviar por e-mail.</p>
+        </div>
+        <div class="result mentor-result" id="mentor_result">
+          <h3>Resultado</h3>
+          <small>Aguardando sua situação...</small>
+        </div>
+        <div class="mini-actions mentor-actions">
+          <button class="ghost" onclick="copyFrom('mentor_result')">Copiar</button>
+          <button class="ghost" onclick="downloadBlock('mentor_result','conselho-mentor-ia.txt')">Baixar TXT</button>
+          <button class="ghost" onclick="printBlock('mentor_result')">Imprimir / PDF</button>
+          <button class="ghost" onclick="mailBlock('mentor_result','Conselho do Mentor IA')">Enviar por e-mail</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="prompts-ia"><div class="wrap"><div class="section-head"><div><h2>🤖 Biblioteca Prompt IA</h2><p class="lead">Prompts prontos para imagens realistas, desenho, robótica, marketing, negócios e produtividade. Clique em copiar e use na sua IA favorita.</p></div></div><div class="prompt-grid">
+<div class="prompt-card"><span class="prompt-label">Imagem Realista</span><h3>Fotografia profissional</h3><div class="prompt-text" id="p-realista">Crie uma imagem hiper-realista em alta resolução de [DESCREVA A CENA], com iluminação cinematográfica, textura natural, profundidade de campo, cores realistas, lente 50mm, composição profissional e detalhes nítidos.</div><button class="ghost" onclick="copyFrom('p-realista')">Copiar prompt</button></div>
+<div class="prompt-card"><span class="prompt-label">Desenho</span><h3>Ilustração educativa</h3><div class="prompt-text" id="p-desenho">Crie uma ilustração limpa e amigável sobre [TEMA], estilo editorial moderno, cores suaves, personagens expressivos, fundo organizado, boa leitura no celular e aparência profissional.</div><button class="ghost" onclick="copyFrom('p-desenho')">Copiar prompt</button></div>
+<div class="prompt-card"><span class="prompt-label">Robótica</span><h3>Robô futurista</h3><div class="prompt-text" id="p-robo">Crie um robô futurista amigável representando inteligência artificial, com conectores luminosos, design tecnológico, fundo azul e roxo, atmosfera premium, detalhes metálicos e aparência de startup.</div><button class="ghost" onclick="copyFrom('p-robo')">Copiar prompt</button></div>
+<div class="prompt-card"><span class="prompt-label">Produto</span><h3>Mockup de venda</h3><div class="prompt-text" id="p-produto">Crie uma imagem de produto premium para [PRODUTO], em fundo limpo, iluminação de estúdio, sombra suave, composição de e-commerce, aparência confiável e espaço para texto publicitário.</div><button class="ghost" onclick="copyFrom('p-produto')">Copiar prompt</button></div>
+<div class="prompt-card"><span class="prompt-label">Arquitetura</span><h3>Ambiente moderno</h3><div class="prompt-text" id="p-arq">Crie um ambiente moderno de [TIPO DE AMBIENTE], com iluminação natural, decoração elegante, materiais realistas, composição ampla, sensação de conforto e fotografia profissional.</div><button class="ghost" onclick="copyFrom('p-arq')">Copiar prompt</button></div>
+<div class="prompt-card"><span class="prompt-label">Marketing</span><h3>Anúncio visual</h3><div class="prompt-text" id="p-marketing">Crie um criativo de anúncio para [OFERTA], visual limpo, título chamativo, composição vertical para Instagram, cores modernas, foco no benefício principal e aparência de campanha profissional.</div><button class="ghost" onclick="copyFrom('p-marketing')">Copiar prompt</button></div>
+</div></div></section>
+<section class="section"><div class="wrap grid"><div class="panel" id="financiamento"><h2>🏦 Financiamento</h2><div class="tool-area"><div class="form"><label>Valor financiado</label><input class="money" id="fin_valor" placeholder="R$ 48.000,00"><label>Juros ao mês (%)</label><input id="fin_juros" placeholder="2,5"><label>Prazo em meses</label><input id="fin_prazo" type="number" placeholder="48"><button class="btn" onclick="calcFin()">Calcular</button></div><div class="result" id="fin_result"><h3>Resultado</h3><small>Preencha os dados para simular.</small></div></div></div><div class="panel" id="cdi"><h2>📈 CDI</h2><div class="tool-area"><div class="form"><label>Valor aplicado</label><input class="money" id="cdi_valor" placeholder="R$ 10.000,00"><label>% do CDI</label><input id="cdi_pct" value="100"><label>Dias</label><input id="cdi_dias" value="30"><label>CDI anual estimado (%)</label><input id="cdi_taxa" value="10,65"><button class="btn" onclick="calcCDI()">Calcular</button></div><div class="result" id="cdi_result"><h3>Resultado</h3><small>Estimativa educativa.</small></div></div></div><div class="panel" id="lucro"><h2>💸 Lucro</h2><div class="tool-area"><div class="form"><input class="money" id="lucro_custo" placeholder="Custo"><input class="money" id="lucro_venda" placeholder="Preço de venda"><input id="lucro_qtd" type="number" placeholder="Quantidade" value="1"><button class="btn" onclick="calcLucro()">Calcular</button></div><div class="result" id="lucro_result"><h3>Resultado</h3></div></div></div></div></section>
+<section class="section" id="veiculos"><div class="wrap"><div class="panel" id="carro"><h2>🚗 Controle de Manutenção do Carro</h2><p class="lead">Registre óleo, pneus, bateria, freio, IPVA, seguro, combustível e outros custos. Os dados ficam no navegador e podem ser exportados.</p><div class="tool-area"><div class="form"><input id="car_data" type="date"><input id="car_desc" placeholder="Descrição. Ex: troca de óleo"><input id="car_km" placeholder="Km atual"><input class="money" id="car_valor" placeholder="Valor gasto"><button class="btn" onclick="addCar()">Adicionar gasto</button><button class="ghost" onclick="clearCar()">Limpar histórico</button></div><div><div class="result" id="car_report"><h3>Relatório</h3><small>Nenhum gasto registrado.</small></div><div class="mini-actions"><button class="btn" onclick="printBlock('car_report')">Imprimir / PDF</button><button class="ghost" onclick="mailBlock('car_report','Relatório de manutenção do veículo')">Enviar e-mail</button><button class="ghost" onclick="downloadBlock('car_report','relatorio-manutencao-carro.txt')">Baixar TXT</button></div></div></div></div></div></section>
+<section class="section"><div class="wrap grid"><div class="panel" id="recibo"><h2>🧾 Recibo</h2><div class="form"><input id="rec_nome" placeholder="Nome de quem pagou"><input class="money" id="rec_valor" placeholder="Valor"><textarea id="rec_ref" placeholder="Referente a..."></textarea><button class="btn" onclick="recibo()">Gerar recibo</button><div id="rec_doc" class="result"></div><div class="mini-actions"><button class="ghost" onclick="printBlock('rec_doc')">Imprimir/PDF</button><button class="ghost" onclick="mailBlock('rec_doc','Recibo Central IA')">Enviar e-mail</button><button class="ghost" onclick="downloadText('recibo-central-ia.txt',document.getElementById('rec_doc').innerText)">Baixar TXT</button></div></div></div><div class="panel" id="orcamento"><h2>📑 Orçamento</h2><div class="form"><input id="orc_cli" placeholder="Cliente"><textarea id="orc_serv" placeholder="Serviço ou produto"></textarea><input class="money" id="orc_valor" placeholder="Valor"><button class="btn" onclick="orcamento()">Gerar orçamento</button><div id="orc_doc" class="result"></div><div class="mini-actions"><button class="ghost" onclick="printBlock('orc_doc')">Imprimir/PDF</button><button class="ghost" onclick="mailBlock('orc_doc','Orçamento Central IA')">Enviar e-mail</button><button class="ghost" onclick="downloadText('orcamento-central-ia.txt',document.getElementById('orc_doc').innerText)">Baixar TXT</button></div></div></div></div></section>
+<section class="section"><div class="wrap grid"><div class="panel" id="moedas"><h2>💱 Conversor de Moedas</h2><div class="form"><input id="moeda_valor" value="100"><select id="moeda_de"><option>BRL</option><option>USD</option><option>EUR</option><option>GBP</option><option>BTC</option></select><select id="moeda_para"><option>USD</option><option>BRL</option><option>EUR</option><option>GBP</option><option>BTC</option></select><button class="btn" onclick="moeda()">Converter</button><div class="result" id="moeda_result"><h3>Resultado</h3><small>Conversor demonstrativo.</small></div></div></div><div class="panel" id="tempo"><h2>🌦️ Previsão do Tempo</h2><div class="form"><input id="weather_city" placeholder="Cidade" value="São Paulo"><button class="btn" onclick="buscarClima()">Ver clima</button><div class="result" id="weather_result"><h3>Clima</h3><small>Digite uma cidade e consulte.</small></div></div></div><div class="panel" id="lembrete"><h2>📅 Lembrete</h2><div class="form"><input id="lem_titulo" placeholder="Título"><input id="lem_email" placeholder="seuemail@gmail.com"><input id="lem_data" type="datetime-local"><textarea id="lem_desc" placeholder="Anotações"></textarea><button class="btn" onclick="lembrete()">Criar lembrete</button><div class="result" id="lem_result"><h3>Resultado</h3></div></div></div><div class="panel" id="bula"><h2>💊 Bula Online</h2><div class="form"><input id="bula_nome" placeholder="Nome do medicamento"><button class="btn" onclick="bula()">Pesquisar bula</button><div class="result" id="bula_result"><h3>Consulta segura</h3><small>Usa caminhos oficiais e busca direcionada.</small></div></div></div></div></section>
+<section class="section"><div class="wrap grid"><div class="panel" id="imc"><h2>🩺 IMC</h2><div class="form"><input id="imc_peso" placeholder="Peso em kg"><input id="imc_altura" placeholder="Altura. Ex: 1,75"><button class="btn" onclick="imc()">Calcular</button><div class="result" id="imc_result"><h3>Resultado</h3></div></div></div><div class="panel" id="agua"><h2>💧 Água Diária</h2><div class="form"><input id="agua_peso" placeholder="Peso em kg"><button class="btn" onclick="agua()">Calcular água</button><div class="result" id="agua_result"><h3>Resultado</h3></div></div></div><div class="panel" id="pdf"><h2>📄 PDF e Imagens</h2><p class="lead">Módulo preparado para conversão, compressão e organização de arquivos. Próxima etapa: páginas próprias para cada conversor.</p><button class="btn" onclick="toast('Módulo PDF preparado para próxima versão')">Ver módulo</button></div><div class="panel prompt-builder" id="prompt-gerador"><span class="badge">🤖 Novo módulo premium</span><h2>✍️ Gerador de Prompt com Resultado</h2><p class="lead">Crie um prompt completo e receba também um resultado pronto gerado dentro da Central IA para copiar, adaptar e usar onde quiser.</p><div class="form"><select id="prompt_tipo"><option value="imagem-realista">Imagem realista</option><option value="desenho">Desenho/ilustração</option><option value="robotica">Robótica/futurista</option><option value="vendas">Texto de vendas</option><option value="instagram">Post para Instagram</option><option value="negocio">Ideia de negócio</option><option value="atendimento">Resposta para cliente</option></select><input id="prompt_tema" placeholder="Tema. Ex: manicure, oficina, carro, produto, robô..."><textarea id="prompt_detalhes" placeholder="Detalhes opcionais: público, estilo, cores, objetivo, formato, tom de voz..."></textarea><select id="prompt_tom"><option value="profissional">Tom profissional</option><option value="simples">Tom simples e direto</option><option value="premium">Tom premium</option><option value="criativo">Tom criativo</option><option value="emocional">Tom emocional</option></select><button class="btn" onclick="gerarPromptAvancado()">Gerar prompt e resultado</button><div class="prompt-output-grid"><div class="result prompt-output" id="prompt_result"><h3>Prompt pronto</h3><small>Preencha os campos e clique em gerar.</small></div><div class="result prompt-output" id="prompt_answer"><h3>Resultado gerado</h3><small>A Central IA vai montar um exemplo pronto para copiar.</small></div></div><div class="mini-actions"><button class="ghost" onclick="copyFrom('prompt_result')">Copiar prompt</button><button class="ghost" onclick="copyFrom('prompt_answer')">Copiar resultado</button><button class="ghost" onclick="mailBlock('prompt_answer','Resultado gerado pela Central IA')">Enviar resultado por e-mail</button><button class="ghost" onclick="downloadText('resultado-prompt-central-ia.txt',document.getElementById('prompt_answer').innerText)">Baixar TXT</button></div></div></div></div></section>
+<section class="section"><div class="wrap panel prose"><h2>Por que a Central IA existe?</h2><p>A Central IA foi criada para reunir ferramentas simples, gratuitas e úteis em um só lugar. Em vez de obrigar o usuário a instalar aplicativos pesados ou aprender sistemas complicados, a proposta é permitir que ele resolva tarefas rápidas diretamente pelo navegador.</p><h3>Como usar com segurança</h3><p>As ferramentas financeiras, de saúde, documentos e veículos são informativas. Sempre confirme dados importantes em fontes oficiais, profissionais especializados ou órgãos responsáveis.</p><h3>Próximas evoluções</h3><p>Novas páginas individuais para cada ferramenta, FAQ completo, guias explicativos e melhorias de SEO serão adicionados continuamente.</p></div></section>
+</main>
+<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js"></script>
+<script>
+(function(){
+  const grid = document.getElementById('home-news-grid');
+  const status = document.getElementById('home-news-status');
+  const buttons = document.querySelectorAll('[data-home-news-query]');
+  if(!grid || !status) return;
+  const safe = (value) => String(value || '').replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+  const formatDate = (value) => {
+    if(!value) return 'Agora';
+    const date = new Date(value);
+    if(Number.isNaN(date.getTime())) return 'Agora';
+    return date.toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+  };
+  async function loadHomeNews(query=''){
+    status.style.display='block';
+    status.innerHTML='<h3>Carregando últimas notícias...</h3><small>Buscando manchetes recentes.</small>';
+    grid.innerHTML='';
+    try{
+      const url='/.netlify/functions/noticias' + (query ? '?q=' + encodeURIComponent(query) : '');
+      const response=await fetch(url, {headers:{'Accept':'application/json'}});
+      const data=await response.json().catch(()=>null);
+      if(!response.ok || !data || data.ok===false) throw new Error((data && data.message) || 'Não foi possível carregar as notícias agora.');
+      const items=(data.articles || []).filter(item => item && item.url && item.titulo).slice(0,4);
+      if(!items.length) throw new Error('Nenhuma manchete encontrada agora.');
+      status.style.display='none';
+      grid.innerHTML=items.map((item,index)=>{
+        const title=safe(item.titulo);
+        const source=safe(item.fonte || 'Fonte');
+        const date=safe(formatDate(item.data));
+        const link=safe(item.url);
+        const img=item.urlToImage ? `<img src="${safe(item.urlToImage)}" alt="" loading="lazy">` : '<div class="news-placeholder">📰</div>';
+        return `<a class="home-news-card ${index===0?'featured-news':''}" href="${link}" target="_blank" rel="noopener noreferrer nofollow">${img}<div class="home-news-overlay"><span>${source} • ${date}</span><h3>${title}</h3><em>Ler notícia</em></div></a>`;
+      }).join('');
+    }catch(error){
+      status.style.display='block';
+      status.innerHTML=`<h3>Últimas notícias indisponíveis</h3><small>${safe(error.message)}</small>`;
+    }
+  }
+  buttons.forEach(btn => btn.addEventListener('click',()=>{
+    buttons.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    loadHomeNews(btn.getAttribute('data-home-news-query') || '');
+  }));
+  loadHomeNews();
+})();
+</script>
+</body></html>
