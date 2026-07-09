@@ -624,3 +624,36 @@ button,input,textarea,select,.btn,.ghost,.secondary,.chip,.badge,.ticker,.menu,.
 .institutional-page li{margin:7px 0}
 .institutional-page a{color:var(--blue);font-weight:800}
 .institutional-page .box{height:100%}
+
+
+/* v34 — correção de contato e botões institucionais */
+.btn, a.btn{
+  background:#173b72 !important;
+  color:#ffffff !important;
+  border:1px solid #173b72 !important;
+  opacity:1 !important;
+  text-decoration:none !important;
+  text-shadow:none !important;
+}
+.btn:hover, a.btn:hover{
+  background:#0f2a55 !important;
+  color:#ffffff !important;
+}
+.ghost, a.ghost, .secondary, a.secondary{
+  background:#fffefa !important;
+  color:#173b72 !important;
+  border:1px solid #b8aa96 !important;
+  opacity:1 !important;
+  text-decoration:none !important;
+}
+.ghost:hover, a.ghost:hover, .secondary:hover, a.secondary:hover{
+  background:#f7f3eb !important;
+  color:#0f2a55 !important;
+}
+.mini-actions .btn,.mini-actions .ghost{
+  min-width:180px;
+  font-weight:600 !important;
+}
+.institutional-page .mini-actions{
+  margin-top:22px;
+}
