@@ -60,7 +60,7 @@
       <div class="dash-card copa-card">
         <div class="copa-headline">
           <h3>🏆 Jogos da Copa</h3>
-          <small>Atualizado automaticamente</small>
+          <small>Atualização automática</small>
         </div>
         <div id="copa_widget" class="copa-widget" aria-live="polite">
           <p class="lead">Carregando próximos jogos...</p>
@@ -283,7 +283,7 @@
         ${rest.length ? `<div class="copa-next-list">${rest.map(game => `<div class="copa-next"><span>${safe(formatGameDate(game.data))}</span><b>${safe(game.timeA.sigla || game.timeA.nome)} x ${safe(game.timeB.sigla || game.timeB.nome)}</b></div>`).join('')}</div>` : ''}
       `;
     }catch(error){
-      box.innerHTML = `<div class="copa-empty"><b>Jogos indisponíveis agora.</b><small>${safe(error.message)}</small></div>`;
+      box.innerHTML = `<div class="copa-empty"><b>Agenda em atualização.</b><small>Se a conexão falhar, tente atualizar a página em instantes.</small></div>`;
     }
   }
   loadCopa();
