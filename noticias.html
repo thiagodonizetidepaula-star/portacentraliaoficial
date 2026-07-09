@@ -4,57 +4,107 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Últimas Notícias Online | Portal Central IA</title>
-<meta name="description" content="Veja últimas notícias em cards visuais com imagem, fonte, data e link para a matéria original.">
+<meta name="description" content="Veja manchetes recentes de tecnologia, economia, negócios e Brasil com links para as fontes originais, sem reprodução do texto completo das matérias.">
+<meta property="og:title" content="Últimas Notícias Online | Portal Central IA">
+<meta property="og:description" content="Manchetes recentes com fonte, data e link para a matéria original.">
+<meta property="og:type" content="website">
 <link rel="stylesheet" href="assets/css/style.css">
 <link rel="icon" href="assets/img/logo-central-ia.svg" type="image/svg+xml">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "De onde vêm as notícias exibidas?", "acceptedAnswer": {"@type": "Answer", "text": "As manchetes são carregadas por uma função serverless do Netlify que consulta a NewsAPI usando uma chave protegida no servidor."}}, {"@type": "Question", "name": "A Central IA copia o texto completo das matérias?", "acceptedAnswer": {"@type": "Answer", "text": "Não. A página exibe apenas manchete, fonte, data e link para a notícia original, sem reproduzir o corpo da matéria."}}, {"@type": "Question", "name": "Por que algumas imagens podem não aparecer?", "acceptedAnswer": {"@type": "Answer", "text": "Algumas fontes não enviam imagem ou bloqueiam o uso externo. Nesses casos, o card mostra um visual padrão."}}, {"@type": "Question", "name": "As notícias são atualizadas automaticamente?", "acceptedAnswer": {"@type": "Answer", "text": "Sim, a cada carregamento a página pode buscar manchetes recentes. A disponibilidade depende da NewsAPI e da configuração da função no Netlify."}}, {"@type": "Question", "name": "Posso confiar totalmente nas manchetes?", "acceptedAnswer": {"@type": "Answer", "text": "Use as notícias como ponto de partida e leia sempre a matéria completa na fonte original antes de tomar decisões importantes."}}]}</script>
 </head>
 <body>
-<div class="topbar"><div class="ticker"><span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span><span>🤖 Novidade: Biblioteca Prompt IA</span><span>🚗 Controle do Carro com relatório</span></div></div>
+<div class="topbar"><div class="ticker">
+<span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span><span>📰 Últimas notícias com fontes originais</span><span>🤖 Portal Central IA</span>
+<span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span>
+</div></div>
 <nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="brand-mark"><img class="logo-svg" src="assets/img/logo-central-ia.svg" alt=""></span><span class="brand-name">Central <span class="brand-ia">IA</span></span></a><div class="menu"><a href="index.html#ferramentas">Ferramentas</a><a href="calculadora-financiamento.html">Financiamento</a><a href="calculadora-cdi.html">CDI</a><a href="controle-manutencao-carro.html">Carro</a><a href="calculadora-imc.html">IMC</a><a href="biblioteca-prompts-ia.html">Prompt IA</a><a href="gerador-prompt-ia.html">Gerador Prompt</a><a href="index.html#mentor-ia">Mentor IA</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div><div class="nav-actions"><a class="icon-btn" href="index.html#ferramentas" aria-label="Buscar ferramentas">🔎</a><button class="icon-btn" type="button" onclick="surpreenda()" aria-label="Me surpreenda">🎲</button></div></div></nav>
-<main class="page news-page">
-  <div class="wrap">
-    <nav class="breadcrumb"><a href="index.html">Início</a><span>›</span><span>Últimas Notícias</span></nav>
-    <section class="news-hero-clean">
-      <span class="badge">📰 Última hora</span>
-      <h1>Últimas Notícias</h1>
-      <p class="lead">Manchetes recentes em cards com imagem. Clique em uma notícia para abrir a matéria completa no site original.</p>
-      <div class="news-controls" aria-label="Filtros de notícias">
-        <button class="chip active" type="button" data-news-query="Brasil OR economia OR tecnologia OR negócios OR inteligência artificial">Principais</button>
-        <button class="chip" type="button" data-news-query="inteligência artificial OR tecnologia">IA e Tecnologia</button>
-        <button class="chip" type="button" data-news-query="economia OR negócios">Economia</button>
-        <button class="chip" type="button" data-news-query="Brasil">Brasil</button>
-        <button class="chip" type="button" data-news-query="carros OR automóveis">Carros</button>
-      </div>
-    </section>
+<header class="page-hero"><div class="wrap">
+  <nav class="breadcrumb"><a href="index.html">Início</a><span>›</span><a href="index.html#ferramentas">Ferramentas</a><span>›</span><span>Últimas Notícias</span></nav>
+  <span class="badge">Notícias com link para fontes originais</span>
+  <h1>Últimas Notícias Online</h1>
+  <p class="lead">A página de Últimas Notícias do Portal Central IA reúne manchetes recentes em formato rápido, leve e fácil de consultar pelo celular. A proposta é ajudar o usuário a acompanhar assuntos relevantes sem copiar conteúdo de veículos jornalísticos. Cada card mostra apenas o título, a fonte, a data de publicação e um botão para abrir a matéria completa no site original. Isso preserva a autoria, evita reprodução indevida de conteúdo e mantém a Central IA como um ponto de organização e descoberta. A atualização depende da integração com a NewsAPI via Netlify Function, com a chave protegida no servidor. Caso a consulta falhe, a página exibirá uma mensagem clara para o visitante tentar novamente mais tarde.</p>
+</div></header>
+<main class="tool-page"><div class="wrap">
+  <article class="content-card prose">
+    <h2>Manchetes recentes</h2>
+    <p>Use os botões abaixo para carregar manchetes gerais ou filtrar por temas populares. A Central IA não exibe o corpo das matérias nem cria resumo automático; o objetivo é direcionar você para a fonte original.</p>
+    <div class="news-controls" aria-label="Filtros de notícias">
+      <button class="chip active" type="button" data-news-query="">Principais</button>
+      <button class="chip" type="button" data-news-query="tecnologia">Tecnologia</button>
+      <button class="chip" type="button" data-news-query="economia">Economia</button>
+      <button class="chip" type="button" data-news-query="negócios">Negócios</button>
+      <button class="chip" type="button" data-news-query="Brasil">Brasil</button>
+    </div>
     <div id="news-status" class="result"><h3>Carregando notícias...</h3><small>Aguarde alguns segundos.</small></div>
-    <div id="news-grid" class="news-grid big-news-grid" aria-live="polite"></div>
-    <section class="tool-section related-tools"><h2>Continue explorando</h2><div class="related-grid"><a href="previsao-tempo.html">🌦️ Previsão do Tempo</a><a href="conversor-moedas.html">💱 Conversor de Moedas</a><a href="biblioteca-prompts-ia.html">🤖 Prompt IA</a></div></section>
-  </div>
-</main>
-<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As notícias exibem apenas manchete, imagem, fonte e link para a publicação original.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js"></script>
+    <div id="news-grid" class="news-grid" aria-live="polite"></div>
+
+    <h2>Como usar</h2>
+    <ol class="steps">
+      <li>Abra a página de Últimas Notícias.</li>
+      <li>Aguarde o carregamento automático das manchetes.</li>
+      <li>Use os filtros para ver temas como tecnologia, economia ou negócios.</li>
+      <li>Clique em “Leia a matéria completa” para abrir a fonte original em nova aba.</li>
+    </ol>
+
+    <h2>Exemplo prático</h2>
+    <div class="example-box"><p>Imagine que você quer acompanhar notícias sobre economia antes de tomar uma decisão de compra, venda ou investimento. Você toca em <b>Economia</b>, visualiza as manchetes recentes, confere fonte e data, e abre apenas as matérias que realmente deseja ler no site original.</p></div>
+
+    <h2>Perguntas frequentes</h2>
+    <div class="faq-list"><details class="faq-item"><summary>De onde vêm as notícias exibidas?</summary><p>As manchetes são carregadas por uma função serverless do Netlify que consulta a NewsAPI usando uma chave protegida no servidor.</p></details>
+<details class="faq-item"><summary>A Central IA copia o texto completo das matérias?</summary><p>Não. A página exibe apenas manchete, fonte, data e link para a notícia original, sem reproduzir o corpo da matéria.</p></details>
+<details class="faq-item"><summary>Por que algumas imagens podem não aparecer?</summary><p>Algumas fontes não enviam imagem ou bloqueiam o uso externo. Nesses casos, o card mostra um visual padrão.</p></details>
+<details class="faq-item"><summary>As notícias são atualizadas automaticamente?</summary><p>Sim, a cada carregamento a página pode buscar manchetes recentes. A disponibilidade depende da NewsAPI e da configuração da função no Netlify.</p></details>
+<details class="faq-item"><summary>Posso confiar totalmente nas manchetes?</summary><p>Use as notícias como ponto de partida e leia sempre a matéria completa na fonte original antes de tomar decisões importantes.</p></details></div>
+
+    <div class="disclaimer"><b>Aviso importante:</b> Esta página é apenas um agregador de manchetes e links. A Central IA não produz, valida, resume ou reproduz o conteúdo completo das notícias. Leia sempre a matéria original na fonte antes de formar opinião ou tomar decisões.</div>
+
+    <h2>Ferramentas relacionadas</h2>
+    <div class="related-tools"><a href="conversor-moedas.html">Conversor de Moedas</a><a href="previsao-tempo.html">Previsão do Tempo</a><a href="calculadora-cdi.html">Calculadora CDI</a></div>
+    <p><a class="ghost" href="index.html">← Voltar para a página inicial</a></p>
+  </article>
+</div></main>
+<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js"></script>
 <script>
 (function(){
   const grid = document.getElementById('news-grid');
   const status = document.getElementById('news-status');
   const buttons = document.querySelectorAll('[data-news-query]');
-  const safe = (value) => String(value || '').replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-  const formatDate = (value) => { if(!value) return 'Agora'; const date = new Date(value); if(Number.isNaN(date.getTime())) return 'Agora'; return date.toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}); };
-  async function loadNews(query='Brasil OR economia OR tecnologia OR negócios OR inteligência artificial'){
-    status.style.display = 'block'; status.innerHTML = '<h3>Carregando notícias...</h3><small>Aguarde alguns segundos.</small>'; grid.innerHTML = '';
-    try{
-      const response = await fetch('/.netlify/functions/noticias?q=' + encodeURIComponent(query));
-      const data = await response.json();
-      if(!response.ok || !data.ok) throw new Error(data.message || 'Não foi possível carregar as notícias agora.');
-      const items = (data.articles || []).filter(item => item.url).slice(0,12);
-      if(!items.length) throw new Error('Nenhuma manchete encontrada agora.');
-      status.style.display = 'none';
-      grid.innerHTML = items.map((item) => {
-        const source = safe(item.fonte || 'Fonte'); const title = safe(item.titulo); const date = safe(formatDate(item.data)); const link = safe(item.url); const img = item.urlToImage ? `<img src="${safe(item.urlToImage)}" alt="" loading="lazy">` : '<div class="news-placeholder">📰</div>';
-        return `<a class="news-card clickable-news" href="${link}" target="_blank" rel="noopener noreferrer nofollow">${img}<div class="news-body"><span class="news-source">${source}</span><h3>${title}</h3><p class="news-date">${date}</p><span class="btn">Ler notícia</span></div></a>`;
-      }).join('');
-    }catch(error){ status.style.display = 'block'; status.innerHTML = `<h3>Últimas notícias indisponíveis</h3><small>${safe(error.message)}</small>`; }
+  function formatDate(value){
+    if(!value) return 'Data não informada';
+    try{return new Intl.DateTimeFormat('pt-BR',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value));}catch(e){return value;}
   }
-  buttons.forEach(btn => btn.addEventListener('click', () => { buttons.forEach(b => b.classList.remove('active')); btn.classList.add('active'); loadNews(btn.getAttribute('data-news-query') || 'Brasil OR economia OR tecnologia OR negócios OR inteligência artificial'); }));
+  function setStatus(title, text){ status.innerHTML = `<h3>${title}</h3><small>${text||''}</small>`; }
+  function safe(text){ return String(text||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  async function loadNews(query=''){
+    grid.innerHTML='';
+    setStatus('Carregando notícias...', 'Buscando manchetes recentes.');
+    try{
+      const url = '/api/noticias' + (query ? '?q=' + encodeURIComponent(query) : '');
+      const response = await fetch(url, {headers:{'Accept':'application/json'}});
+      const data = await response.json().catch(()=>null);
+      if(!response.ok || !data || data.ok === false) throw new Error((data && data.message) || 'Não foi possível carregar as notícias agora.');
+      const articles = Array.isArray(data.articles) ? data.articles : [];
+      if(!articles.length){ setStatus('Nenhuma notícia encontrada', 'Tente outro filtro daqui a pouco.'); return; }
+      status.style.display='none';
+      grid.innerHTML = articles.map(item => {
+        const source = safe(item.fonte || 'Fonte');
+        const title = safe(item.titulo || 'Notícia sem título');
+        const date = safe(formatDate(item.data));
+        const link = safe(item.url || '#');
+        const img = item.urlToImage ? `<img src="${safe(item.urlToImage)}" alt="" loading="lazy">` : '<div class="news-placeholder">📰</div>';
+        return `<article class="news-card">${img}<div class="news-body"><span class="news-source">${source}</span><h3>${title}</h3><p class="news-date">${date}</p><a class="btn" href="${link}" target="_blank" rel="noopener noreferrer nofollow">Leia a matéria completa em ${source}</a></div></article>`;
+      }).join('');
+    }catch(err){
+      status.style.display='block';
+      setStatus('Não foi possível carregar as notícias', err.message || 'Verifique a configuração da função no Netlify e tente novamente.');
+    }
+  }
+  buttons.forEach(btn=>btn.addEventListener('click',()=>{
+    buttons.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    status.style.display='block';
+    loadNews(btn.getAttribute('data-news-query')||'');
+  }));
   loadNews();
 })();
 </script>

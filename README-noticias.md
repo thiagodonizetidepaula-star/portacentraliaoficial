@@ -1,67 +1,71 @@
 # Módulo Últimas Notícias — Portal Central IA
 
-Este módulo usa uma Netlify Function para buscar manchetes na NewsAPI.org sem expor sua chave no JavaScript do navegador.
+Este módulo usa uma Cloudflare Pages Function para buscar manchetes na NewsAPI.org sem expor sua chave no JavaScript do navegador.
 
-## Arquivos adicionados
+## Arquivos envolvidos
 
 - `noticias.html` — página pública das últimas notícias.
-- `netlify/functions/noticias.js` — função serverless que consulta a NewsAPI no servidor.
+- `index.html` — também mostra uma vitrine de notícias na entrada do site.
+- `functions/api/noticias.js` — função serverless (Cloudflare Pages Function) que consulta a NewsAPI no servidor.
 - `README-noticias.md` — este guia de configuração.
 
-## Por que usar Netlify Function?
+## Por que usar uma Pages Function?
 
-A chave da NewsAPI não deve ficar no front-end. Se ela fosse colocada em `fetch()` direto no navegador, qualquer visitante poderia ver a chave no código-fonte ou no painel de rede do navegador. A função serverless mantém a chave protegida em uma variável de ambiente do Netlify chamada `NEWS_API_KEY`.
+A chave da NewsAPI não deve ficar no front-end. Se ela fosse colocada em `fetch()` direto no navegador, qualquer visitante poderia ver a chave no código-fonte ou no painel de rede do navegador. A função mantém a chave protegida em uma variável de ambiente do Cloudflare chamada `NEWS_API_KEY`, acessada no servidor via `env.NEWS_API_KEY`.
 
-## Como configurar no painel do Netlify
+## Como configurar no painel do Cloudflare Pages
 
-1. Acesse sua conta no Netlify.
-2. Entre no site do **Portal Central IA**.
-3. Vá em **Site configuration**.
-4. Abra **Environment variables**.
-5. Clique em **Add a variable**.
-6. Em **Key**, coloque exatamente:
+1. Acesse o painel do Cloudflare (dash.cloudflare.com).
+2. Vá em **Workers & Pages** e abra o projeto do **Portal Central IA**.
+3. Clique em **Settings** (Configurações).
+4. Abra **Environment variables** (Variáveis de ambiente).
+5. Clique em **Add variable**.
+6. Em **Variable name**, coloque exatamente:
 
 ```text
 NEWS_API_KEY
 ```
 
 7. Em **Value**, cole sua chave da NewsAPI.org.
-8. Salve a variável.
+8. Marque para aplicar em **Production** (e também em Preview, se quiser testar em deploys de preview).
+9. Salve e faça um novo deploy (qualquer novo commit já dispara isso automaticamente).
 
-## Como garantir que as functions fiquem ativas no deploy
+## Como a função é detectada
 
-1. Verifique se o projeto enviado ao Netlify contém esta pasta:
-
-```text
-netlify/functions/noticias.js
-```
-
-2. Faça um novo deploy do ZIP completo no Netlify.
-3. Após o deploy, acesse:
+O Cloudflare Pages detecta automaticamente qualquer arquivo dentro da pasta `functions/` na raiz do projeto e transforma em uma rota. Como o arquivo está em:
 
 ```text
-https://portalcentralia.com.br/.netlify/functions/noticias
+functions/api/noticias.js
 ```
 
-4. Se estiver configurado corretamente, a resposta será um JSON com `ok: true` e uma lista de manchetes.
-5. Depois acesse:
+ele fica disponível em:
+
+```text
+https://portalcentralia.com.br/api/noticias
+```
+
+Não é necessário nenhum arquivo de configuração adicional — basta a pasta `functions/` estar na raiz do repositório que o Cloudflare já reconhece.
+
+## Como testar depois do deploy
+
+1. Acesse diretamente:
+
+```text
+https://portalcentralia.com.br/api/noticias
+```
+
+Se estiver configurado corretamente, a resposta será um JSON com `ok: true` e uma lista de manchetes.
+
+2. Depois acesse a página normal:
 
 ```text
 https://portalcentralia.com.br/noticias.html
 ```
 
-## Teste local opcional
-
-Para testar localmente, instale a CLI do Netlify e rode:
-
-```bash
-netlify dev
-```
-
-Depois acesse:
+E também confira a vitrine de notícias na home:
 
 ```text
-http://localhost:8888/noticias.html
+https://portalcentralia.com.br/
 ```
 
 ## Regras editoriais do módulo
@@ -73,11 +77,14 @@ http://localhost:8888/noticias.html
 
 ## Erros comuns
 
-### “NEWS_API_KEY não está configurada”
-A variável de ambiente ainda não foi criada no Netlify ou o nome foi digitado diferente.
+### "NEWS_API_KEY não está configurada"
+A variável de ambiente ainda não foi criada no Cloudflare Pages, foi digitada com nome diferente, ou foi salva só em Preview (e não em Production).
 
-### “A NewsAPI retornou um erro”
-Pode ser limite do plano, chave inválida, endpoint indisponível ou restrição da própria NewsAPI.
+### "A NewsAPI retornou um erro"
+Pode ser limite do plano gratuito, chave inválida, endpoint indisponível ou restrição da própria NewsAPI.
 
 ### A página carrega, mas não aparecem notícias
-Abra a URL da função diretamente para ver a mensagem de erro retornada em JSON.
+Abra `https://portalcentralia.com.br/api/noticias` diretamente no navegador para ver a mensagem de erro retornada em JSON — ela indica exatamente o que está errado.
+
+### Erro 404 em `/api/noticias`
+Confirme que a pasta `functions/api/noticias.js` realmente foi enviada ao repositório (às vezes pastas ficam de fora do commit por engano) e que o deploy mais recente já rodou.

@@ -18,10 +18,66 @@
 <span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span>
 </div></div>
 <nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="brand-mark"><img class="logo-svg" src="assets/img/logo-central-ia.svg" alt=""></span><span class="brand-name">Central <span class="brand-ia">IA</span></span></a><div class="menu"><a href="index.html#ferramentas">Ferramentas</a><a href="calculadora-financiamento.html">Financiamento</a><a href="calculadora-cdi.html">CDI</a><a href="controle-manutencao-carro.html">Carro</a><a href="calculadora-imc.html">IMC</a><a href="biblioteca-prompts-ia.html">Prompt IA</a><a href="gerador-prompt-ia.html">Gerador Prompt</a><a href="index.html#mentor-ia">Mentor IA</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div><div class="nav-actions"><a class="icon-btn" href="index.html#ferramentas" aria-label="Buscar ferramentas">🔎</a><button class="icon-btn" type="button" onclick="surpreenda()" aria-label="Me surpreenda">🎲</button></div></div></nav>
-<header class="hero hero-news-first"><div class="wrap hero-grid"><div class="hero-card news-first-card"><span class="badge">📰 Última hora</span><h1>Notícias para acompanhar agora</h1><p>Manchetes recentes em cards visuais. Clique na imagem para abrir a matéria completa no site original.</p><div class="news-mini-filters hero-news-filters" aria-label="Filtros rápidos de notícias"><button class="chip active" type="button" data-home-news-query="Brasil OR economia OR tecnologia OR negócios OR inteligência artificial">Principais</button><button class="chip" type="button" data-home-news-query="inteligência artificial OR tecnologia">IA e tecnologia</button><button class="chip" type="button" data-home-news-query="economia OR negócios">Economia</button><button class="chip" type="button" data-home-news-query="Brasil">Brasil</button></div><div id="home-news-status" class="result compact-news-status"><h3>Carregando últimas notícias...</h3><small>Aguarde alguns segundos.</small></div><div id="home-news-grid" class="home-news-grid hero-news-grid" aria-live="polite"></div></div>
-<div class="dashboard"><div class="dash-card"><div class="big-weather"><div><h3 id="weather_city_title">Tempo em São Paulo</h3><p id="weather_text" class="lead">Consultando clima em tempo real...</p></div><div><div id="weather_temp" class="temp">--°C</div><small id="weather_desc">Atualizando</small></div></div></div><div class="dash-card"><h3>Mercado agora</h3><div class="market-line"><div class="market">💵 Dólar<b data-usd>--</b></div><div class="market">💶 Euro<b data-eur>--</b></div><div class="market">₿ Bitcoin<b data-btc>--</b></div></div></div><div class="dash-card tool-day"><h3>⚡ Acesse ferramentas</h3><p>Finanças, carro, documentos, saúde, prompts e produtividade continuam disponíveis no portal.</p><div class="quick-grid compact-tools"><a class="quick" href="index.html#ferramentas">🧰 Ferramentas</a><a class="quick" href="controle-manutencao-carro.html">🚗 Carro</a><a class="quick" href="calculadora-cdi.html">📈 CDI</a><a class="quick" href="biblioteca-prompts-ia.html">🤖 Prompt IA</a></div></div></div></div></header>
+<header class="hero hero-news-first">
+  <div class="wrap hero-grid">
+    <div class="hero-card hero-news-card">
+      <span class="badge">📰 Última hora</span>
+      <h1>Notícias para acompanhar agora</h1>
+      <p>Manchetes recentes em cards visuais. Clique na imagem para abrir a matéria completa no site original.</p>
+
+      <div class="news-mini-filters" aria-label="Filtros rápidos de notícias">
+        <button class="chip active" type="button" data-home-news-query="Brasil OR política OR economia OR tecnologia">Principais</button>
+        <button class="chip" type="button" data-home-news-query="inteligência artificial OR tecnologia">IA e tecnologia</button>
+        <button class="chip" type="button" data-home-news-query="economia OR negócios">Economia</button>
+        <button class="chip" type="button" data-home-news-query="Brasil">Brasil</button>
+      </div>
+
+      <div id="home-news-status" class="result compact-news-status">
+        <h3>Carregando últimas notícias...</h3>
+        <small>Aguarde alguns segundos.</small>
+      </div>
+      <div id="home-news-grid" class="home-news-grid hero-news-grid" aria-live="polite"></div>
+
+      <div class="mini-actions hero-news-actions">
+        <a class="ghost" href="noticias.html">Ver todas as notícias</a>
+        <a class="secondary" href="#ferramentas">Ver ferramentas</a>
+      </div>
+    </div>
+
+    <div class="dashboard">
+      <div class="dash-card">
+        <div class="big-weather">
+          <div>
+            <h3 id="weather_city_title">Tempo em São Paulo</h3>
+            <p id="weather_text" class="lead">Consultando clima em tempo real...</p>
+          </div>
+          <div>
+            <div id="weather_temp" class="temp">--°C</div>
+            <small id="weather_desc">Atualizando</small>
+          </div>
+        </div>
+      </div>
+      <div class="dash-card">
+        <h3>Mercado agora</h3>
+        <div class="market-line">
+          <div class="market">💵 Dólar<b data-usd>--</b></div>
+          <div class="market">💶 Euro<b data-eur>--</b></div>
+          <div class="market">₿ Bitcoin<b data-btc>--</b></div>
+        </div>
+      </div>
+      <div class="dash-card tool-day">
+        <h3>⚡ Acesso rápido</h3>
+        <p>Finanças, documentos, veículos, saúde, prompts de IA e utilidades continuam logo abaixo das notícias.</p>
+        <div class="mini-actions">
+          <a class="btn" href="#ferramentas">Ferramentas</a>
+          <a class="ghost" href="biblioteca-prompts-ia.html">Prompt IA</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
 <main>
-<section class="section"><div class="wrap feature-strip"><div class="highlight"><div><span class="badge">✨ Descubra algo útil</span><h2>Um portal com cara de aplicativo.</h2><p class="lead">A primeira tela agora mostra ferramentas para usar de imediato, recomendações, clima, cotações e atalhos para resolver problemas com poucos toques.</p><div class="mini-actions"><button class="btn" onclick="surpreenda()">🎲 Me surpreenda</button><a class="ghost" href="biblioteca-prompts-ia.html">Ver Prompt IA</a></div></div><div class="highlight-visual">🧠⚙️</div></div><div class="info-card"><h3>📌 Status do projeto</h3><p><b>35+</b> ferramentas e módulos em construção.</p><p><b>100%</b> focado em celular, SEO e utilidade real.</p><p><b>Grátis</b> para atrair uso recorrente e tráfego orgânico.</p></div></div></section>
 <section class="section" id="categorias"><div class="wrap"><div class="section-head"><div><h2>Categorias principais</h2><p class="lead">Organização visual para o usuário encontrar rapidamente o que precisa.</p></div></div><div class="cat-grid">
 <a class="cat-card" href="#ferramentas" onclick="filtrar('financeiro')"><div class="icon">💰</div><h3>Finanças</h3><p>CDI, lucro e financiamento.</p><span class="cat-art">💹</span></a>
 <a class="cat-card" href="#veiculos" onclick="filtrar('veiculos')"><div class="icon">🚗</div><h3>Veículos</h3><p>Gastos, manutenção e consumo.</p><span class="cat-art">🚘</span></a>
@@ -146,12 +202,12 @@
     if(Number.isNaN(date.getTime())) return 'Agora';
     return date.toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
   };
-  async function loadHomeNews(query=''){
+  async function loadHomeNews(query='Brasil OR política OR economia OR tecnologia'){
     status.style.display='block';
     status.innerHTML='<h3>Carregando últimas notícias...</h3><small>Buscando manchetes recentes.</small>';
     grid.innerHTML='';
     try{
-      const url='/.netlify/functions/noticias' + (query ? '?q=' + encodeURIComponent(query) : '');
+      const url='/api/noticias' + (query ? '?q=' + encodeURIComponent(query) : '');
       const response=await fetch(url, {headers:{'Accept':'application/json'}});
       const data=await response.json().catch(()=>null);
       if(!response.ok || !data || data.ok===false) throw new Error((data && data.message) || 'Não foi possível carregar as notícias agora.');
@@ -174,9 +230,9 @@
   buttons.forEach(btn => btn.addEventListener('click',()=>{
     buttons.forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    loadHomeNews(btn.getAttribute('data-home-news-query') || '');
+    loadHomeNews(btn.getAttribute('data-home-news-query') || 'Brasil OR política OR economia OR tecnologia');
   }));
-  loadHomeNews('Brasil OR economia OR tecnologia OR negócios OR inteligência artificial');
+  loadHomeNews('Brasil OR política OR economia OR tecnologia');
 })();
 </script>
 </body></html>
