@@ -1,1 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contato - Central IA</title>
+<meta name="description" content="Entre em contato com a Central IA para enviar sugestões, informar problemas ou solicitar melhorias nas ferramentas gratuitas do portal.">
+<link rel="stylesheet" href="assets/css/style.css?v=32">
+<link rel="icon" href="assets/img/favicon.ico" sizes="any">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+</head>
+<body>
+<div class="topbar"><div class="ticker"><span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span><span>🤖 Ferramentas inteligentes para o dia a dia</span><span>📄 Documentos para imprimir e baixar</span><span>🚗 Controle do veículo</span><span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span></div></div>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="brand-mark"><img class="logo-svg" src="assets/img/logo-central-ia.svg" alt="Central IA"></span><span class="brand-name">Central <span class="brand-ia">IA</span></span></a><div class="menu"><a href="index.html#ferramentas">Ferramentas</a><a href="calculadora-financiamento.html">Financiamento</a><a href="calculadora-cdi.html">CDI</a><a href="controle-manutencao-carro.html">Carro</a><a href="calculadora-imc.html">IMC</a><a href="biblioteca-prompts-ia.html">Prompt IA</a><a href="gerador-prompt-ia.html">Gerador Prompt</a><a href="mentor-ia.html">Mentor IA</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div><div class="nav-actions"><a class="icon-btn" href="index.html#ferramentas" aria-label="Buscar ferramentas">🔎</a><button class="icon-btn" type="button" onclick="surpreenda()" aria-label="Me surpreenda">🎲</button></div></div></nav>
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-card">
+      <span class="badge">📩 Contato</span>
+      <h1>Fale com a Central IA</h1>
+      <p>Envie sugestões, informe problemas nas ferramentas ou solicite melhorias para o portal.</p>
+      <div class="mini-actions">
+        <a class="btn" href="mailto:thiagodonizetidepaula@gmail.com?subject=Contato%20Central%20IA">Enviar e-mail</a>
+        <a class="ghost" href="index.html#ferramentas">Voltar às ferramentas</a>
+      </div>
+    </div>
+    <div class="dashboard">
+      <div class="dash-card"><h3>O que você pode enviar</h3><p>Ideias de novas ferramentas, correções, parcerias, dúvidas sobre uso do site e sugestões de conteúdo.</p></div>
+      <div class="dash-card"><h3>Resposta</h3><p>As mensagens são analisadas com prioridade para melhorar a experiência dos usuários.</p></div>
+    </div>
+  </div>
+</header>
+<main>
+<section class="section"><div class="wrap"><div class="grid">
+  <div class="panel">
+    <h2>Formulário rápido</h2>
+    <p class="lead">Preencha os campos abaixo. Ao clicar em enviar, seu aplicativo de e-mail será aberto com a mensagem pronta.</p>
+    <form class="form" onsubmit="enviarContato(event)">
+      <input id="contatoNome" type="text" placeholder="Seu nome" required>
+      <input id="contatoEmail" type="email" placeholder="Seu e-mail" required>
+      <select id="contatoAssunto" required>
+        <option value="Sugestão para a Central IA">Sugestão</option>
+        <option value="Problema encontrado na Central IA">Informar problema</option>
+        <option value="Parceria com a Central IA">Parceria</option>
+        <option value="Dúvida sobre a Central IA">Dúvida</option>
+      </select>
+      <textarea id="contatoMensagem" placeholder="Digite sua mensagem" required></textarea>
+      <button class="btn" type="submit">Enviar mensagem</button>
+    </form>
+  </div>
+  <div class="panel">
+    <h2>Canais</h2>
+    <div class="values-list">
+      <div><strong>E-mail</strong><p><a href="mailto:thiagodonizetidepaula@gmail.com">thiagodonizetidepaula@gmail.com</a></p></div>
+      <div><strong>Portal</strong><p>Central IA - ferramentas gratuitas para facilitar tarefas do dia a dia.</p></div>
+      <div><strong>Importante</strong><p>Não envie dados sensíveis, senhas, documentos completos ou informações bancárias pelo formulário.</p></div>
+    </div>
+  </div>
+</div></div></section>
+</main>
+<script>
+function enviarContato(event){
+  event.preventDefault();
+  const nome = document.getElementById('contatoNome').value.trim();
+  const email = document.getElementById('contatoEmail').value.trim();
+  const assunto = document.getElementById('contatoAssunto').value;
+  const mensagem = document.getElementById('contatoMensagem').value.trim();
+  const corpo = encodeURIComponent(`Nome: ${nome}
+E-mail: ${email}
 
+Mensagem:
+${mensagem}`);
+  window.location.href = `mailto:thiagodonizetidepaula@gmail.com?subject=${encodeURIComponent(assunto)}&body=${corpo}`;
+}
+</script>
+<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=32"></script>
+</body></html>
