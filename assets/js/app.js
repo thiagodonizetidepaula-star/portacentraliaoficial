@@ -64,9 +64,13 @@ async function buscarClima(){
     const g=geo.results[0];
     const w=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${g.latitude}&longitude=${g.longitude}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto`).then(r=>r.json());
     const c=w.current||{}; const desc=weatherCode(c.weather_code);
-    const text=`${g.name}${g.admin1?' - '+g.admin1:''}: ${NUM.format(c.temperature_2m)}°C, ${desc}, umidade ${c.relative_humidity_2m||'-'}%, vento ${c.wind_speed_10m||'-'} km/h.`;
-    setHtml('weather_result',`<h3>${g.name}</h3><p><b>${NUM.format(c.temperature_2m)}°C</b> — ${desc}</p><p>Umidade: <b>${c.relative_humidity_2m||'-'}%</b></p><p>Vento: <b>${c.wind_speed_10m||'-'} km/h</b></p><small>Fonte: Open-Meteo. Pode variar conforme localização.</small>`);
-    updateWeatherHeader(`${NUM.format(c.temperature_2m)}°C`,desc,text,g.name);
+    const tempNum = Number(c.temperature_2m);
+    const temp = Number.isFinite(tempNum) ? `${NUM.format(tempNum)}°C` : '--°C';
+    const humidity = c.relative_humidity_2m ?? '-';
+    const wind = c.wind_speed_10m ?? '-';
+    const text=`${g.name}${g.admin1?' - '+g.admin1:''}: ${temp}, ${desc}, umidade ${humidity}%, vento ${wind} km/h.`;
+    setHtml('weather_result',`<h3>${g.name}</h3><p><b>${temp}</b> — ${desc}</p><p>Umidade: <b>${humidity}%</b></p><p>Vento: <b>${wind} km/h</b></p><small>Fonte: Open-Meteo. Pode variar conforme localização.</small>`);
+    updateWeatherHeader(temp,desc,text,g.name);
   }catch(e){setHtml('weather_result',`<h3>Não foi possível consultar</h3><p>Tente outra cidade ou verifique a conexão.</p>`);toast('Clima não carregou agora')}
 }
 function weatherCode(code){const map={0:'céu limpo',1:'principalmente claro',2:'parcialmente nublado',3:'nublado',45:'neblina',48:'neblina com geada',51:'garoa fraca',53:'garoa',55:'garoa forte',61:'chuva fraca',63:'chuva',65:'chuva forte',80:'pancadas fracas',81:'pancadas',82:'pancadas fortes',95:'trovoadas'};return map[code]||'condição variável'}
