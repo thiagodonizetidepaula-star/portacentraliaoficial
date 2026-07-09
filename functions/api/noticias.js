@@ -1,59 +1,18 @@
-export async function onRequestGet(context) {
-  const { request, env } = context;
-  const headers = {
-    'Content-Type': 'application/json; charset=utf-8',
-    'Cache-Control': 'public, max-age=300'
-  };
-
-  const apiKey = env.NEWS_API_KEY;
-  if (!apiKey) {
-    return new Response(JSON.stringify({
-      ok: false,
-      message: 'A variável de ambiente NEWS_API_KEY não está configurada no Cloudflare Pages.'
-    }), { status: 500, headers });
-  }
-
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=300' } });
+}
+function cleanText(value){return String(value||'').replace(/<!\[CDATA\[(.*?)\]\]>/gs,'$1').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&apos;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').trim();}
+function xmlValue(item,tag){const re=new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tag}>`,'i');const m=item.match(re);return m?cleanText(m[1]):'';}
+async function fallbackRss(query){const q=encodeURIComponent(query||'Brasil notícias');const r=await fetch(`https://news.google.com/rss/search?q=${q}&hl=pt-BR&gl=BR&ceid=BR:pt-419`);if(!r.ok)throw new Error('Falha ao consultar RSS.');const xml=await r.text();const items=[...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)].slice(0,12);return{ok:true,source:'rss',articles:items.map(m=>{const item=m[1];return{titulo:xmlValue(item,'title'),fonte:xmlValue(item,'source')||'Google Notícias',data:xmlValue(item,'pubDate')||null,url:xmlValue(item,'link'),urlToImage:null};}).filter(a=>a.titulo&&a.url)}}
+export async function onRequestGet({request, env}) {
   const url = new URL(request.url);
-  const query = (url.searchParams.get('q') || 'Brasil OR política OR economia OR tecnologia').trim();
-  const endpoint = new URL('https://newsapi.org/v2/everything');
-
-  endpoint.searchParams.set('q', query);
-  endpoint.searchParams.set('language', 'pt');
-  endpoint.searchParams.set('sortBy', 'publishedAt');
-
-  endpoint.searchParams.set('pageSize', '12');
-  endpoint.searchParams.set('apiKey', apiKey);
-
-  try {
-    const response = await fetch(endpoint.toString(), {
-      headers: { 'User-Agent': 'PortalCentralIA/1.0' }
-    });
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok || data.status === 'error') {
-      return new Response(JSON.stringify({
-        ok: false,
-        message: data.message || 'A NewsAPI retornou um erro ao buscar as notícias.'
-      }), { status: response.status || 502, headers });
-    }
-
-    const articles = (data.articles || [])
-      .filter((article) => article && article.title && article.url)
-      .sort((a,b) => Number(Boolean(b.urlToImage)) - Number(Boolean(a.urlToImage)))
-      .slice(0, 12)
-      .map((article) => ({
-        titulo: article.title,
-        fonte: article.source && article.source.name ? article.source.name : 'Fonte não informada',
-        data: article.publishedAt || null,
-        url: article.url,
-        urlToImage: article.urlToImage || null
-      }));
-
-    return new Response(JSON.stringify({ ok: true, articles }), { status: 200, headers });
-  } catch (error) {
-    return new Response(JSON.stringify({
-      ok: false,
-      message: 'Não foi possível conectar à NewsAPI agora. Tente novamente mais tarde.'
-    }), { status: 502, headers });
-  }
+  const rawQuery = (url.searchParams.get('q') || '').trim();
+  const query = rawQuery || 'Brasil OR política OR economia OR tecnologia';
+  const apiKey = env.NEWS_API_KEY;
+  if (!apiKey) return json(await fallbackRss(query));
+  const endpoint = new URL(rawQuery ? 'https://newsapi.org/v2/everything' : 'https://newsapi.org/v2/top-headlines');
+  if (rawQuery) { endpoint.searchParams.set('q', query); endpoint.searchParams.set('language','pt'); endpoint.searchParams.set('sortBy','publishedAt'); }
+  else { endpoint.searchParams.set('country','br'); }
+  endpoint.searchParams.set('pageSize','12'); endpoint.searchParams.set('apiKey',apiKey);
+  try { const resp=await fetch(endpoint.toString(),{headers:{'User-Agent':'PortalCentralIA/1.0'}}); const data=await resp.json().catch(()=>({})); if(!resp.ok||data.status==='error') return json(await fallbackRss(query)); const articles=(data.articles||[]).filter(a=>a&&a.title&&a.url).sort((a,b)=>Number(Boolean(b.urlToImage))-Number(Boolean(a.urlToImage))).slice(0,12).map(a=>({titulo:a.title,fonte:a.source&&a.source.name?a.source.name:'Fonte não informada',data:a.publishedAt||null,url:a.url,urlToImage:a.urlToImage||null})); return json({ok:true,source:'newsapi',articles}); } catch(e) { return json(await fallbackRss(query)); }
 }
