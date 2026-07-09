@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mentor IA - Central IA</title>
+<meta name="description" content="Mentor IA da Central IA com orientação por temas: dinheiro, trabalho, negócios, família, relacionamento, estudo, saúde, hábitos, emocional e objetivos.">
+<meta property="og:title" content="Central IA - Ferramentas Gratuitas">
+<meta property="og:description" content="Portal brasileiro com ferramentas online úteis para facilitar o dia a dia.">
+<meta property="og:type" content="website">
+<link rel="stylesheet" href="assets/css/style.css?v=32">
+<link rel="icon" href="assets/img/favicon.ico" sizes="any">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Central IA","description":"Ferramentas gratuitas para empreendedores e utilidades online.","potentialAction":{"@type":"SearchAction","target":"/?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+</head>
+<body>
+<div class="topbar"><div class="ticker">
+<span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span><span>🤖 Novidade: Biblioteca Prompt IA</span><span>🚗 Controle do Carro com relatório</span>
+<span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span>
+</div></div>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="brand-mark"><img class="logo-svg" src="assets/img/logo-central-ia.svg" alt=""></span><span class="brand-name">Central <span class="brand-ia">IA</span></span></a><div class="menu"><a href="index.html#ferramentas">Ferramentas</a><a href="calculadora-financiamento.html">Financiamento</a><a href="calculadora-cdi.html">CDI</a><a href="controle-manutencao-carro.html">Carro</a><a href="calculadora-imc.html">IMC</a><a href="biblioteca-prompts-ia.html">Prompt IA</a><a href="gerador-prompt-ia.html">Gerador Prompt</a><a href="mentor-ia.html">Mentor IA</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div><div class="nav-actions"><a class="icon-btn" href="index.html#ferramentas" aria-label="Buscar ferramentas">🔎</a><button class="icon-btn" type="button" onclick="surpreenda()" aria-label="Me surpreenda">🎲</button></div></div></nav>
+<section class="section mentor-section" id="mentor-ia">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h1>Central IA Mentor</h1>
+        <p class="lead">Escolha um tema, conte sua situação e receba uma orientação organizada em diagnóstico, conselho, plano de ação e próximos passos.</p>
+        <p class="lead"><small>Conteúdos informativos. Não substitui atendimento profissional em saúde, psicologia, direito ou finanças.</small></p>
+      </div>
+    </div>
+
+    <div class="mentor-layout">
+      <div class="mentor-panel">
+        <h3>Escolha o tema</h3>
+        <div class="mentor-topics" id="mentor_topics">
+          <button class="mentor-topic active" data-topic="dinheiro"><span>💰</span><b>Dinheiro</b><small>Dívidas, renda e organização.</small></button>
+          <button class="mentor-topic" data-topic="trabalho"><span>💼</span><b>Trabalho</b><small>Carreira, emprego e rotina.</small></button>
+          <button class="mentor-topic" data-topic="negocios"><span>🚀</span><b>Negócios</b><small>Ideias, vendas e crescimento.</small></button>
+          <button class="mentor-topic" data-topic="familia"><span>👨‍👩‍👧</span><b>Família</b><small>Diálogo, limites e convivência.</small></button>
+          <button class="mentor-topic" data-topic="relacionamento"><span>❤️</span><b>Relacionamento</b><small>Conversa, respeito e decisões.</small></button>
+          <button class="mentor-topic" data-topic="estudos"><span>📚</span><b>Estudos</b><small>Foco, plano e disciplina.</small></button>
+          <button class="mentor-topic" data-topic="saude"><span>🩺</span><b>Saúde</b><small>Cuidados, corpo e bem-estar.</small></button>
+          <button class="mentor-topic" data-topic="habitos"><span>💪</span><b>Hábitos</b><small>Rotina, disciplina e constância.</small></button>
+          <button class="mentor-topic" data-topic="emocional"><span>🧘</span><b>Emocional</b><small>Ansiedade leve, clareza e calma.</small></button>
+          <button class="mentor-topic" data-topic="objetivos"><span>🎯</span><b>Objetivos</b><small>Metas, direção e próximos passos.</small></button>
+        </div>
+
+        <div class="mentor-form">
+          <label>Conte o que está acontecendo</label>
+          <textarea id="mentor_problem" rows="5" placeholder="Exemplo: estou com muitas dívidas, desempregado e não sei por onde começar..."></textarea>
+
+          <div class="mentor-row">
+            <div>
+              <label>Como você está se sentindo?</label>
+              <select id="mentor_feeling">
+                <option value="perdido">Perdido(a)</option>
+                <option value="ansioso">Ansioso(a)</option>
+                <option value="cansado">Cansado(a)</option>
+                <option value="motivado">Motivado(a)</option>
+                <option value="triste">Triste</option>
+                <option value="pressionado">Pressionado(a)</option>
+              </select>
+            </div>
+            <div>
+              <label>Estilo do mentor</label>
+              <select id="mentor_style">
+                <option value="pratico">Prático e direto</option>
+                <option value="professor">Professor</option>
+                <option value="empreendedor">Empreendedor</option>
+                <option value="produtividade">Produtividade</option>
+                <option value="biblico">Princípios bíblicos</option>
+                <option value="calmo">Calmo e acolhedor</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="btn wide" onclick="gerarMentor()">Gerar conselho</button>
+        </div>
+      </div>
+
+      <div class="mentor-output">
+        <div class="mentor-illustration" id="mentor_visual">
+          <div class="orb">🧠</div>
+          <h3>Seu conselho aparecerá aqui</h3>
+          <p>Escolha um tema, descreva sua situação e gere uma orientação organizada para copiar, imprimir, baixar ou enviar por e-mail.</p>
+        </div>
+        <div class="result mentor-result" id="mentor_result">
+          <h3>Resultado</h3>
+          <small>Aguardando sua situação...</small>
+        </div>
+        <div class="mini-actions mentor-actions">
+          <button class="ghost" onclick="copyFrom('mentor_result')">Copiar</button>
+          <button class="ghost" onclick="downloadBlock('mentor_result','conselho-mentor-ia.txt')">Baixar TXT</button>
+          <button class="ghost" onclick="printBlock('mentor_result')">Imprimir / PDF</button>
+          <button class="ghost" onclick="mailBlock('mentor_result','Conselho do Mentor IA')">Enviar por e-mail</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=32"></script>
+</body></html>
