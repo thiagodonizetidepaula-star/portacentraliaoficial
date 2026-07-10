@@ -657,3 +657,134 @@ button,input,textarea,select,.btn,.ghost,.secondary,.chip,.badge,.ticker,.menu,.
 .institutional-page .mini-actions{
   margin-top:22px;
 }
+
+
+/* v37 — imagens fotográficas visíveis nos cards de notícias */
+.home-news-card::after{background:linear-gradient(180deg,rgba(8,18,38,.04) 16%,rgba(8,18,38,.86) 100%) !important}
+.home-news-card img,.news-card img{background:#e8edf5}
+
+
+/* v38 — menu móvel e navegação compacta */
+.mobile-menu-toggle{
+  display:none;
+  width:46px;
+  height:46px;
+  min-width:46px;
+  padding:0;
+  border:1px solid #b8aa96;
+  border-radius:14px;
+  background:#fffefa;
+  color:#173b72;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-size:0;
+  position:relative;
+  z-index:72;
+}
+.mobile-menu-toggle span,
+.mobile-menu-toggle::before,
+.mobile-menu-toggle::after{
+  content:"";
+  display:block;
+  width:22px;
+  height:2px;
+  border-radius:2px;
+  background:currentColor;
+  position:absolute;
+  left:11px;
+  transition:transform .22s ease,opacity .22s ease,top .22s ease;
+}
+.mobile-menu-toggle::before{top:14px}
+.mobile-menu-toggle span{top:21px}
+.mobile-menu-toggle::after{top:28px}
+.mobile-menu-toggle[aria-expanded="true"]::before{top:21px;transform:rotate(45deg)}
+.mobile-menu-toggle[aria-expanded="true"] span{opacity:0}
+.mobile-menu-toggle[aria-expanded="true"]::after{top:21px;transform:rotate(-45deg)}
+.mobile-menu-backdrop{
+  position:fixed;
+  inset:0;
+  z-index:60;
+  background:rgba(15,23,42,.46);
+  opacity:0;
+  visibility:hidden;
+  transition:.22s ease;
+}
+.mobile-menu-panel{
+  position:fixed;
+  z-index:70;
+  top:0;
+  right:0;
+  width:min(86vw,360px);
+  height:100dvh;
+  padding:24px 20px 30px;
+  background:#fffefa;
+  border-left:1px solid #d8d0c3;
+  box-shadow:-18px 0 50px rgba(15,23,42,.18);
+  transform:translateX(105%);
+  transition:transform .24s ease;
+  overflow-y:auto;
+}
+.mobile-menu-panel .mobile-menu-title{
+  margin:4px 0 18px;
+  padding-bottom:16px;
+  border-bottom:1px solid #d8d0c3;
+  font-size:25px;
+  font-weight:600;
+  color:#111827;
+}
+.mobile-menu-links{display:grid;gap:4px}
+.mobile-menu-links a{
+  display:flex;
+  align-items:center;
+  min-height:48px;
+  padding:11px 12px;
+  border-radius:12px;
+  color:#1f2937;
+  font-size:18px;
+  font-weight:500;
+  border-bottom:1px solid #eee8de;
+}
+.mobile-menu-links a:hover,.mobile-menu-links a:focus{background:#f7f3eb;color:#173b72}
+body.mobile-menu-open{overflow:hidden}
+body.mobile-menu-open .mobile-menu-backdrop{opacity:1;visibility:visible}
+body.mobile-menu-open .mobile-menu-panel{transform:translateX(0)}
+@media(max-width:900px){
+  .nav-actions{display:flex !important}
+  .mobile-menu-toggle{display:inline-flex}
+}
+
+
+/* v39 — busca inteligente, atalhos e refinamento mobile */
+.home-search-section{padding-top:24px;padding-bottom:14px}
+.home-search-panel{background:#fffefa;border:1px solid #d8d0c3;border-radius:24px;padding:24px;display:grid;grid-template-columns:1fr minmax(360px,.8fr);gap:22px;align-items:center}
+.home-search-panel h2{font-size:clamp(28px,4vw,42px);margin:5px 0 8px}
+.home-search-panel p{margin:0;color:#4b5563;line-height:1.55}
+.search-kicker{font-size:12px;text-transform:uppercase;letter-spacing:.12em;font-weight:700;color:#8b1e2d}
+.smart-search{display:flex;align-items:center;gap:10px;border:1px solid #b8aa96;background:#fff;border-radius:16px;padding:8px 9px 8px 14px;box-shadow:0 8px 24px rgba(17,24,39,.05)}
+.smart-search:focus-within{border-color:#173b72;box-shadow:0 0 0 4px rgba(23,59,114,.1)}
+.smart-search input{width:100%;border:0;outline:0;background:transparent;font:inherit;font-size:17px;color:#111827;min-width:0}
+.smart-search button{border:0;background:#f2eee7;color:#334155;border-radius:10px;padding:10px 12px;font:inherit;font-weight:600;cursor:pointer}
+.search-feedback{grid-column:2;color:#6b7280;font-size:14px;margin-top:-14px}
+.popular-tools-section{padding-top:18px;padding-bottom:18px}
+.popular-tools-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.popular-tools-grid a{background:#fffefa;border:1px solid #d8d0c3;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:5px;min-height:126px;transition:.18s ease}
+.popular-tools-grid a:hover{transform:translateY(-3px);border-color:#b8aa96;box-shadow:0 10px 24px rgba(17,24,39,.07)}
+.popular-tools-grid span{font-size:28px}.popular-tools-grid b{font-size:17px;color:#111827}.popular-tools-grid small{color:#6b7280;line-height:1.35}
+#ferramentas.search-empty .tools-list::after{content:'Nenhuma ferramenta encontrada. Tente outra palavra.';display:block;grid-column:1/-1;padding:26px;border:1px dashed #b8aa96;border-radius:18px;text-align:center;color:#6b7280;background:#fffefa}
+@media(max-width:900px){
+  .home-search-panel{grid-template-columns:1fr;padding:20px}
+  .search-feedback{grid-column:1;margin-top:-10px}
+  .popular-tools-grid{grid-template-columns:1fr 1fr}
+  .nav{position:sticky;top:32px;z-index:50}
+}
+@media(max-width:560px){
+  .home-search-section{padding-top:16px}
+  .home-search-panel{border-radius:18px;padding:17px}
+  .smart-search{padding-left:12px}.smart-search input{font-size:16px}.smart-search button{padding:9px 10px}
+  .popular-tools-grid{grid-template-columns:1fr}
+  .popular-tools-grid a{min-height:auto;display:grid;grid-template-columns:42px 1fr;column-gap:10px;align-items:center}
+  .popular-tools-grid a span{grid-row:1/3}.popular-tools-grid a small{grid-column:2}
+}
+/* Gerador de QR Code — v40 */
+.qr-form label{font-weight:650;margin-top:4px}.qr-output{min-height:300px;margin-top:10px;padding:20px;border:1px dashed #cbd5e1;border-radius:16px;background:#f8fafc;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:auto}.qr-output canvas{display:block;max-width:100%;height:auto;border:10px solid #fff;box-shadow:0 8px 24px rgba(15,23,42,.10)}.qr-output p{margin:16px 0 0;color:#64748b;font-size:.92rem}.mini-actions button:disabled{opacity:.45;cursor:not-allowed}@media(max-width:720px){.qr-output{min-height:260px;padding:14px}.qr-output canvas{border-width:6px}}

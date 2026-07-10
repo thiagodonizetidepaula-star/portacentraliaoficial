@@ -11,3 +11,8 @@
   from = "/api/copa"
   to = "/.netlify/functions/copa"
   status = 200
+
+[[redirects]]
+  from = "/api/noticia-imagem"
+  to = "/.netlify/functions/noticia-imagem"
+  status = 200

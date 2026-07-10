@@ -59,6 +59,32 @@ function parseRss(xml) {
   }).filter((article) => article.titulo && article.url);
 }
 
+
+function imageSeed(article, tema) {
+  const base = `${tema}-${article.fonte || ''}-${article.titulo || ''}`
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 80) || `centralia-${tema}`;
+  return `https://picsum.photos/seed/${encodeURIComponent(base)}/1200/700`;
+}
+
+function detectTheme(params = {}) {
+  const category = String(params.categoria || '').toLowerCase();
+  if (CATEGORY_QUERIES[category]) return category;
+  const q = String(params.q || '').toLowerCase();
+  if (/economia|negócio|mercado|financeiro/.test(q)) return 'economia';
+  if (/tecnologia|inteligência artificial|\bia\b/.test(q)) return 'tecnologia';
+  if (/mundo|internacional/.test(q)) return 'mundo';
+  if (/esporte|futebol/.test(q)) return 'esportes';
+  if (/saúde|saude/.test(q)) return 'saude';
+  if (/entretenimento|cultura/.test(q)) return 'entretenimento';
+  if (/brasil|política|politica/.test(q)) return 'brasil';
+  return 'principais';
+}
+
 function buildQuery(params = {}) {
   const category = String(params.categoria || '').toLowerCase();
   const supplied = String(params.q || '').trim();
@@ -74,7 +100,9 @@ exports.handler = async function(event) {
 
   if (event.httpMethod === 'OPTIONS') return { statusCode: 204, headers, body: '' };
 
-  const query = buildQuery(event.queryStringParameters || {});
+  const params = event.queryStringParameters || {};
+  const query = buildQuery(params);
+  const tema = detectTheme(params);
   const endpoint = new URL('https://news.google.com/rss/search');
   endpoint.searchParams.set('q', query);
   endpoint.searchParams.set('hl', 'pt-BR');
@@ -91,7 +119,12 @@ exports.handler = async function(event) {
 
     if (!response.ok) throw new Error(`Feed indisponível (${response.status})`);
     const xml = await response.text();
-    const articles = parseRss(xml).slice(0, 18);
+    const articles = parseRss(xml).slice(0, 18).map((article) => ({
+      ...article,
+      tema,
+      urlToImage: article.urlToImage || imageSeed(article, tema),
+      imagemIlustrativa: !article.urlToImage
+    }));
 
     if (!articles.length) throw new Error('O feed não retornou manchetes neste momento.');
 

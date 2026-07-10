@@ -35,8 +35,40 @@ function printBlock(id){
 
 function setupMasks(){ $$('.money').forEach(i=>{i.addEventListener('input',()=>maskMoney(i));i.addEventListener('blur',()=>maskMoney(i));}); }
 function setupFilters(){
-  $$('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>{const f=btn.dataset.filter;$$('[data-filter]').forEach(b=>b.classList.remove('active'));btn.classList.add('active');$$('.tool-card').forEach(c=>{c.style.display=(f==='todos'||c.dataset.cat===f)?'flex':'none'});document.getElementById('ferramentas')?.scrollIntoView({behavior:'smooth'});}));
-  $('#search')?.addEventListener('input',e=>{const q=e.target.value.toLowerCase();$$('.tool-card').forEach(c=>{c.style.display=c.innerText.toLowerCase().includes(q)?'flex':'none'})});
+  const cards=[...$$('.tool-card')];
+  const search=$('#search');
+  const feedback=$('#search-feedback');
+  const clear=$('#clear-search');
+  const normalize=(value)=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+  const updateFeedback=(count,query='')=>{
+    if(!feedback)return;
+    feedback.textContent=query ? (count===1?'1 ferramenta encontrada.':`${count} ferramentas encontradas.`) : 'Todas as ferramentas estão disponíveis abaixo.';
+  };
+  const applySearch=(value)=>{
+    const q=normalize(value);
+    let visible=0;
+    $$('[data-filter]').forEach(b=>b.classList.toggle('active',b.dataset.filter==='todos'));
+    cards.forEach(card=>{
+      const match=!q||normalize(card.innerText).includes(q)||normalize(card.dataset.cat).includes(q);
+      card.style.display=match?'flex':'none';
+      if(match)visible++;
+    });
+    updateFeedback(visible,q);
+    document.getElementById('ferramentas')?.classList.toggle('search-empty',visible===0);
+  };
+  $$('[data-filter]').forEach(btn=>btn.addEventListener('click',()=>{
+    const f=btn.dataset.filter;
+    if(search)search.value='';
+    $$('[data-filter]').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    let visible=0;
+    cards.forEach(c=>{const show=f==='todos'||c.dataset.cat===f;c.style.display=show?'flex':'none';if(show)visible++});
+    updateFeedback(visible,'');
+    document.getElementById('ferramentas')?.scrollIntoView({behavior:'smooth',block:'start'});
+  }));
+  search?.addEventListener('input',e=>applySearch(e.target.value));
+  search?.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('ferramentas')?.scrollIntoView({behavior:'smooth',block:'start'})}});
+  clear?.addEventListener('click',()=>{if(!search)return;search.value='';applySearch('');search.focus()});
 }
 
 function calcFin(){const pv=moneyToNumber(getVal('fin_valor')),juros=Number(getVal('fin_juros').replace(',','.'))/100,n=Number(getVal('fin_prazo'));if(!pv||!n){toast('Preencha valor e prazo');return}let p=juros?pv*(juros*Math.pow(1+juros,n))/(Math.pow(1+juros,n)-1):pv/n;let total=p*n;setHtml('fin_result',`<h3>Resultado do financiamento</h3><p>Parcela estimada: <b>${BRL.format(p)}</b></p><p>Total pago: <b>${BRL.format(total)}</b></p><p>Juros totais: <b>${BRL.format(total-pv)}</b></p><small>Cálculo estimado pela Tabela Price. Consulte sempre a instituição financeira.</small>`)}
@@ -266,3 +298,70 @@ function gerarMentor(){
   setHtml('mentor_result',html);
   toast('Conselho gerado');
 }
+
+
+// v38 — menu móvel criado automaticamente em todas as páginas
+(function initMobileMenu(){
+  function setup(){
+    const nav=document.querySelector('.nav');
+    const navInner=document.querySelector('.nav-inner');
+    const desktopMenu=document.querySelector('.nav .menu');
+    if(!nav || !navInner || !desktopMenu || document.querySelector('.mobile-menu-toggle')) return;
+
+    let actions=navInner.querySelector('.nav-actions');
+    if(!actions){
+      actions=document.createElement('div');
+      actions.className='nav-actions';
+      navInner.appendChild(actions);
+    }
+
+    const toggle=document.createElement('button');
+    toggle.className='mobile-menu-toggle';
+    toggle.type='button';
+    toggle.setAttribute('aria-label','Abrir menu');
+    toggle.setAttribute('aria-expanded','false');
+    toggle.setAttribute('aria-controls','mobile-menu-panel');
+    toggle.innerHTML='<span></span>';
+    actions.appendChild(toggle);
+
+    const backdrop=document.createElement('div');
+    backdrop.className='mobile-menu-backdrop';
+    backdrop.hidden=false;
+
+    const panel=document.createElement('aside');
+    panel.className='mobile-menu-panel';
+    panel.id='mobile-menu-panel';
+    panel.setAttribute('aria-label','Menu principal');
+    panel.innerHTML='<div class="mobile-menu-title">Central IA</div><nav class="mobile-menu-links"></nav>';
+    const links=panel.querySelector('.mobile-menu-links');
+    desktopMenu.querySelectorAll('a').forEach(a=>links.appendChild(a.cloneNode(true)));
+
+    // Garante acesso direto às notícias no menu móvel, sem tratá-las como ferramenta.
+    if(!Array.from(links.querySelectorAll('a')).some(a=>/noticias\.html/.test(a.getAttribute('href')||''))){
+      const newsLink=document.createElement('a');
+      newsLink.href='noticias.html';
+      newsLink.textContent='Notícias';
+      links.insertBefore(newsLink,links.children[1]||null);
+    }
+
+    document.body.append(backdrop,panel);
+
+    const close=()=>{
+      document.body.classList.remove('mobile-menu-open');
+      toggle.setAttribute('aria-expanded','false');
+      toggle.setAttribute('aria-label','Abrir menu');
+    };
+    const open=()=>{
+      document.body.classList.add('mobile-menu-open');
+      toggle.setAttribute('aria-expanded','true');
+      toggle.setAttribute('aria-label','Fechar menu');
+    };
+    toggle.addEventListener('click',()=>document.body.classList.contains('mobile-menu-open')?close():open());
+    backdrop.addEventListener('click',close);
+    links.addEventListener('click',close);
+    document.addEventListener('keydown',e=>{if(e.key==='Escape') close()});
+    window.addEventListener('resize',()=>{if(window.innerWidth>900) close()});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup);
+  else setup();
+})();
