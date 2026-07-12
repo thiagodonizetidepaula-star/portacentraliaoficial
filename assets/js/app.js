@@ -29,7 +29,7 @@ function printBlock(id){
   const w=window.open('','_blank','width=900,height=700');
   if(!w){toast('O navegador bloqueou a impressão. Permita pop-ups.');return}
   w.document.open();
-  w.document.write(`<html><head><title>Central IA</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family:Arial,sans-serif;padding:28px;color:#111}h1,h2,h3{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:12px}td,th{border:1px solid #ddd;padding:8px;text-align:left}.box{border:1px solid #ddd;border-radius:12px;padding:20px}.brand{font-weight:bold;color:#2563eb;margin-bottom:20px}@media print{button{display:none}}</style></head><body><div class="brand">Central IA</div>${el.innerHTML}</body></html>`);
+  w.document.write(`<html><head><title>Central IA</title><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{font-family: Arial, Helvetica, sans-serif !important;padding:28px;color:#111}h1,h2,h3{margin-top:0}table{width:100%;border-collapse:collapse;margin-top:12px}td,th{border:1px solid #ddd;padding:8px;text-align:left}.box{border:1px solid #ddd;border-radius:12px;padding:20px}.brand{font-weight:bold;color:#2563eb;margin-bottom:20px}@media print{button{display:none}}</style></head><body><div class="brand">Central IA</div>${el.innerHTML}</body></html>`);
   w.document.close();w.focus();setTimeout(()=>w.print(),350);
 }
 
