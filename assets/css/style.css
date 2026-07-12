@@ -941,3 +941,9 @@ button, input, select, textarea, option, table, th, td, pre, code {
 h1, h2, h3, h4, h5, h6 {
   font-family: Arial, Helvetica, sans-serif !important;
 }
+
+/* V69: logo P incorporada diretamente no HTML para evitar cache do ícone antigo */
+.brand-mark{overflow:hidden}
+.brand-mark .logo-svg{width:40px!important;height:40px!important;display:block;flex:none;filter:none}
+@media(max-width:900px){.brand-mark .logo-svg{width:36px!important;height:36px!important}}
+@media(max-width:560px){.brand-mark .logo-svg{width:34px!important;height:34px!important}}
