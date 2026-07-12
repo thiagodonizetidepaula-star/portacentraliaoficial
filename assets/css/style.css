@@ -914,3 +914,30 @@ body.mobile-menu-open .mobile-menu-panel{transform:translateX(0)}
 @media(max-width:900px){.hero-showcase{grid-template-columns:1fr 1fr}.showcase-card:last-child{grid-column:1/-1}.quote-detail{grid-template-columns:1fr 1fr}.quote-detail>div:first-child{grid-column:1/-1}}
 @media(max-width:560px){.hero-showcase{grid-template-columns:1fr}.showcase-card:last-child{grid-column:auto}.quote-grid{grid-template-columns:1fr 1fr}.quote-tile:last-child{grid-column:1/-1}.hero-card{padding:22px!important}}
 @media(prefers-reduced-motion:reduce){.showcase-chart i,.showcase-gauge{animation:none}}
+
+/* Central IA v64 — tipografia global unificada */
+html, body {
+  font-family: Arial, Helvetica, sans-serif !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+body, body *:not(svg):not(svg *) {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-style: normal;
+}
+button, input, select, textarea, option, table, th, td, pre, code {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+.topbar, .topbar *, .ticker, .ticker *, .nav, .nav *, .mobile-nav, .mobile-nav * {
+  font-family: Arial, Helvetica, sans-serif !important;
+  letter-spacing: normal;
+}
+.ticker, .ticker * {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+/* Mantém o padrão visual aprovado na página de financiamento */
+h1, h2, h3, h4, h5, h6 {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
