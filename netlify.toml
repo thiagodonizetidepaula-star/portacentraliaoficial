@@ -2,17 +2,8 @@
   publish = "."
   functions = "netlify/functions"
 
-[[redirects]]
-  from = "/api/noticias"
-  to = "/.netlify/functions/noticias"
-  status = 200
 
 [[redirects]]
   from = "/api/copa"
   to = "/.netlify/functions/copa"
-  status = 200
-
-[[redirects]]
-  from = "/api/noticia-imagem"
-  to = "/.netlify/functions/noticia-imagem"
   status = 200

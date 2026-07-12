@@ -19,91 +19,243 @@
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Central IA","description":"Ferramentas gratuitas para empreendedores e utilidades online.","potentialAction":{"@type":"SearchAction","target":"/?q={search_term_string}","query-input":"required name=search_term_string"}}</script>
+<style>
+.mentor-pro-page{padding:34px 0 70px;background:linear-gradient(180deg,#f5fbfa 0,#fff 30%)}
+.mentor-pro-wrap{max-width:1220px}.mentor-hero-pro{position:relative;overflow:hidden;display:grid;grid-template-columns:1.45fr .55fr;gap:30px;align-items:center;padding:46px 52px;border-radius:34px;background:linear-gradient(135deg,#0b2447,#143f74 58%,#0c7866);color:#fff;box-shadow:0 22px 60px rgba(11,36,71,.18)}
+.mentor-hero-pro:before{content:"";position:absolute;inset:auto -100px -180px auto;width:420px;height:420px;border-radius:50%;background:rgba(255,255,255,.08)}
+.mentor-kicker{display:inline-flex;padding:8px 14px;border:1px solid rgba(255,255,255,.32);border-radius:999px;background:rgba(255,255,255,.1);font-weight:700}.mentor-hero-copy h1{font-size:clamp(44px,6vw,76px);line-height:.95;margin:18px 0}.mentor-hero-copy p{max-width:750px;font-size:20px;line-height:1.55;color:#e7f3ff}.mentor-benefits{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}.mentor-benefits span{padding:9px 13px;border-radius:12px;background:rgba(255,255,255,.1);font-weight:700}.mentor-hero-visual{position:relative;display:grid;place-items:center;min-height:220px}.mentor-brain{display:grid;place-items:center;width:150px;height:150px;border-radius:42px;background:rgba(255,255,255,.14);font-size:76px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);animation:mentorFloat 4s ease-in-out infinite}.mentor-orbit{position:absolute;display:grid;place-items:center;width:54px;height:54px;border-radius:18px;background:#fff;font-size:26px;box-shadow:0 12px 30px rgba(0,0,0,.2)}.orbit-one{top:7px;right:20px}.orbit-two{bottom:10px;left:10px}.orbit-three{bottom:4px;right:5px}@keyframes mentorFloat{50%{transform:translateY(-8px) rotate(2deg)}}
+.mentor-progress{margin:24px 4px 28px}.mentor-progress-bar{height:9px;border-radius:999px;background:#dce8e6;overflow:hidden}.mentor-progress-bar span{display:block;width:33%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#0c7866,#2fb49d);transition:width .35s ease}.mentor-progress small{display:block;margin-top:8px;color:#53635f;font-weight:700}
+.mentor-pro-layout{display:grid;grid-template-columns:minmax(0,1.18fr) minmax(340px,.82fr);gap:25px;align-items:start}.mentor-workspace{display:grid;gap:20px}.mentor-card,.mentor-result-panel,.mentor-history-card{border:1px solid #d9e3e1;border-radius:27px;background:#fff;box-shadow:0 13px 36px rgba(18,54,65,.07)}.mentor-card{padding:28px}.mentor-card-head{display:flex;gap:16px;align-items:flex-start;margin-bottom:23px}.step-number{flex:0 0 42px;display:grid;place-items:center;width:42px;height:42px;border-radius:14px;background:#0c7866;color:#fff;font-size:20px;font-weight:800}.mentor-card h2,.mentor-result-panel h2{margin:0 0 5px;font-size:28px;line-height:1.15}.mentor-card-head p{margin:0;color:#66736f}.mentor-topic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.mentor-topic-pro{display:grid;grid-template-columns:46px 1fr;grid-template-rows:auto auto;text-align:left;column-gap:11px;padding:14px;border:1px solid #d8e1df;border-radius:17px;background:#fff;color:#15243a;cursor:pointer;transition:.2s}.mentor-topic-pro span{grid-row:1/3;display:grid;place-items:center;width:44px;height:44px;border-radius:14px;background:#f0f5ff;font-size:22px}.mentor-topic-pro b{align-self:end;font-size:17px}.mentor-topic-pro small{color:#687571}.mentor-topic-pro:hover{transform:translateY(-2px);border-color:#6cbcae}.mentor-topic-pro.active{border-color:#0c7866;background:#eefaf7;box-shadow:0 0 0 3px rgba(12,120,102,.1)}
+.mentor-label{display:block;margin:17px 0 8px;font-weight:800;font-size:17px}.mentor-pro-page textarea,.mentor-pro-page select,.mentor-pro-page input{width:100%;padding:14px 15px;border:1px solid #ccd8d5;border-radius:14px;background:#fff;font:inherit;color:#182333;outline:none}.mentor-pro-page textarea:focus,.mentor-pro-page select:focus,.mentor-pro-page input:focus{border-color:#0c7866;box-shadow:0 0 0 4px rgba(12,120,102,.1)}.field-meta{display:flex;justify-content:space-between;gap:12px;margin-top:7px;color:#75817e;font-size:13px}.mentor-form-grid,.mentor-dynamic-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.quick-prompts{display:flex;flex-wrap:wrap;gap:8px}.quick-prompts button{padding:8px 11px;border:1px solid #d2ddda;border-radius:999px;background:#f8fbfa;color:#334743;cursor:pointer}.quick-prompts button:hover{border-color:#0c7866;color:#0c7866}.mentor-generate{width:100%;padding:17px 20px;border:0;border-radius:16px;background:linear-gradient(135deg,#133d78,#0c7866);color:#fff;font-size:19px;font-weight:800;cursor:pointer;box-shadow:0 14px 28px rgba(12,120,102,.19)}.mentor-generate:hover{filter:brightness(1.06);transform:translateY(-1px)}.mentor-disclaimer{text-align:center;color:#6d7976;font-size:13px;margin:13px 0 0}
+.mentor-result-panel{position:sticky;top:94px;padding:27px;min-height:550px}.mentor-empty{display:grid;place-items:center;text-align:center;min-height:490px;padding:20px}.mentor-empty-icon{display:grid;place-items:center;width:88px;height:88px;border-radius:28px;background:#edf8f5;font-size:44px}.mentor-empty h2{margin-top:19px}.mentor-empty p{max-width:390px;color:#63716d}.mentor-preview-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-top:18px}.mentor-preview-list span{padding:10px;border-radius:12px;background:#f5f8f8;font-weight:700;color:#4b5b57}.mentor-result-pro{animation:mentorReveal .4s ease}.mentor-result-header{padding-bottom:18px;border-bottom:1px solid #dbe5e3}.mentor-result-header .result-icon{font-size:36px}.mentor-result-header h2{font-size:31px;margin:9px 0}.mentor-result-header p{color:#62706c}.mentor-section-result{margin-top:18px;padding:17px;border-radius:17px;background:#f7faf9;border:1px solid #e1e9e7}.mentor-section-result h3{margin:0 0 9px;font-size:19px;color:#0b5b4e}.mentor-section-result p,.mentor-section-result li{line-height:1.55;color:#344641}.mentor-section-result ol,.mentor-section-result ul{padding-left:21px;margin-bottom:0}.mentor-priority{background:#fff8e9;border-color:#f0dfb5}.mentor-today{background:#eef8ff;border-color:#d4e5f1}.mentor-result-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}.mentor-result-actions button{padding:11px;border:1px solid #ccd8d5;border-radius:12px;background:#fff;font-weight:700;cursor:pointer}.mentor-result-actions button:hover{border-color:#0c7866;color:#0c7866}@keyframes mentorReveal{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.mentor-history-card{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-top:24px;padding:25px}.mentor-history{display:flex;flex-wrap:wrap;gap:9px}.mentor-history button{padding:9px 12px;border:1px solid #d6e0de;border-radius:12px;background:#fff;cursor:pointer}.mentor-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:25px}.mentor-info-grid article{padding:22px;border:1px solid #dce5e3;border-radius:20px;background:#fff}.mentor-info-grid article span{font-size:29px}.mentor-info-grid h3{margin:10px 0 7px}.mentor-info-grid p{margin:0;color:#66736f;line-height:1.55}
+@media(max-width:900px){.mentor-hero-pro{grid-template-columns:1fr;padding:34px 27px}.mentor-hero-visual{display:none}.mentor-pro-layout{grid-template-columns:1fr}.mentor-result-panel{position:static;min-height:auto}.mentor-empty{min-height:330px}.mentor-info-grid{grid-template-columns:1fr}.mentor-history-card{display:block}.mentor-history{margin-top:14px}}
+@media(max-width:600px){.mentor-pro-page{padding-top:18px}.mentor-hero-pro{padding:27px 22px;border-radius:24px}.mentor-hero-copy h1{font-size:47px}.mentor-hero-copy p{font-size:17px}.mentor-benefits span{font-size:13px}.mentor-card,.mentor-result-panel{padding:20px;border-radius:22px}.mentor-card h2,.mentor-result-panel h2{font-size:24px}.mentor-topic-grid{grid-template-columns:1fr}.mentor-topic-pro{grid-template-columns:42px 1fr}.mentor-form-grid,.mentor-dynamic-fields{grid-template-columns:1fr}.mentor-result-actions{grid-template-columns:1fr 1fr}.field-meta{display:block}.field-meta span{display:block;margin-top:4px}}
+@media(prefers-reduced-motion:reduce){.mentor-brain,.mentor-result-pro{animation:none!important}.mentor-topic-pro,.mentor-progress-bar span{transition:none!important}}
+
+#mentor_print_report{display:none}
+@media print{
+  @page{size:A4;margin:14mm 13mm 15mm}
+  html,body{background:#fff!important;color:#17212b!important}
+  body *{visibility:hidden!important}
+  #mentor_print_report,#mentor_print_report *{visibility:visible!important}
+  #mentor_print_report{display:block!important;position:absolute;inset:0 auto auto 0;width:100%;font-family:Arial,Helvetica,sans-serif;color:#17212b;background:#fff}
+  .mentor-print-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding:0 0 16px;border-bottom:3px solid #0c7866}
+  .mentor-print-brand{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#0c7866;font-weight:800}
+  .mentor-print-head h1{font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:1.08;margin:7px 0 5px;color:#10253f}
+  .mentor-print-meta{font-size:12px;color:#65716d;text-align:right;line-height:1.55}
+  .mentor-print-summary{margin:18px 0;padding:14px 16px;border:1px solid #d9e5e2;border-left:5px solid #0c7866;border-radius:9px;background:#f4faf8}
+  .mentor-print-summary b{color:#0b5b4e}
+  .mentor-print-content .mentor-result-header{padding:0 0 13px;border-bottom:1px solid #dce5e3}
+  .mentor-print-content .result-icon{font-size:25px}
+  .mentor-print-content .mentor-result-header h2{font-family:Georgia,'Times New Roman',serif;font-size:24px;margin:5px 0;color:#10253f}
+  .mentor-print-content .mentor-result-header p{font-size:13px;margin:0;color:#56645f}
+  .mentor-print-content .mentor-section-result{break-inside:avoid;page-break-inside:avoid;margin:12px 0 0;padding:13px 15px;border:1px solid #dfe8e6;border-radius:9px;background:#fff}
+  .mentor-print-content .mentor-section-result h3{font-size:16px;margin:0 0 7px;color:#0b5b4e}
+  .mentor-print-content .mentor-section-result p,.mentor-print-content .mentor-section-result li{font-size:12.5px;line-height:1.48;color:#283833}
+  .mentor-print-content .mentor-section-result ol,.mentor-print-content .mentor-section-result ul{margin:5px 0 0;padding-left:20px}
+  .mentor-print-content .mentor-priority{border-left:4px solid #c49324;background:#fffaf0}
+  .mentor-print-content .mentor-today{border-left:4px solid #2b74a7;background:#f4faff}
+  .mentor-print-footer{margin-top:18px;padding-top:10px;border-top:1px solid #dce5e3;font-size:10.5px;line-height:1.45;color:#68736f}
+  .mentor-print-footer strong{color:#0b5b4e}
+}
+
+</style>
 </head>
 <body>
 <div class="topbar"><div class="ticker">
-<span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span><span>🤖 Novidade: Biblioteca Prompt IA</span><span>🚗 Controle do Carro com relatório</span>
+<span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span><span>✨ Novidade: Gerador de Prompt IA</span><span>🚗 Controle do Carro com relatório</span>
 <span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span>
 </div></div>
-<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="brand-mark"><img class="logo-svg" src="assets/img/logo-central-ia.svg" alt=""></span><span class="brand-name">Central <span class="brand-ia">IA</span></span></a><div class="menu"><a href="index.html#ferramentas">Ferramentas</a><a href="calculadora-financiamento.html">Financiamento</a><a href="calculadora-cdi.html">CDI</a><a href="controle-manutencao-carro.html">Carro</a><a href="calculadora-imc.html">IMC</a><a href="biblioteca-prompts-ia.html">Prompt IA</a><a href="gerador-prompt-ia.html">Gerador Prompt</a><a href="mentor-ia.html">Mentor IA</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div><div class="nav-actions"><a class="icon-btn" href="index.html#ferramentas" aria-label="Buscar ferramentas">🔎</a><button class="icon-btn" type="button" onclick="surpreenda()" aria-label="Me surpreenda">🎲</button></div></div></nav>
-<section class="section mentor-section" id="mentor-ia">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h1>Central IA Mentor</h1>
-        <p class="lead">Escolha um tema, conte sua situação e receba uma orientação organizada em diagnóstico, conselho, plano de ação e próximos passos.</p>
-        <p class="lead"><small>Conteúdos informativos. Não substitui atendimento profissional em saúde, psicologia, direito ou finanças.</small></p>
+<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="brand-mark"><img class="logo-svg" src="assets/img/logo-central-ia.svg" alt=""></span><span class="brand-name">Central <span class="brand-ia">IA</span></span></a><div class="menu"><a href="index.html#ferramentas">Ferramentas</a><a href="calculadora-financiamento.html">Financiamento</a><a href="calculadora-cdi.html">CDI</a><a href="controle-manutencao-carro.html">Carro</a><a href="calculadora-imc.html">IMC</a><a href="gerador-prompt-ia.html">Gerador Prompt</a><a href="mentor-ia.html">Mentor IA</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div></div></nav>
+<section class="mentor-pro-page" id="mentor-ia">
+  <div class="wrap mentor-pro-wrap">
+    <header class="mentor-hero-pro">
+      <div class="mentor-hero-copy">
+        <span class="mentor-kicker">Orientação prática e personalizada</span>
+        <h1>Mentor IA</h1>
+        <p>Escolha uma área da vida, responda algumas perguntas e receba um plano claro com diagnóstico, prioridades, ações para hoje e próximos passos.</p>
+        <div class="mentor-benefits">
+          <span>✓ Plano em poucos minutos</span><span>✓ 10 áreas da vida</span><span>✓ Copiar, imprimir ou baixar</span>
+        </div>
       </div>
+      <div class="mentor-hero-visual" aria-hidden="true">
+        <div class="mentor-brain">🧠</div>
+        <div class="mentor-orbit orbit-one">🎯</div>
+        <div class="mentor-orbit orbit-two">💡</div>
+        <div class="mentor-orbit orbit-three">📈</div>
+      </div>
+    </header>
+
+    <div class="mentor-progress" aria-label="Progresso">
+      <div class="mentor-progress-bar"><span id="mentor_progress_fill"></span></div>
+      <small id="mentor_progress_text">Etapa 1 de 3 — escolha o tema</small>
     </div>
 
-    <div class="mentor-layout">
-      <div class="mentor-panel">
-        <h3>Escolha o tema</h3>
-        <div class="mentor-topics" id="mentor_topics">
-          <button class="mentor-topic active" data-topic="dinheiro"><span>💰</span><b>Dinheiro</b><small>Dívidas, renda e organização.</small></button>
-          <button class="mentor-topic" data-topic="trabalho"><span>💼</span><b>Trabalho</b><small>Carreira, emprego e rotina.</small></button>
-          <button class="mentor-topic" data-topic="negocios"><span>🚀</span><b>Negócios</b><small>Ideias, vendas e crescimento.</small></button>
-          <button class="mentor-topic" data-topic="familia"><span>👨‍👩‍👧</span><b>Família</b><small>Diálogo, limites e convivência.</small></button>
-          <button class="mentor-topic" data-topic="relacionamento"><span>❤️</span><b>Relacionamento</b><small>Conversa, respeito e decisões.</small></button>
-          <button class="mentor-topic" data-topic="estudos"><span>📚</span><b>Estudos</b><small>Foco, plano e disciplina.</small></button>
-          <button class="mentor-topic" data-topic="saude"><span>🩺</span><b>Saúde</b><small>Cuidados, corpo e bem-estar.</small></button>
-          <button class="mentor-topic" data-topic="habitos"><span>💪</span><b>Hábitos</b><small>Rotina, disciplina e constância.</small></button>
-          <button class="mentor-topic" data-topic="emocional"><span>🧘</span><b>Emocional</b><small>Ansiedade leve, clareza e calma.</small></button>
-          <button class="mentor-topic" data-topic="objetivos"><span>🎯</span><b>Objetivos</b><small>Metas, direção e próximos passos.</small></button>
-        </div>
+    <div class="mentor-pro-layout">
+      <main class="mentor-workspace">
+        <section class="mentor-card mentor-step" id="mentor_step_topics">
+          <div class="mentor-card-head">
+            <span class="step-number">1</span>
+            <div><h2>Em qual área você precisa de orientação?</h2><p>Toque em um tema para personalizar as próximas perguntas.</p></div>
+          </div>
+          <div class="mentor-topic-grid" id="mentor_topics">
+            <button class="mentor-topic-pro active" type="button" data-topic="dinheiro"><span>💰</span><b>Dinheiro</b><small>Dívidas, orçamento e renda</small></button>
+            <button class="mentor-topic-pro" type="button" data-topic="trabalho"><span>💼</span><b>Trabalho</b><small>Carreira, emprego e rotina</small></button>
+            <button class="mentor-topic-pro" type="button" data-topic="negocios"><span>🚀</span><b>Negócios</b><small>Vendas, ideias e crescimento</small></button>
+            <button class="mentor-topic-pro" type="button" data-topic="familia"><span>👨‍👩‍👧</span><b>Família</b><small>Diálogo, limites e convivência</small></button>
+            <button class="mentor-topic-pro" type="button" data-topic="relacionamento"><span>❤️</span><b>Relacionamento</b><small>Comunicação e decisões</small></button>
+            <button class="mentor-topic-pro" type="button" data-topic="estudos"><span>📚</span><b>Estudos</b><small>Foco, provas e organização</small></button>
+            <button class="mentor-topic-pro" type="button" data-topic="saude"><span>🩺</span><b>Saúde</b><small>Bem-estar e autocuidado</small></button>
+            <button class="mentor-topic-pro" type="button" data-topic="habitos"><span>💪</span><b>Hábitos</b><small>Disciplina e constância</small></button>
+            <button class="mentor-topic-pro" type="button" data-topic="emocional"><span>🧘</span><b>Emocional</b><small>Clareza, calma e equilíbrio</small></button>
+            <button class="mentor-topic-pro" type="button" data-topic="objetivos"><span>🎯</span><b>Objetivos</b><small>Metas e plano de ação</small></button>
+          </div>
+        </section>
 
-        <div class="mentor-form">
-          <label>Conte o que está acontecendo</label>
-          <textarea id="mentor_problem" rows="5" placeholder="Exemplo: estou com muitas dívidas, desempregado e não sei por onde começar..."></textarea>
+        <section class="mentor-card mentor-step" id="mentor_step_context">
+          <div class="mentor-card-head">
+            <span class="step-number">2</span>
+            <div><h2 id="mentor_form_title">Conte sua situação financeira</h2><p id="mentor_form_subtitle">Quanto mais concreto você for, mais útil será o plano.</p></div>
+          </div>
 
-          <div class="mentor-row">
+          <div class="quick-prompts" id="mentor_quick_prompts"></div>
+
+          <label class="mentor-label" for="mentor_problem">O que está acontecendo?</label>
+          <textarea id="mentor_problem" rows="6" maxlength="1200" placeholder="Ex.: estou com dívidas, minha renda diminuiu e não sei por onde começar..."></textarea>
+          <div class="field-meta"><span>Não informe senhas, documentos ou dados bancários.</span><span id="mentor_counter">0/1200</span></div>
+
+          <div class="mentor-dynamic-fields" id="mentor_dynamic_fields"></div>
+
+          <div class="mentor-form-grid">
             <div>
-              <label>Como você está se sentindo?</label>
+              <label class="mentor-label" for="mentor_feeling">Como você está se sentindo?</label>
               <select id="mentor_feeling">
-                <option value="perdido">Perdido(a)</option>
-                <option value="ansioso">Ansioso(a)</option>
-                <option value="cansado">Cansado(a)</option>
-                <option value="motivado">Motivado(a)</option>
-                <option value="triste">Triste</option>
-                <option value="pressionado">Pressionado(a)</option>
+                <option value="perdido">Perdido(a)</option><option value="ansioso">Ansioso(a)</option><option value="cansado">Cansado(a)</option><option value="pressionado">Pressionado(a)</option><option value="motivado">Motivado(a)</option><option value="triste">Triste</option>
               </select>
             </div>
             <div>
-              <label>Estilo do mentor</label>
+              <label class="mentor-label" for="mentor_style">Como prefere a orientação?</label>
               <select id="mentor_style">
-                <option value="pratico">Prático e direto</option>
-                <option value="professor">Professor</option>
-                <option value="empreendedor">Empreendedor</option>
-                <option value="produtividade">Produtividade</option>
-                <option value="biblico">Princípios bíblicos</option>
-                <option value="calmo">Calmo e acolhedor</option>
+                <option value="pratico">Prática e direta</option><option value="acolhedor">Calma e acolhedora</option><option value="professor">Didática, como professor</option><option value="estrategico">Estratégica e objetiva</option><option value="biblico">Com princípios bíblicos</option>
               </select>
             </div>
           </div>
+        </section>
 
-          <button class="btn wide" onclick="gerarMentor()">Gerar conselho</button>
-        </div>
-      </div>
+        <section class="mentor-card mentor-step">
+          <div class="mentor-card-head">
+            <span class="step-number">3</span>
+            <div><h2>Gere seu plano</h2><p>Você poderá ajustar as respostas e gerar novamente quantas vezes quiser.</p></div>
+          </div>
+          <button class="mentor-generate" id="mentor_generate" type="button"><span>✨</span> Criar meu plano de ação</button>
+          <p class="mentor-disclaimer">Conteúdo educativo e de apoio. Não substitui avaliação médica, psicológica, jurídica ou financeira profissional.</p>
+        </section>
+      </main>
 
-      <div class="mentor-output">
-        <div class="mentor-illustration" id="mentor_visual">
-          <div class="orb">🧠</div>
-          <h3>Seu conselho aparecerá aqui</h3>
-          <p>Escolha um tema, descreva sua situação e gere uma orientação organizada para copiar, imprimir, baixar ou enviar por e-mail.</p>
+      <aside class="mentor-result-panel">
+        <div class="mentor-empty" id="mentor_empty">
+          <div class="mentor-empty-icon">🧭</div>
+          <h2>Seu plano aparecerá aqui</h2>
+          <p>Escolha um tema, descreva sua situação e toque em “Criar meu plano de ação”.</p>
+          <div class="mentor-preview-list"><span>Diagnóstico claro</span><span>Prioridades</span><span>Ações para hoje</span><span>Plano de 7 dias</span></div>
         </div>
-        <div class="result mentor-result" id="mentor_result">
-          <h3>Resultado</h3>
-          <small>Aguardando sua situação...</small>
+        <div class="mentor-result-pro" id="mentor_result" hidden></div>
+        <div class="mentor-result-actions" id="mentor_actions" hidden>
+          <button type="button" data-action="copy">📋 Copiar</button>
+          <button type="button" data-action="download">⬇️ Baixar</button>
+          <button type="button" data-action="print">📄 PDF relatório</button>
+          <button type="button" data-action="reset">↻ Novo plano</button>
         </div>
-        <div class="mini-actions mentor-actions">
-          <button class="ghost" onclick="copyFrom('mentor_result')">Copiar</button>
-          <button class="ghost" onclick="downloadBlock('mentor_result','conselho-mentor-ia.txt')">Baixar TXT</button>
-          <button class="ghost" onclick="printBlock('mentor_result')">Imprimir / PDF</button>
-          <button class="ghost" onclick="mailBlock('mentor_result','Conselho do Mentor IA')">Enviar por e-mail</button>
-        </div>
-      </div>
+      </aside>
     </div>
+
+    <section class="mentor-history-card" id="mentor_history_section" hidden>
+      <div><h2>Planos recentes</h2><p>Salvos somente neste navegador.</p></div>
+      <div id="mentor_history" class="mentor-history"></div>
+    </section>
+
+    <section class="mentor-info-grid">
+      <article><span>🔒</span><h3>Privacidade</h3><p>As informações digitadas ficam no navegador e não são usadas para criar uma conta.</p></article>
+      <article><span>🧩</span><h3>Plano estruturado</h3><p>O resultado separa o problema em prioridades e ações simples para evitar sobrecarga.</p></article>
+      <article><span>⚠️</span><h3>Uso responsável</h3><p>Em situações graves, procure um profissional ou serviço de emergência adequado.</p></article>
+    </section>
   </div>
 </section>
+
+<section id="mentor_print_report" aria-hidden="true"></section>
 <footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=39"></script>
+<script>
+(function(){
+const configs={
+ dinheiro:{icon:'💰',title:'Conte sua situação financeira',subtitle:'Dívidas, renda, gastos ou um objetivo financeiro.',placeholder:'Ex.: tenho renda de R$ 3.000, parcelas atrasadas e quero organizar meu orçamento...',prompts:['Sair das dívidas','Organizar meu salário','Criar reserva de emergência'],fields:[['renda','Renda mensal aproximada','Ex.: R$ 3.000'],['divida','Total de dívidas (opcional)','Ex.: R$ 8.000']]},
+ trabalho:{icon:'💼',title:'Conte sua situação profissional',subtitle:'Descreva seu trabalho atual, dificuldade e o que deseja mudar.',placeholder:'Ex.: estou desempregado há três meses e quero voltar para a área de logística...',prompts:['Conseguir emprego','Mudar de carreira','Melhorar produtividade'],fields:[['area','Sua área ou profissão','Ex.: logística'],['prazo','Prazo para mudança','Ex.: 3 meses']]},
+ negocios:{icon:'🚀',title:'Conte sobre seu negócio ou ideia',subtitle:'Explique o que vende, para quem e qual obstáculo enfrenta.',placeholder:'Ex.: vendo semijoias, tenho pouco movimento e preciso atrair novos clientes...',prompts:['Aumentar vendas','Validar uma ideia','Organizar meu negócio'],fields:[['oferta','Produto ou serviço','Ex.: semijoias'],['cliente','Cliente principal','Ex.: mulheres de 25 a 45 anos']]},
+ familia:{icon:'👨‍👩‍👧',title:'Conte a situação familiar',subtitle:'Descreva o conflito ou mudança com respeito à privacidade das pessoas.',placeholder:'Ex.: estamos com dificuldade para organizar a rotina e conversar sem discussões...',prompts:['Melhorar diálogo','Criar rotina familiar','Definir limites'],fields:[['envolvidos','Quem está envolvido?','Ex.: pais e filhos'],['frequencia','Com que frequência ocorre?','Ex.: quase todos os dias']]},
+ relacionamento:{icon:'❤️',title:'Conte a situação do relacionamento',subtitle:'Foque no que aconteceu, no que você sente e no que deseja construir.',placeholder:'Ex.: estamos nos afastando e nossas conversas terminam em discussão...',prompts:['Melhorar comunicação','Reconstruir confiança','Tomar uma decisão'],fields:[['tempo','Tempo de relacionamento','Ex.: 8 anos'],['objetivo','O que deseja melhorar?','Ex.: comunicação']]},
+ estudos:{icon:'📚',title:'Conte seu desafio nos estudos',subtitle:'Informe o que estuda, tempo disponível e maior dificuldade.',placeholder:'Ex.: quero aprender Power BI, mas perco o foco e não consigo manter uma rotina...',prompts:['Criar cronograma','Parar de procrastinar','Preparar para prova'],fields:[['materia','Curso ou matéria','Ex.: Power BI'],['horas','Tempo disponível por dia','Ex.: 1 hora']]},
+ saude:{icon:'🩺',title:'Conte seu objetivo de bem-estar',subtitle:'Esta área oferece apenas organização e autocuidado, sem diagnóstico.',placeholder:'Ex.: estou sedentário e quero começar uma rotina leve com segurança...',prompts:['Começar atividade física','Melhorar alimentação','Organizar autocuidado'],fields:[['objetivo','Objetivo principal','Ex.: ter mais disposição'],['rotina','Como está sua rotina hoje?','Ex.: sedentária']]},
+ habitos:{icon:'💪',title:'Conte o hábito que deseja mudar',subtitle:'Explique o comportamento atual e o resultado que gostaria de alcançar.',placeholder:'Ex.: começo projetos animado, mas abandono depois de poucos dias...',prompts:['Criar disciplina','Dormir mais cedo','Diminuir celular'],fields:[['habito','Hábito desejado','Ex.: caminhar'],['frequencia','Frequência ideal','Ex.: 4 vezes por semana']]},
+ emocional:{icon:'🧘',title:'Conte como você está se sentindo',subtitle:'Para sofrimento intenso ou risco imediato, procure ajuda profissional.',placeholder:'Ex.: estou sobrecarregado, com pensamentos acelerados e dificuldade para organizar o dia...',prompts:['Reduzir sobrecarga','Organizar pensamentos','Recuperar confiança'],fields:[['gatilho','O que mais pesa hoje?','Ex.: trabalho'],['apoio','Tem alguém de confiança?','Ex.: sim, minha esposa']]},
+ objetivos:{icon:'🎯',title:'Conte a meta que deseja alcançar',subtitle:'Uma boa meta tem resultado, prazo e primeiro passo.',placeholder:'Ex.: quero juntar R$ 30 mil em dois anos e preciso transformar isso em um plano...',prompts:['Definir uma meta','Criar plano de 90 dias','Voltar a ter direção'],fields:[['meta','Meta principal','Ex.: juntar R$ 30 mil'],['prazo','Prazo desejado','Ex.: 24 meses']]}
+};
+let topic='dinheiro';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s||'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function updateForm(){const c=configs[topic];$('mentor_form_title').textContent=c.title;$('mentor_form_subtitle').textContent=c.subtitle;$('mentor_problem').placeholder=c.placeholder;$('mentor_quick_prompts').innerHTML=c.prompts.map(x=>`<button type="button">${esc(x)}</button>`).join('');$('mentor_dynamic_fields').innerHTML=c.fields.map(f=>`<div><label class="mentor-label" for="mentor_${f[0]}">${esc(f[1])}</label><input id="mentor_${f[0]}" type="text" placeholder="${esc(f[2])}"></div>`).join('');$('mentor_quick_prompts').querySelectorAll('button').forEach(b=>b.onclick=()=>{const ta=$('mentor_problem');ta.value=(ta.value?ta.value+'\n':'')+b.textContent+': ';ta.focus();count();});}
+function count(){$('mentor_counter').textContent=$('mentor_problem').value.length+'/1200';updateProgress();}
+function updateProgress(){let p=33,t='Etapa 1 de 3 — escolha o tema';if($('mentor_problem').value.trim()){p=66;t='Etapa 2 de 3 — contexto preenchido'}if(!$('mentor_result').hidden){p=100;t='Plano concluído — você pode copiar ou ajustar'}$('mentor_progress_fill').style.width=p+'%';$('mentor_progress_text').textContent=t;}
+function styleIntro(style){return {pratico:'Vou ser direto e transformar o problema em ações simples.',acolhedor:'Vamos organizar isso com calma, sem cobrança excessiva.',professor:'Vou explicar a lógica de cada passo para você entender e aplicar.',estrategico:'Vamos priorizar impacto, prazo e recursos disponíveis.',biblico:'A orientação abaixo combina prudência, responsabilidade e constância.'}[style]||''}
+const plans={
+ dinheiro:{diag:'A dificuldade financeira costuma ficar maior quando números, prazos e prioridades estão misturados. O primeiro ganho é transformar preocupação em uma visão concreta.',priority:['Mapear renda, gastos essenciais, dívidas e vencimentos.','Proteger moradia, alimentação, saúde e transporte antes de gastos secundários.','Atacar primeiro a dívida com maior risco ou juros, sem criar nova parcela impagável.'],today:['Anote tudo que entra e sai neste mês.','Liste cada dívida com saldo, parcela, juros e atraso.','Escolha um gasto que pode ser reduzido ainda hoje.'],week:['Dia 1: levantar números reais.','Dia 2: separar essencial de adiável.','Dia 3: contatar credores prioritários.','Dias 4 a 7: acompanhar gastos e ajustar a meta.']},
+ trabalho:{diag:'Seu próximo passo profissional precisa equilibrar renda imediata, posicionamento e desenvolvimento de habilidade.',priority:['Definir o cargo-alvo e os requisitos mais frequentes.','Ajustar currículo e perfil profissional para esse alvo.','Criar uma rotina semanal de candidaturas, contatos e estudo.'],today:['Escolha um cargo-alvo específico.','Atualize o título e o resumo do currículo.','Candidate-se a três vagas realmente compatíveis.'],week:['Mapear 20 empresas.','Revisar currículo com resultados mensuráveis.','Praticar apresentação profissional.','Estudar uma habilidade-chave por 30 minutos ao dia.']},
+ negocios:{diag:'Negócios melhoram quando oferta, cliente e canal de venda ficam claros. Crescimento sem essa base costuma gerar esforço disperso.',priority:['Definir uma oferta principal e seu benefício.','Escolher um perfil de cliente prioritário.','Testar uma ação comercial simples e medir resposta.'],today:['Escreva sua oferta em uma frase.','Liste dez clientes potenciais.','Faça cinco contatos personalizados.'],week:['Validar preço e benefício.','Publicar prova ou demonstração.','Fazer contatos diários.','Registrar origem e resultado de cada oportunidade.']},
+ familia:{diag:'Conflitos familiares raramente melhoram durante o momento de tensão. A mudança começa com conversa em horário neutro, acordos simples e constância.',priority:['Separar o problema da pessoa.','Ouvir antes de propor solução.','Criar um acordo pequeno e observável.'],today:['Escolha um momento calmo para conversar.','Use frases sobre o que você sente, sem acusações.','Combine apenas uma mudança para esta semana.'],week:['Observar os momentos de maior tensão.','Reforçar comportamentos positivos.','Revisar o acordo no fim da semana.']},
+ relacionamento:{diag:'O relacionamento precisa de segurança para conversar: respeito, clareza e espaço para os dois lados.',priority:['Definir o assunto central sem juntar conflitos antigos.','Expressar necessidade sem ataque.','Observar se existe reciprocidade e respeito.'],today:['Escreva o que você sente e o que precisa.','Convide para uma conversa curta em momento adequado.','Faça uma pergunta e escute a resposta completa.'],week:['Ter duas conversas curtas em vez de uma discussão longa.','Combinar uma atitude concreta de cada pessoa.','Avaliar mudanças por comportamento, não por promessa.']},
+ estudos:{diag:'Dificuldade nos estudos geralmente é problema de sistema, não falta de capacidade. Metas pequenas, revisão e ambiente preparado aumentam a constância.',priority:['Definir o resultado de aprendizagem.','Dividir o conteúdo em blocos pequenos.','Estudar com prática ativa e revisão.'],today:['Escolha uma aula ou capítulo.','Estude por 25 minutos sem notificações.','Resuma em cinco linhas e faça três perguntas.'],week:['Planejar cinco sessões curtas.','Alternar teoria e exercício.','Revisar conteúdos antigos.','Medir sessões concluídas, não apenas horas.']},
+ saude:{diag:'Mudanças de saúde sustentáveis começam pequenas e devem respeitar limitações pessoais. Sintomas, dor ou condição clínica precisam de avaliação profissional.',priority:['Escolher uma mudança segura e simples.','Organizar sono, alimentação, hidratação e movimento.','Buscar avaliação quando houver sintomas ou limitações.'],today:['Beba água regularmente.','Faça uma refeição mais equilibrada.','Programe alguns minutos de movimento leve, se for seguro.'],week:['Definir horários básicos.','Preparar opções de alimentação.','Registrar energia e sono.','Marcar consulta quando necessário.']},
+ habitos:{diag:'Um hábito fica mais fácil quando a ação é pequena, tem horário e está ligada a um gatilho já existente.',priority:['Reduzir o hábito à menor versão possível.','Definir quando e onde será feito.','Preparar o ambiente para facilitar a ação.'],today:['Faça a versão de dois minutos do hábito.','Remova uma distração do ambiente.','Marque a execução em um calendário.'],week:['Repetir no mesmo horário.','Evitar compensar falhas com metas exageradas.','Revisar o que dificultou e ajustar.']},
+ emocional:{diag:'Sobrecarga emocional reduz a capacidade de decidir. Primeiro, diminua o volume de estímulos e organize apenas o que está sob seu controle.',priority:['Regular o corpo com pausa, respiração e descanso.','Separar fatos, pensamentos e preocupações.','Procurar apoio quando o sofrimento persiste ou piora.'],today:['Faça três minutos de respiração lenta.','Escreva o que é fato e o que é preocupação.','Converse com alguém de confiança.'],week:['Reduzir excesso de notícias e notificações.','Criar um horário de descanso.','Observar gatilhos.','Buscar atendimento profissional se necessário.']},
+ objetivos:{diag:'Uma meta sem prazo e rotina permanece como desejo. O plano precisa ligar o resultado final às ações semanais.',priority:['Definir resultado e prazo.','Identificar recursos e obstáculos.','Escolher uma ação semanal mensurável.'],today:['Escreva a meta em uma frase com prazo.','Defina o primeiro marco.','Reserve horário para a primeira ação.'],week:['Executar três ações prioritárias.','Registrar o progresso.','Revisar prazo e estratégia sem abandonar a meta.']}
+};
+function generate(){const text=$('mentor_problem').value.trim();if(!text){alert('Conte brevemente o que está acontecendo.');$('mentor_problem').focus();return}const crisis=/suic|me matar|tirar minha vida|quero morrer|não quero viver|automutil|me cortar/i;if(crisis.test(text)){$('mentor_empty').hidden=true;$('mentor_result').hidden=false;$('mentor_actions').hidden=false;$('mentor_result').innerHTML='<div class="mentor-result-header"><div class="result-icon">💙</div><h2>Procure apoio imediato</h2><p>O que você descreveu merece ajuda humana agora.</p></div><div class="mentor-section-result mentor-priority"><h3>Não fique sozinho(a)</h3><p>Entre em contato com alguém de confiança e procure um serviço de urgência da sua região. No Brasil, o CVV atende pelo 188. Em risco imediato, ligue 192 ou vá ao pronto-socorro.</p></div>';updateProgress();return}
+const c=configs[topic],p=plans[topic],feeling=$('mentor_feeling').selectedOptions[0].textContent,style=$('mentor_style').value;const extras=[...$('mentor_dynamic_fields').querySelectorAll('input')].map(i=>i.value.trim()).filter(Boolean).join(' • ');const html=`<div class="mentor-result-header"><div class="result-icon">${c.icon}</div><h2>Seu plano de ${c.title.replace('Conte ','').toLowerCase()}</h2><p>${esc(styleIntro(style))} Você informou que está se sentindo ${esc(feeling.toLowerCase())}.</p></div><div class="mentor-section-result"><h3>Leitura da situação</h3><p>${esc(p.diag)}</p><p><b>Seu contexto:</b> ${esc(text)}</p>${extras?`<p><b>Informações adicionais:</b> ${esc(extras)}</p>`:''}</div><div class="mentor-section-result mentor-priority"><h3>3 prioridades agora</h3><ol>${p.priority.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div><div class="mentor-section-result mentor-today"><h3>Ações para hoje</h3><ul>${p.today.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div><div class="mentor-section-result"><h3>Plano simples de 7 dias</h3><ol>${p.week.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div><div class="mentor-section-result"><h3>Pergunta de reflexão</h3><p><b>Qual é a menor ação que você consegue concluir nas próximas 24 horas?</b></p></div>`;$('mentor_empty').hidden=true;$('mentor_result').hidden=false;$('mentor_actions').hidden=false;$('mentor_result').innerHTML=html;saveHistory(c.icon+' '+c.title.replace('Conte sua ','').replace('Conte seu ','').replace('Conte a ',''),html);updateProgress();$('mentor_result').scrollIntoView({behavior:'smooth',block:'start'});}
+function preparePrintReport(){
+  const result=$('mentor_result');
+  if(!result || result.hidden || !result.innerHTML.trim()){
+    alert('Gere um plano antes de salvar o relatório em PDF.');
+    return false;
+  }
+  const c=configs[topic];
+  const feeling=$('mentor_feeling').selectedOptions[0]?.textContent||'';
+  const style=$('mentor_style').selectedOptions[0]?.textContent||'';
+  const today=new Date();
+  const date=today.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const time=today.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const report=$('mentor_print_report');
+  report.innerHTML=`
+    <header class="mentor-print-head">
+      <div>
+        <div class="mentor-print-brand">Central IA • Mentor IA</div>
+        <h1>Relatório de orientação e plano de ação</h1>
+        <div>Plano personalizado para o tema <strong>${esc(c.title.replace('Conte sua ','').replace('Conte seu ','').replace('Conte a ','').replace('Conte sobre ',''))}</strong></div>
+      </div>
+      <div class="mentor-print-meta"><b>${esc(date)}</b><br>${esc(time)}<br>portalcentralia.com.br</div>
+    </header>
+    <div class="mentor-print-summary"><b>Perfil da orientação:</b> ${esc(style)}<br><b>Estado informado:</b> ${esc(feeling)}</div>
+    <main class="mentor-print-content">${result.innerHTML}</main>
+    <footer class="mentor-print-footer"><strong>Uso responsável:</strong> este relatório é educativo e de apoio. Não substitui avaliação médica, psicológica, jurídica, financeira ou de outro profissional qualificado. As decisões continuam sendo de responsabilidade do usuário.</footer>`;
+  return true;
+}
+function printReport(){
+  if(!preparePrintReport()) return;
+  document.body.classList.add('printing-mentor-report');
+  setTimeout(()=>window.print(),80);
+}
+window.addEventListener('afterprint',()=>document.body.classList.remove('printing-mentor-report'));
+function saveHistory(title,html){let h=JSON.parse(localStorage.getItem('centralia_mentor_history')||'[]');h.unshift({title,html,date:new Date().toLocaleDateString('pt-BR')});h=h.slice(0,4);localStorage.setItem('centralia_mentor_history',JSON.stringify(h));renderHistory()}
+function renderHistory(){const h=JSON.parse(localStorage.getItem('centralia_mentor_history')||'[]');$('mentor_history_section').hidden=!h.length;$('mentor_history').innerHTML=h.map((x,i)=>`<button type="button" data-i="${i}">${esc(x.title)} <small>${esc(x.date)}</small></button>`).join('');$('mentor_history').querySelectorAll('button').forEach(b=>b.onclick=()=>{const x=h[+b.dataset.i];$('mentor_empty').hidden=true;$('mentor_result').hidden=false;$('mentor_actions').hidden=false;$('mentor_result').innerHTML=x.html;updateProgress();});}
+document.querySelectorAll('.mentor-topic-pro').forEach(b=>b.onclick=()=>{document.querySelectorAll('.mentor-topic-pro').forEach(x=>x.classList.remove('active'));b.classList.add('active');topic=b.dataset.topic;updateForm();updateProgress();});$('mentor_problem').addEventListener('input',count);$('mentor_generate').onclick=generate;$('mentor_actions').addEventListener('click',e=>{const a=e.target.closest('button')?.dataset.action;if(!a)return;if(a==='copy'){navigator.clipboard.writeText($('mentor_result').innerText);if(window.toast)toast('Plano copiado')}if(a==='download'){const blob=new Blob([$('mentor_result').innerText],{type:'text/plain;charset=utf-8'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='plano-mentor-ia.txt';link.click();URL.revokeObjectURL(url)}if(a==='print')printReport();if(a==='reset'){location.reload()}});updateForm();renderHistory();count();
+})();
+</script>
 </body></html>

@@ -1,25 +1,11 @@
-# Central IA — Deploy no Netlify
+# Publicação no Netlify
 
-## Passos
+Este projeto pode ser publicado diretamente no Netlify ou pelo GitHub.
 
-1. Envie este projeto para o Netlify por ZIP ou pelo GitHub.
-2. No Netlify, abra o site e vá em **Site configuration > Environment variables**.
-3. Crie a variável:
+## Recursos externos
 
-```text
-NEWS_API_KEY
-```
+A versão atual não utiliza NewsAPI e não possui seção de notícias. Não é necessário configurar `NEWS_API_KEY`.
 
-4. No valor, cole sua chave da NewsAPI.
-5. Salve e faça um novo deploy.
-6. Teste a URL:
+## AdSense
 
-```text
-https://SEU-SITE.netlify.app/api/noticias
-```
-
-Se retornar JSON com `ok: true`, as notícias estão funcionando.
-
-## Observação
-
-O JavaScript da Home chama `/api/noticias`. O arquivo `netlify.toml` redireciona automaticamente para a Netlify Function `/.netlify/functions/noticias`.
+O código do Google AdSense e o arquivo `ads.txt` permanecem na raiz do projeto.

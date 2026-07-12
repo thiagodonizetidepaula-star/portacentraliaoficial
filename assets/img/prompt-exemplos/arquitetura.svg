@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#475569"/><stop offset="1" stop-color="#edf3f8"/></linearGradient></defs>
+<rect width="800" height="500" rx="38" fill="url(#g)"/>
+<circle cx="660" cy="95" r="125" fill="#fff" opacity=".12"/><circle cx="115" cy="425" r="150" fill="#fff" opacity=".08"/>
+<rect x="52" y="48" width="696" height="404" rx="30" fill="#fff" opacity=".94"/>
+<text x="100" y="150" font-size="70">🏛️</text>
+<text x="100" y="235" font-family="Georgia,serif" font-size="48" font-weight="700" fill="#132238">Ambiente moderno</text>
+<text x="100" y="295" font-family="Arial,sans-serif" font-size="26" fill="#536273">Perspectiva ampla • luz natural</text>
+<rect x="100" y="350" width="240" height="16" rx="8" fill="#475569" opacity=".75"/><rect x="100" y="384" width="385" height="11" rx="6" fill="#cbd5e1"/>
+<rect x="530" y="325" width="145" height="80" rx="18" fill="#edf3f8"/><circle cx="576" cy="365" r="22" fill="#475569" opacity=".8"/><rect x="610" y="350" width="42" height="12" rx="6" fill="#475569" opacity=".55"/><rect x="610" y="374" width="55" height="9" rx="5" fill="#94a3b8"/>
+</svg>

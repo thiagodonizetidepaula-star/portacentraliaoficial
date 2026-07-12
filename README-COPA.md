@@ -14,4 +14,4 @@ O módulo não copia textos de matérias, não reproduz conteúdo jornalístico 
 
 ## Variáveis
 
-Este módulo não precisa de chave própria. A NewsAPI continua usando `NEWS_API_KEY` apenas para as notícias.
+Este módulo não precisa de chave própria. A versão atual não utiliza NewsAPI.

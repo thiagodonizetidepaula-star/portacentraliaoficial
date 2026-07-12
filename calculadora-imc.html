@@ -1,63 +1,150 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5420904279194542" crossorigin="anonymous"></script>
-
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Calculadora de IMC Online Grátis | Portal Central IA</title>
-<link rel="canonical" href="https://portalcentralia.com.br/calculadora-imc.html">
-
-<meta name="description" content="Calcule seu Índice de Massa Corporal com a Calculadora de IMC Online Grátis.">
-<meta property="og:title" content="Calculadora de IMC Online Grátis | Portal Central IA">
-<meta property="og:description" content="Calcule seu Índice de Massa Corporal com a Calculadora de IMC Online Grátis.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://portalcentralia.com.br/calculadora-imc.html">
-<link rel="stylesheet" href="assets/css/style.css?v=39">
-<link rel="icon" href="assets/img/favicon.ico" sizes="any">
-<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "O que é IMC?", "acceptedAnswer": {"@type": "Answer", "text": "IMC significa Índice de Massa Corporal e é calculado dividindo o peso pela altura ao quadrado."}}, {"@type": "Question", "name": "Qual é o IMC considerado normal?", "acceptedAnswer": {"@type": "Answer", "text": "De forma geral, a faixa entre 18,5 e 24,9 costuma ser classificada como peso normal em adultos, mas a interpretação deve considerar o contexto individual."}}, {"@type": "Question", "name": "IMC serve para atletas?", "acceptedAnswer": {"@type": "Answer", "text": "Pode ser limitado para atletas, pois não diferencia massa muscular de gordura corporal."}}, {"@type": "Question", "name": "Crianças podem usar a mesma tabela de IMC?", "acceptedAnswer": {"@type": "Answer", "text": "Não. Crianças e adolescentes precisam de avaliação específica por idade e sexo, preferencialmente com profissional de saúde."}}, {"@type": "Question", "name": "A calculadora de IMC substitui consulta médica?", "acceptedAnswer": {"@type": "Answer", "text": "Não. Ela é apenas informativa e não substitui avaliação médica, nutricional ou profissional."}}]}</script>
+  <script async crossorigin="anonymous" src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5420904279194542"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Calculadora de IMC Completa: peso ideal, água e calorias | Central IA</title>
+  <link rel="canonical" href="https://portalcentralia.com.br/calculadora-imc.html" />
+  <meta name="description" content="Calcule seu IMC, faixa de peso saudável, água diária, metabolismo basal e calorias estimadas. Veja dicas informativas conforme o resultado." />
+  <meta property="og:title" content="Calculadora de IMC Completa | Central IA" />
+  <meta property="og:description" content="Descubra seu IMC, peso saudável, água diária e gasto calórico estimado em uma ferramenta gratuita." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://portalcentralia.com.br/calculadora-imc.html" />
+  <link rel="stylesheet" href="assets/css/style.css?v=46.1" />
+  <link rel="icon" href="assets/img/favicon.ico" sizes="any" />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png" />
+  <style>
+    .imc-shell{max-width:1120px;margin:0 auto;padding:26px 18px 54px}.imc-hero{background:linear-gradient(135deg,#0c2545,#173f6c);color:#fff;border-radius:24px;padding:34px;display:grid;grid-template-columns:1.35fr .65fr;gap:26px;align-items:center;box-shadow:0 18px 50px rgba(9,35,67,.18)}
+    .imc-hero h1{margin:10px 0 12px;font-size:clamp(2rem,5vw,3.5rem);line-height:1.02}.imc-hero p{max-width:720px;font-size:1.06rem;line-height:1.65;color:#e8f2fb}.imc-badge{display:inline-block;padding:7px 12px;border-radius:999px;background:#e8f5ff;color:#0c4f82;font-weight:700;font-size:.82rem}.imc-hero-visual{display:grid;place-items:center;min-height:180px}.imc-hero-visual span{font-size:92px;filter:drop-shadow(0 14px 18px rgba(0,0,0,.25))}
+    .imc-tool{margin-top:24px;background:#fff;border:1px solid #dfe7ef;border-radius:22px;padding:26px;box-shadow:0 12px 38px rgba(20,45,70,.08)}.imc-tool h2{margin:0 0 6px}.imc-sub{margin:0 0 22px;color:#526373}.imc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.imc-field label{display:block;font-weight:700;margin-bottom:7px;color:#26394b}.imc-field input,.imc-field select{width:100%;padding:14px 13px;border:1px solid #cbd7e2;border-radius:12px;font-size:1rem;background:#fff}.imc-field input:focus,.imc-field select:focus{outline:3px solid rgba(31,126,183,.14);border-color:#1f7eb7}.imc-actions{display:flex;gap:12px;margin-top:18px;flex-wrap:wrap}.imc-btn{border:0;border-radius:12px;padding:14px 20px;font-weight:800;cursor:pointer}.imc-btn.primary{background:#0d5f91;color:#fff}.imc-btn.secondary{background:#eef4f8;color:#29465d}.imc-hint{font-size:.86rem;color:#687987;margin-top:6px}
+    .imc-results{display:none;margin-top:24px}.imc-results.show{display:block}.imc-result-top{display:grid;grid-template-columns:1.05fr 1.95fr;gap:16px}.imc-score{border-radius:18px;padding:24px;background:#f2f7fb;border:1px solid #d9e5ee}.imc-score .number{font-size:3.3rem;line-height:1;font-weight:900;margin:8px 0}.imc-class{display:inline-block;border-radius:999px;padding:7px 12px;font-weight:800}.class-low{background:#e5f0ff;color:#155fa0}.class-ok{background:#e2f6ea;color:#176b3b}.class-over{background:#fff3d9;color:#8a5a00}.class-ob1{background:#ffe5d8;color:#9a3e0b}.class-ob2,.class-ob3{background:#ffe0e0;color:#9b2020}.imc-message{border-radius:18px;padding:24px;background:#fff;border:1px solid #dfe7ef}.imc-message h3{margin-top:0}.imc-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px}.imc-mini{background:#fff;border:1px solid #dfe7ef;border-radius:16px;padding:18px}.imc-mini b{display:block;font-size:1.25rem;margin-top:8px;color:#0c4f82}.imc-range{margin-top:18px}.imc-scale{height:12px;border-radius:999px;background:linear-gradient(90deg,#6aa6df 0 22%,#66bd83 22% 46%,#f2c15d 46% 64%,#ef8f59 64% 80%,#df5d5d 80% 100%);position:relative}.imc-dot{position:absolute;top:50%;width:20px;height:20px;background:#122d49;border:3px solid #fff;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 2px 8px rgba(0,0,0,.25)}.imc-scale-labels{display:flex;justify-content:space-between;font-size:.75rem;color:#65717d;margin-top:7px}
+    .imc-sections{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:24px}.imc-card{background:#fff;border:1px solid #dfe7ef;border-radius:18px;padding:24px}.imc-card h2,.imc-card h3{margin-top:0}.imc-tips{padding-left:20px;line-height:1.75}.imc-note{background:#fff8df;border:1px solid #f2df9c;border-radius:16px;padding:18px;margin-top:16px;color:#574818}.imc-faq details{border-top:1px solid #e1e7ec;padding:14px 0}.imc-faq details:first-child{border-top:0}.imc-faq summary{cursor:pointer;font-weight:800}.imc-related{display:flex;gap:10px;flex-wrap:wrap}.imc-related a{display:inline-block;background:#edf5fa;color:#174f75;border-radius:999px;padding:10px 14px;text-decoration:none;font-weight:700}
+    @media(max-width:860px){.imc-hero{grid-template-columns:1fr;padding:26px 22px}.imc-hero-visual{min-height:auto}.imc-hero-visual span{font-size:68px}.imc-grid{grid-template-columns:1fr 1fr}.imc-result-top{grid-template-columns:1fr}.imc-cards{grid-template-columns:1fr 1fr}.imc-sections{grid-template-columns:1fr}}
+    @media(max-width:520px){.imc-shell{padding:18px 12px 42px}.imc-hero{border-radius:18px}.imc-tool{padding:18px}.imc-grid{grid-template-columns:1fr}.imc-cards{grid-template-columns:1fr}.imc-actions{flex-direction:column}.imc-btn{width:100%}.imc-score .number{font-size:2.8rem}}
+    @media print{.topbar,.nav,.footer,.imc-actions,.breadcrumb{display:none!important}.imc-shell{padding:0}.imc-hero{box-shadow:none}.imc-results{display:block!important}}
+  </style>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"O que é IMC?","acceptedAnswer":{"@type":"Answer","text":"IMC significa Índice de Massa Corporal e relaciona peso e altura para uma avaliação inicial em adultos."}},{"@type":"Question","name":"Qual é a faixa de IMC considerada saudável?","acceptedAnswer":{"@type":"Answer","text":"Para adultos, a faixa de referência mais usada fica entre 18,5 e 24,9."}},{"@type":"Question","name":"O IMC serve para atletas?","acceptedAnswer":{"@type":"Answer","text":"O IMC pode superestimar o risco em pessoas com muita massa muscular, porque não distingue músculo de gordura."}},{"@type":"Question","name":"Crianças podem usar esta calculadora?","acceptedAnswer":{"@type":"Answer","text":"Não. Crianças e adolescentes precisam de curvas específicas por idade e sexo."}},{"@type":"Question","name":"A calculadora substitui consulta médica?","acceptedAnswer":{"@type":"Answer","text":"Não. Os resultados são estimativas educativas e não substituem avaliação profissional."}}]}</script>
 </head>
 <body>
-<div class="topbar"><div class="ticker">
-<span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span><span>🤖 Portal Central IA</span><span>🚗 Ferramentas para veículos</span>
-<span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span>
-</div></div>
-<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="brand-mark"><img class="logo-svg" src="assets/img/logo-central-ia.svg" alt=""></span><span class="brand-name">Central <span class="brand-ia">IA</span></span></a><div class="menu"><a href="index.html#ferramentas">Ferramentas</a><a href="calculadora-financiamento.html">Financiamento</a><a href="calculadora-cdi.html">CDI</a><a href="controle-manutencao-carro.html">Carro</a><a href="calculadora-imc.html">IMC</a><a href="biblioteca-prompts-ia.html">Prompt IA</a><a href="gerador-prompt-ia.html">Gerador Prompt</a><a href="mentor-ia.html">Mentor IA</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div><div class="nav-actions"><a class="icon-btn" href="index.html#ferramentas" aria-label="Buscar ferramentas">🔎</a><button class="icon-btn" type="button" onclick="surpreenda()" aria-label="Me surpreenda">🎲</button></div></div></nav>
-<header class="page-hero"><div class="wrap">
-  <nav class="breadcrumb"><a href="index.html">Início</a><span>›</span><a href="index.html#ferramentas">Ferramentas</a><span>›</span><span>Calculadora de IMC</span></nav>
-  <span class="badge">Ferramenta gratuita</span>
-  <h1>Calculadora de IMC Online Grátis</h1>
-  <p class="lead">A Calculadora de IMC Online Grátis ajuda a estimar o Índice de Massa Corporal a partir do peso e da altura. O IMC é uma medida simples usada como referência inicial para avaliar se uma pessoa está abaixo do peso, dentro de uma faixa considerada normal, com sobrepeso ou obesidade. Apesar de ser muito conhecida, essa medida não considera composição corporal, massa muscular, idade, sexo, histórico de saúde ou distribuição de gordura. Por isso, deve ser vista apenas como uma orientação geral. A ferramenta é útil para quem deseja ter uma noção rápida do próprio índice, acompanhar mudanças ao longo do tempo ou iniciar uma conversa mais informada com um profissional de saúde.</p>
-</div></header>
-<main class="tool-page"><div class="wrap tool-layout">
-  <article class="content-card prose">
-    <h2>Como esta ferramenta ajuda</h2>
-    <p>A Calculadora de IMC Online Grátis ajuda a estimar o Índice de Massa Corporal a partir do peso e da altura. O IMC é uma medida simples usada como referência inicial para avaliar se uma pessoa está abaixo do peso, dentro de uma faixa considerada normal, com sobrepeso ou obesidade. Apesar de ser muito conhecida, essa medida não considera composição corporal, massa muscular, idade, sexo, histórico de saúde ou distribuição de gordura. Por isso, deve ser vista apenas como uma orientação geral. A ferramenta é útil para quem deseja ter uma noção rápida do próprio índice, acompanhar mudanças ao longo do tempo ou iniciar uma conversa mais informada com um profissional de saúde.</p>
-    <h2>Como usar</h2>
-    <ol class="steps"><li>Digite seu peso atual em quilogramas.</li>
-<li>Informe sua altura em metros, por exemplo 1,75.</li>
-<li>Clique em calcular IMC.</li>
-<li>Veja o índice calculado e a classificação aproximada.</li>
-<li>Use o resultado apenas como referência inicial.</li></ol>
-    <h2>Exemplo prático</h2>
-    <div class="example-box"><p>Uma pessoa com <b>86 kg</b> e <b>1,75 m</b> de altura terá o IMC calculado pela fórmula peso dividido pela altura ao quadrado. O resultado é exibido com uma classificação aproximada para facilitar a leitura.</p></div>
-    <h2>Perguntas frequentes</h2>
-    <div class="faq-list"><details class="faq-item"><summary>O que é IMC?</summary><p>IMC significa Índice de Massa Corporal e é calculado dividindo o peso pela altura ao quadrado.</p></details>
-<details class="faq-item"><summary>Qual é o IMC considerado normal?</summary><p>De forma geral, a faixa entre 18,5 e 24,9 costuma ser classificada como peso normal em adultos, mas a interpretação deve considerar o contexto individual.</p></details>
-<details class="faq-item"><summary>IMC serve para atletas?</summary><p>Pode ser limitado para atletas, pois não diferencia massa muscular de gordura corporal.</p></details>
-<details class="faq-item"><summary>Crianças podem usar a mesma tabela de IMC?</summary><p>Não. Crianças e adolescentes precisam de avaliação específica por idade e sexo, preferencialmente com profissional de saúde.</p></details>
-<details class="faq-item"><summary>A calculadora de IMC substitui consulta médica?</summary><p>Não. Ela é apenas informativa e não substitui avaliação médica, nutricional ou profissional.</p></details></div>
-    <div class="disclaimer"><b>Aviso importante:</b> Conteúdo apenas informativo. O IMC não substitui avaliação médica, nutricional ou acompanhamento profissional, especialmente em caso de doenças, gestação, infância, adolescência ou sintomas.</div>
-    <h2>Ferramentas relacionadas</h2>
-    <div class="related-tools"><a href="calculadora-agua-diaria.html">Água Diária</a>
-<a href="bula-online.html">Bula Online</a>
-<a href="mentor-ia.html">Mentor IA</a></div>
-    <p><a class="ghost" href="index.html">← Voltar para a página inicial</a></p>
-  </article>
-  <aside class="tool-widget"><div class="panel" id="imc"><h2>🩺 Calculadora IMC</h2><div class="form"><label>Peso em kg</label><input id="imc_peso" placeholder="Ex: 86"><label>Altura em metros</label><input id="imc_altura" placeholder="Ex: 1,75"><button class="btn" onclick="imc()">Calcular IMC</button><div class="result" id="imc_result"><h3>Resultado</h3><small>Preencha peso e altura para calcular.</small></div></div></div></aside>
-</div></main>
-<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=39"></script>
-</body></html>
+  <div class="topbar"><div class="ticker"><span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span><span>🤖 Portal Central IA</span><span>🩺 Saúde e bem-estar</span></div></div>
+  <nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="brand-mark"><img alt="" class="logo-svg" src="assets/img/logo-central-ia.svg" /></span><span class="brand-name">Central <span class="brand-ia">IA</span></span></a><div class="menu"><a href="index.html#ferramentas">Ferramentas</a><a href="calculadora-financiamento.html">Financiamento</a><a href="calculadora-cdi.html">CDI</a><a href="controle-manutencao-carro.html">Carro</a><a href="calculadora-imc.html">IMC</a><a href="gerador-qr-code.html">QR Code</a><a href="mentor-ia.html">Mentor IA</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div></div></nav>
+
+  <main class="imc-shell">
+    <nav class="breadcrumb"><a href="index.html">Início</a><span>›</span><a href="index.html#ferramentas">Ferramentas</a><span>›</span><span>Calculadora de IMC</span></nav>
+
+    <section class="imc-hero">
+      <div><span class="imc-badge">Ferramenta gratuita</span><h1>Calculadora de IMC Completa</h1><p>Descubra seu IMC, sua faixa estimada de peso saudável, o consumo diário de água e o gasto calórico aproximado. A calculadora fica logo no início para você obter o resultado sem precisar procurar pela página.</p></div>
+      <div class="imc-hero-visual" aria-hidden="true"><span>🩺</span></div>
+    </section>
+
+    <section class="imc-tool" id="calculadora">
+      <h2>Calcule agora</h2><p class="imc-sub">Preencha os dados abaixo. O resultado é atualizado automaticamente.</p>
+      <div class="imc-grid">
+        <div class="imc-field"><label for="peso">Peso (kg)</label><input id="peso" inputmode="decimal" placeholder="Ex.: 86,5" autocomplete="off" /><div class="imc-hint">Use quilos.</div></div>
+        <div class="imc-field"><label for="altura">Altura</label><input id="altura" inputmode="decimal" placeholder="Ex.: 1,75 ou 175" autocomplete="off" /><div class="imc-hint">Metros ou centímetros.</div></div>
+        <div class="imc-field"><label for="idade">Idade</label><input id="idade" type="number" min="18" max="100" placeholder="Ex.: 36" /><div class="imc-hint">Usada no cálculo de calorias.</div></div>
+        <div class="imc-field"><label for="sexo">Sexo biológico</label><select id="sexo"><option value="">Selecione</option><option value="masculino">Masculino</option><option value="feminino">Feminino</option></select><div class="imc-hint">Usado apenas na estimativa de TMB.</div></div>
+      </div>
+      <div class="imc-actions"><button class="imc-btn primary" id="btnCalcular">Calcular IMC</button><button class="imc-btn secondary" id="btnLimpar">Limpar</button><button class="imc-btn secondary" id="btnImprimir">Imprimir / salvar PDF</button></div>
+
+      <div class="imc-results" id="resultados" aria-live="polite">
+        <div class="imc-result-top">
+          <div class="imc-score"><span>Seu IMC</span><div class="number" id="imcNumero">--</div><span class="imc-class" id="imcClasse">Preencha os dados</span><div class="imc-range"><div class="imc-scale"><span class="imc-dot" id="imcDot" style="left:0%"></span></div><div class="imc-scale-labels"><span>Baixo</span><span>Saudável</span><span>Sobrepeso</span><span>Obesidade</span></div></div></div>
+          <div class="imc-message"><h3 id="tituloOrientacao">Interpretação do resultado</h3><p id="textoOrientacao">Preencha peso e altura para receber uma orientação geral.</p><div class="imc-note"><strong>Importante:</strong> o IMC é uma estimativa para adultos e não substitui avaliação médica ou nutricional. Ele pode ser impreciso em atletas, gestantes, idosos e pessoas com condições específicas.</div></div>
+        </div>
+        <div class="imc-cards">
+          <div class="imc-mini">Faixa de peso saudável<b id="pesoSaudavel">--</b></div>
+          <div class="imc-mini">Diferença para a faixa<b id="diferencaPeso">--</b></div>
+          <div class="imc-mini">Água diária estimada<b id="aguaDiaria">--</b></div>
+          <div class="imc-mini">Metabolismo basal<b id="tmbValor">Informe idade e sexo</b></div>
+        </div>
+        <div class="imc-cards" id="caloriasCards" style="display:none">
+          <div class="imc-mini">Manutenção estimada<b id="caloriasManter">--</b></div>
+          <div class="imc-mini">Déficit moderado estimado<b id="caloriasEmagrecer">--</b></div>
+          <div class="imc-mini">Superávit moderado estimado<b id="caloriasGanhar">--</b></div>
+          <div class="imc-mini">Observação<b>Valores aproximados</b></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="imc-sections">
+      <article class="imc-card"><h2>Dicas conforme o resultado</h2><ul class="imc-tips" id="listaDicas"><li>Faça mudanças graduais e sustentáveis.</li><li>Priorize alimentação variada, sono adequado e movimento regular.</li><li>Procure orientação profissional quando necessário.</li></ul></article>
+      <article class="imc-card"><h2>Como interpretar o IMC</h2><p><strong>Abaixo de 18,5:</strong> abaixo do peso.</p><p><strong>18,5 a 24,9:</strong> faixa de referência saudável.</p><p><strong>25 a 29,9:</strong> sobrepeso.</p><p><strong>30 ou mais:</strong> obesidade, dividida em graus.</p><p>O resultado deve ser analisado junto com composição corporal, circunferência abdominal, histórico de saúde e rotina.</p></article>
+      <article class="imc-card"><h2>Para quem está acima do peso</h2><p>Um resultado elevado não define sua saúde sozinho. Como ponto de partida, tente:</p><ul class="imc-tips"><li>Reduzir bebidas açucaradas e alimentos ultraprocessados.</li><li>Incluir mais legumes, verduras, frutas e proteínas adequadas.</li><li>Começar com caminhadas curtas e aumentar gradualmente.</li><li>Dormir de 7 a 9 horas e acompanhar a evolução sem pressa.</li><li>Buscar nutricionista ou médico para um plano individualizado.</li></ul></article>
+      <article class="imc-card"><h2>Como usar a calculadora</h2><ol class="imc-tips"><li>Informe peso e altura.</li><li>Idade e sexo são opcionais, mas permitem estimar a TMB.</li><li>Veja a classificação, peso saudável e água diária.</li><li>Use os resultados como referência educativa, não como diagnóstico.</li></ol></article>
+    </section>
+
+    <section class="imc-card imc-faq" style="margin-top:24px"><h2>Perguntas frequentes</h2><details><summary>O que é IMC?</summary><p>É o Índice de Massa Corporal, calculado dividindo o peso em quilogramas pela altura em metros ao quadrado.</p></details><details><summary>Qual é o IMC considerado saudável?</summary><p>Em adultos, a faixa de referência mais usada é de 18,5 a 24,9.</p></details><details><summary>O IMC é confiável para atletas?</summary><p>Nem sempre. Pessoas com muita massa muscular podem ter IMC alto sem excesso de gordura corporal.</p></details><details><summary>Crianças podem usar esta calculadora?</summary><p>Não. Crianças e adolescentes precisam de curvas específicas por idade e sexo.</p></details><details><summary>Quanto de água devo beber?</summary><p>A ferramenta usa uma referência aproximada de 35 ml por quilo. Necessidades reais variam com clima, atividade física, saúde e orientação profissional.</p></details><details><summary>A estimativa de calorias é exata?</summary><p>Não. É uma aproximação baseada em fórmula. Atividade física, composição corporal e metabolismo individual alteram o gasto real.</p></details></section>
+
+    <section class="imc-card" style="margin-top:24px"><h2>Ferramentas relacionadas</h2><div class="imc-related"><a href="calculadora-agua-diaria.html">Água diária</a><a href="mentor-ia.html">Mentor IA</a><a href="calculadora-cdi.html">Calculadora CDI</a><a href="index.html#ferramentas">Ver todas as ferramentas</a></div><p style="margin-top:22px"><a class="ghost" href="index.html">← Voltar para a página inicial</a></p></section>
+  </main>
+
+  <footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para resolver tarefas do dia a dia com rapidez.</p><p><small>Conteúdo informativo. Em saúde, procure orientação profissional quando necessário.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer>
+  <script src="assets/js/app.js?v=46.1"></script>
+  <script>
+    (() => {
+      const $ = id => document.getElementById(id);
+      const parseBR = value => {
+        if (!value) return NaN;
+        let s = String(value).trim().replace(/\s/g, '');
+        if (s.includes(',') && s.includes('.')) s = s.replace(/\./g, '').replace(',', '.');
+        else if (s.includes(',')) s = s.replace(',', '.');
+        return Number(s);
+      };
+      const fmt1 = n => n.toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1});
+      const fmt0 = n => Math.round(n).toLocaleString('pt-BR');
+      const campos = ['peso','altura','idade','sexo'].map($);
+      function dados(){
+        const peso = parseBR($('peso').value);
+        let altura = parseBR($('altura').value);
+        if (altura > 3) altura /= 100;
+        return {peso, altura, idade:Number($('idade').value), sexo:$('sexo').value};
+      }
+      function classificacao(imc){
+        if(imc < 18.5) return ['Abaixo do peso','class-low'];
+        if(imc < 25) return ['Peso adequado','class-ok'];
+        if(imc < 30) return ['Sobrepeso','class-over'];
+        if(imc < 35) return ['Obesidade grau I','class-ob1'];
+        if(imc < 40) return ['Obesidade grau II','class-ob2'];
+        return ['Obesidade grau III','class-ob3'];
+      }
+      function orientacao(imc){
+        if(imc < 18.5) return ['Atenção ao baixo peso','O resultado indica peso abaixo da faixa de referência. Uma avaliação profissional pode ajudar a investigar alimentação, massa muscular e possíveis causas.',['Faça refeições regulares e completas.','Inclua proteínas e alimentos nutritivos.','Evite tentar ganhar peso apenas com ultraprocessados.','Converse com nutricionista ou médico se houver perda de peso sem explicação.']];
+        if(imc < 25) return ['Resultado dentro da faixa de referência','Seu IMC está na faixa geralmente considerada saudável para adultos. Continue cuidando da alimentação, do sono, da atividade física e dos exames preventivos.',['Mantenha alimentação variada.','Pratique atividade física de forma regular.','Durma bem e cuide do estresse.','Acompanhe medidas e saúde geral, não apenas o peso.']];
+        if(imc < 30) return ['Resultado indica sobrepeso','O IMC sugere peso acima da faixa de referência. Pequenas mudanças consistentes podem melhorar saúde e disposição, sem dietas extremas.',['Comece com 20 a 30 minutos de caminhada.','Reduza bebidas açucaradas e ultraprocessados.','Inclua mais verduras, frutas e proteínas adequadas.','Defina metas graduais e procure orientação profissional.']];
+        return ['Resultado indica obesidade','O IMC está na faixa de obesidade. Isso não é um diagnóstico isolado, mas justifica uma avaliação profissional para analisar pressão, glicemia, colesterol, sono, mobilidade e composição corporal.',['Procure médico ou nutricionista para uma avaliação segura.','Evite dietas muito restritivas sem acompanhamento.','Comece atividade física respeitando seus limites.','Priorize mudanças graduais, sono adequado e apoio contínuo.']];
+      }
+      function calcular(){
+        const {peso,altura,idade,sexo}=dados();
+        if(!(peso>20 && peso<400 && altura>1 && altura<2.5)) { $('resultados').classList.remove('show'); return; }
+        const imc = peso/(altura*altura);
+        const [classe, css] = classificacao(imc);
+        $('imcNumero').textContent = fmt1(imc);
+        $('imcClasse').textContent = classe;
+        $('imcClasse').className = 'imc-class '+css;
+        const pos = Math.max(1,Math.min(99,((imc-15)/(45-15))*100)); $('imcDot').style.left=pos+'%';
+        const min = 18.5*altura*altura, max = 24.9*altura*altura;
+        $('pesoSaudavel').textContent = fmt1(min)+' a '+fmt1(max)+' kg';
+        if(peso<min) $('diferencaPeso').textContent = 'Ganhar cerca de '+fmt1(min-peso)+' kg';
+        else if(peso>max) $('diferencaPeso').textContent = 'Reduzir cerca de '+fmt1(peso-max)+' kg';
+        else $('diferencaPeso').textContent = 'Dentro da faixa';
+        $('aguaDiaria').textContent = fmt1((peso*35)/1000)+' litros/dia';
+        const [titulo,texto,dicas]=orientacao(imc); $('tituloOrientacao').textContent=titulo; $('textoOrientacao').textContent=texto; $('listaDicas').innerHTML=dicas.map(x=>'<li>'+x+'</li>').join('');
+        if(idade>=18 && idade<=100 && sexo){
+          const tmb = sexo==='masculino' ? 10*peso+6.25*(altura*100)-5*idade+5 : 10*peso+6.25*(altura*100)-5*idade-161;
+          const manut = tmb*1.35;
+          $('tmbValor').textContent=fmt0(tmb)+' kcal/dia'; $('caloriasManter').textContent=fmt0(manut)+' kcal/dia'; $('caloriasEmagrecer').textContent=fmt0(Math.max(1200,manut-350))+' kcal/dia'; $('caloriasGanhar').textContent=fmt0(manut+250)+' kcal/dia'; $('caloriasCards').style.display='grid';
+        } else { $('tmbValor').textContent='Informe idade e sexo'; $('caloriasCards').style.display='none'; }
+        $('resultados').classList.add('show');
+      }
+      let timer; campos.forEach(el=>el.addEventListener('input',()=>{clearTimeout(timer);timer=setTimeout(calcular,250)})); $('sexo').addEventListener('change',calcular);
+      $('btnCalcular').addEventListener('click',calcular);
+      $('btnLimpar').addEventListener('click',()=>{campos.forEach(el=>el.value='');$('resultados').classList.remove('show');$('listaDicas').innerHTML='<li>Faça mudanças graduais e sustentáveis.</li><li>Priorize alimentação variada, sono adequado e movimento regular.</li><li>Procure orientação profissional quando necessário.</li>';});
+      $('btnImprimir').addEventListener('click',()=>window.print());
+    })();
+  </script>
+</body>
+</html>
