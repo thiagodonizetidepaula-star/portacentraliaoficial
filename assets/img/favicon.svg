@@ -1,6 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-<rect width="64" height="64" rx="18" fill="#111827"/>
-<circle cx="32" cy="32" r="24" fill="none" stroke="#f8fafc" stroke-width="3"/>
-<text x="17" y="40" font-family="Georgia, 'Times New Roman', serif" font-size="30" font-weight="600" fill="#f8fafc">C</text>
-<text x="39" y="40" font-family="Georgia, 'Times New Roman', serif" font-size="13" font-weight="600" fill="#f8fafc">IA</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Portal Central IA">
+  <defs>
+    <linearGradient id="pgrad" x1="18" y1="108" x2="110" y2="16" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563eb"/>
+      <stop offset="0.48" stop-color="#06c8f4"/>
+      <stop offset="1" stop-color="#a333f5"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#4338ca" flood-opacity="0.24"/>
+    </filter>
+  </defs>
+  <g filter="url(#soft)">
+    <path fill="url(#pgrad)" d="M43 18h31c24 0 40 14 40 36 0 22-16 37-40 37H61v19H43V18zm18 17v39h12c13 0 22-7 22-20 0-12-9-19-22-19H61z"/>
+    <rect x="28" y="35" width="9" height="9" rx="2.5" fill="#06c8f4"/>
+    <rect x="19" y="49" width="8" height="8" rx="2.2" fill="#22d3ee"/>
+    <rect x="30" y="59" width="7" height="7" rx="2" fill="#3b82f6"/>
+    <rect x="20" y="72" width="9" height="9" rx="2.5" fill="#6366f1"/>
+    <rect x="31" y="84" width="6" height="6" rx="1.8" fill="#8b5cf6"/>
+  </g>
 </svg>
