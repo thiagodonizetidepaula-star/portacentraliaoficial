@@ -336,14 +336,6 @@ function gerarMentor(){
     const links=panel.querySelector('.mobile-menu-links');
     desktopMenu.querySelectorAll('a').forEach(a=>links.appendChild(a.cloneNode(true)));
 
-    // Garante acesso direto às notícias no menu móvel, sem tratá-las como ferramenta.
-    if(!Array.from(links.querySelectorAll('a')).some(a=>/noticias\.html/.test(a.getAttribute('href')||''))){
-      const newsLink=document.createElement('a');
-      newsLink.href='noticias.html';
-      newsLink.textContent='Notícias';
-      links.insertBefore(newsLink,links.children[1]||null);
-    }
-
     document.body.append(backdrop,panel);
 
     const close=()=>{
