@@ -13,7 +13,7 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://portalcentralia.com.br/">
 <link rel="canonical" href="https://portalcentralia.com.br/">
-<link rel="stylesheet" href="assets/css/style.css?v=64">
+<link rel="stylesheet" href="assets/css/style.css?v=73">
 <link rel="icon" href="assets/img/favicon.ico" sizes="any">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -93,10 +93,19 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
     </div>
 
     <div class="dashboard">
-      <div class="dash-card copa-card">
-        <div class="copa-headline"><h3>🏆 Jogos da Copa</h3></div>
-        <div id="copa_widget" class="copa-widget" aria-live="polite"><p class="lead">Carregando próximos jogos...</p></div>
-      </div>
+      <section class="dash-card portal-presentation" aria-labelledby="portal-presentation-title">
+        <span class="presentation-kicker">Tudo em um só portal</span>
+        <h2 id="portal-presentation-title">Ferramentas úteis para resolver tarefas reais</h2>
+        <p>Calcule, organize, crie documentos e use recursos de inteligência artificial sem instalar aplicativos.</p>
+        <div class="presentation-benefits">
+          <span><b>⚡</b> Resultado rápido</span>
+          <span><b>📱</b> Funciona no celular</span>
+          <span><b>🔒</b> Dados no navegador</span>
+          <span><b>🎯</b> Ferramentas práticas</span>
+        </div>
+        <a class="presentation-cta" href="#ferramentas">Conhecer todas as ferramentas <span aria-hidden="true">→</span></a>
+      </section>
+
       <div class="dash-card tool-day premium-quick-card">
         <div class="quick-head"><span>✨ Explore a Central IA</span><small>Escolha e use agora</small></div>
         <div class="quick-visual-grid">
@@ -135,96 +144,6 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 <section class="section"><div class="wrap grid"><div class="panel" id="imc"><h2>🩺 IMC</h2><div class="form"><input id="imc_peso" placeholder="Peso em kg"><input id="imc_altura" placeholder="Altura. Ex: 1,75"><button class="btn" onclick="imc()">Calcular</button><div class="result" id="imc_result"><h3>Resultado</h3></div></div></div><div class="panel" id="agua"><h2>💧 Água Diária</h2><div class="form"><input id="agua_peso" placeholder="Peso em kg"><button class="btn" onclick="agua()">Calcular água</button><div class="result" id="agua_result"><h3>Resultado</h3></div></div></div><div class="panel" id="pdf"><h2>📄 PDF e Imagens</h2><p class="lead">Módulo preparado para conversão, compressão e organização de arquivos. Próxima etapa: páginas próprias para cada conversor.</p><button class="btn" onclick="toast('Módulo PDF preparado para próxima versão')">Ver módulo</button></div><div class="panel prompt-builder" id="prompt-gerador"><span class="badge">🤖 Novo módulo premium</span><h2>✍️ Gerador de Prompt com Resultado</h2><p class="lead">Crie um prompt completo e receba também um resultado pronto gerado dentro da Central IA para copiar, adaptar e usar onde quiser.</p><div class="form"><select id="prompt_tipo"><option value="imagem-realista">Imagem realista</option><option value="desenho">Desenho/ilustração</option><option value="robotica">Robótica/futurista</option><option value="vendas">Texto de vendas</option><option value="instagram">Post para Instagram</option><option value="negocio">Ideia de negócio</option><option value="atendimento">Resposta para cliente</option></select><input id="prompt_tema" placeholder="Tema. Ex: manicure, oficina, carro, produto, robô..."><textarea id="prompt_detalhes" placeholder="Detalhes opcionais: público, estilo, cores, objetivo, formato, tom de voz..."></textarea><select id="prompt_tom"><option value="profissional">Tom profissional</option><option value="simples">Tom simples e direto</option><option value="premium">Tom premium</option><option value="criativo">Tom criativo</option><option value="emocional">Tom emocional</option></select><button class="btn" onclick="gerarPromptAvancado()">Gerar prompt e resultado</button><div class="prompt-output-grid"><div class="result prompt-output" id="prompt_result"><h3>Prompt pronto</h3><small>Preencha os campos e clique em gerar.</small></div><div class="result prompt-output" id="prompt_answer"><h3>Resultado gerado</h3><small>A Central IA vai montar um exemplo pronto para copiar.</small></div></div><div class="mini-actions"><button class="ghost" onclick="copyFrom('prompt_result')">Copiar prompt</button><button class="ghost" onclick="copyFrom('prompt_answer')">Copiar resultado</button><button class="ghost" onclick="mailBlock('prompt_answer','Resultado gerado pela Central IA')">Enviar resultado por e-mail</button><button class="ghost" onclick="downloadText('resultado-prompt-central-ia.txt',document.getElementById('prompt_answer').innerText)">Baixar TXT</button></div></div></div></div></section>
 <section class="section"><div class="wrap panel prose"><h2>Por que a Central IA existe?</h2><p>A Central IA foi criada para reunir ferramentas simples, gratuitas e úteis em um só lugar. Em vez de obrigar o usuário a instalar aplicativos pesados ou aprender sistemas complicados, a proposta é permitir que ele resolva tarefas rápidas diretamente pelo navegador.</p><h3>Como usar com segurança</h3><p>As ferramentas financeiras, de saúde, documentos e veículos são informativas. Sempre confirme dados importantes em fontes oficiais, profissionais especializados ou órgãos responsáveis.</p><h3>Próximas evoluções</h3><p>Novas páginas individuais para cada ferramenta, FAQ completo, guias explicativos e melhorias de SEO serão adicionados continuamente.</p></div></section>
 </main>
-<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=58"></script>
-
-<script>
-(function(){
-  const box = document.getElementById('copa_widget');
-  if(!box) return;
-  const safe = (value) => String(value || '').replace(/[&<>"']/g, (char) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
-  const formatGameDate = (value) => {
-    if(!value) return 'Data a confirmar';
-    const date = new Date(value);
-    if(Number.isNaN(date.getTime())) return 'Data a confirmar';
-    return date.toLocaleString('pt-BR', {weekday:'short', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}).replace('.', '');
-  };
-  const teamLogo = (team) => team && team.logo ? `<img src="${safe(team.logo)}" alt="${safe(team.name || 'Seleção')}" loading="lazy">` : '<span class="team-ball">⚽</span>';
-  async function loadCopa(){
-    try{
-      const response = await fetch('', {headers:{'Accept':'application/json'}});
-      const data = await response.json().catch(()=>null);
-      if(!response.ok || !data || data.ok === false) throw new Error((data && data.message) || 'Não foi possível carregar os jogos.');
-      const games = (data.games || []).slice(0,3);
-      if(!games.length){
-        box.innerHTML = '<div class="copa-empty"><b>Nenhum jogo encontrado agora.</b><small>Novas partidas aparecerão aqui quando estiverem disponíveis.</small></div>';
-        return;
-      }
-      const main = games[0];
-      const rest = games.slice(1);
-      box.innerHTML = `
-        <article class="copa-main-game">
-          <div class="copa-league">${safe(main.liga || 'Copa')}</div>
-          <div class="copa-time">${safe(formatGameDate(main.data))}</div>
-          <div class="copa-teams">
-            <div class="copa-team">${teamLogo(main.timeA)}<b>${safe(main.timeA.sigla || main.timeA.nome)}</b></div>
-            <div class="copa-x">x</div>
-            <div class="copa-team">${teamLogo(main.timeB)}<b>${safe(main.timeB.sigla || main.timeB.nome)}</b></div>
-          </div>
-          <small>${safe(main.status || 'A confirmar')}</small>
-        </article>
-        ${rest.length ? `<div class="copa-next-list">${rest.map(game => `<div class="copa-next"><span>${safe(formatGameDate(game.data))}</span><b>${safe(game.timeA.sigla || game.timeA.nome)} x ${safe(game.timeB.sigla || game.timeB.nome)}</b></div>`).join('')}</div>` : ''}
-      `;
-    }catch(error){
-      box.innerHTML = `<div class="copa-empty"><b>Agenda em atualização.</b><small>Se a conexão falhar, tente atualizar a página em instantes.</small></div>`;
-    }
-  }
-  loadCopa();
-})();
-</script>
-
-<script>
-(function(){
-  const card=document.getElementById('market_pro_card');
-  if(!card) return;
-  const data={
-    ibov:{name:'Ibovespa',value:null,change:null,high:null,low:null,format:'points',source:'Brapi'},
-    usd:{name:'Dólar comercial',value:null,change:null,high:null,low:null,format:'brl',source:'AwesomeAPI'},
-    btc:{name:'Bitcoin',value:null,change:null,high:null,low:null,format:'brl0',source:'CoinGecko'}
-  };
-  let active='ibov';
-  const brl=(n,d=2)=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:d,maximumFractionDigits:d}).format(n);
-  const fmt=(n,t)=>n==null?'Indisponível':t==='points'?new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0}).format(n)+' pts':t==='brl0'?brl(n,0):brl(n,2);
-  const pct=n=>Number.isFinite(n)?(n>=0?'+':'')+n.toFixed(2).replace('.',',')+'%':'--';
-  function renderTiles(){
-    for(const k of ['ibov','usd','btc']){
-      const d=data[k];
-      const v=document.getElementById('market_'+k+'_value');
-      const c=document.getElementById('market_'+k+'_change');
-      v.textContent=fmt(d.value,d.format); c.textContent=pct(d.change);
-      c.className=Number.isFinite(d.change)?(d.change>0?'up':d.change<0?'down':'neutral'):'neutral';
-    }
-  }
-  function renderDetail(){
-    const d=data[active];
-    document.getElementById('quote_name').textContent=d.name;
-    document.getElementById('quote_high').textContent=fmt(d.high,d.format);
-    document.getElementById('quote_low').textContent=fmt(d.low,d.format);
-    document.getElementById('quote_source').textContent='Fonte: '+d.source+' • Consulta automática em '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+'. Valores podem sofrer atraso.';
-    card.querySelectorAll('[data-market-tab]').forEach(b=>b.classList.toggle('active',b.dataset.marketTab===active));
-  }
-  card.querySelectorAll('[data-market-tab]').forEach(b=>b.addEventListener('click',()=>{active=b.dataset.marketTab;renderDetail()}));
-  async function ibov(){
-    try{const r=await fetch('https://brapi.dev/api/quote/%5EBVSP').then(x=>{if(!x.ok)throw 0;return x.json()});const q=r.results&&r.results[0];if(!q)throw 0;Object.assign(data.ibov,{value:+q.regularMarketPrice,change:+q.regularMarketChangePercent,high:+q.regularMarketDayHigh,low:+q.regularMarketDayLow});}catch(e){}
-  }
-  async function usd(){
-    try{const r=await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL').then(x=>{if(!x.ok)throw 0;return x.json()});const q=r.USDBRL;if(!q)throw 0;Object.assign(data.usd,{value:+q.bid,change:+q.pctChange,high:+q.high,low:+q.low});}catch(e){}
-  }
-  async function btc(){
-    try{const r=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl&include_24hr_change=true').then(x=>{if(!x.ok)throw 0;return x.json()});const q=r.bitcoin;if(!q)throw 0;Object.assign(data.btc,{value:+q.brl,change:+q.brl_24h_change,high:null,low:null});}catch(e){}
-  }
-  async function load(){await Promise.allSettled([ibov(),usd(),btc()]);renderTiles();renderDetail();}
-  renderTiles();renderDetail();load();setInterval(load,180000);
-})();
-</script>
+<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=73"></script>
 
 </body></html>
