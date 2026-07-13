@@ -151,7 +151,7 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
   const teamLogo = (team) => team && team.logo ? `<img src="${safe(team.logo)}" alt="${safe(team.name || 'Seleção')}" loading="lazy">` : '<span class="team-ball">⚽</span>';
   async function loadCopa(){
     try{
-      const response = await fetch('/api/copa', {headers:{'Accept':'application/json'}});
+      const response = await fetch('', {headers:{'Accept':'application/json'}});
       const data = await response.json().catch(()=>null);
       if(!response.ok || !data || data.ok === false) throw new Error((data && data.message) || 'Não foi possível carregar os jogos.');
       const games = (data.games || []).slice(0,3);
