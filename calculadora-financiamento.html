@@ -14,7 +14,7 @@
 <meta property="og:description" content="Compare financiamento Price e SAC, calcule parcelas, juros, comprometimento de renda e amortização extra gratuitamente.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://portalcentralia.com.br/calculadora-financiamento.html">
-<link rel="stylesheet" href="assets/css/style.css?v=74">
+<link rel="stylesheet" href="assets/css/style.css?v=76">
 <link rel="icon" href="assets/img/favicon.ico" sizes="any">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -41,6 +41,12 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
   gtag('config', 'G-8HC73ZNR5C');
 </script>
 
+<style id="fin-hero-v75">
+.fin-premium-hero{padding:24px 0 34px;background:#f5f8ff}.fin-breadcrumb{margin-bottom:18px}.fin-hero-shell{position:relative;overflow:hidden;border-radius:30px;padding:46px;background:radial-gradient(circle at 78% 30%,rgba(32,130,255,.42),transparent 31%),linear-gradient(135deg,#071c58 0%,#0a3fa7 55%,#0b72df 100%);color:#fff;box-shadow:0 24px 60px rgba(7,32,86,.22);display:grid;grid-template-columns:1.02fr .98fr;gap:28px;align-items:center;min-height:600px}.fin-hero-shell:before,.fin-hero-shell:after{content:"";position:absolute;border-radius:50%;border:1px solid rgba(108,190,255,.18)}.fin-hero-shell:before{width:460px;height:460px;right:-90px;top:-150px}.fin-hero-shell:after{width:330px;height:330px;left:-150px;bottom:-190px}.fin-hero-copy{position:relative;z-index:2}.fin-hero-badge{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(90deg,#0d6bff,#21b7ff);padding:10px 18px;border-radius:999px;font-weight:800;font-size:.9rem;box-shadow:0 10px 25px rgba(0,92,255,.28)}.fin-hero-copy h1{margin:22px 0 14px;font-size:clamp(2.5rem,4.6vw,4.6rem);line-height:.98;letter-spacing:-.04em;color:#fff}.fin-hero-copy h1 span{display:block;background:linear-gradient(90deg,#56ddff,#3fa0ff);-webkit-background-clip:text;background-clip:text;color:transparent}.fin-hero-copy>p{font-size:1.1rem;line-height:1.7;max-width:560px;color:#dce9ff}.fin-benefits{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px;margin:26px 0;color:#fff;font-weight:700}.fin-benefits div{display:flex;align-items:center;gap:9px}.fin-benefits div::first-letter{color:#58d9ff}.fin-privacy{display:flex;align-items:center;gap:12px;padding:16px 18px;border:1px solid rgba(127,194,255,.35);background:rgba(3,27,79,.52);border-radius:18px;width:max-content;max-width:100%;backdrop-filter:blur(10px)}.fin-privacy b,.fin-privacy small{display:block}.fin-privacy small{margin-top:3px;color:#c8dcff}.fin-hero-visual{position:relative;z-index:2;min-height:520px;display:flex;align-items:center;justify-content:center}.fin-hero-visual svg{width:100%;max-width:720px;filter:drop-shadow(0 24px 34px rgba(0,19,72,.25));animation:finFloat 5s ease-in-out infinite}.fin-float-cards{position:absolute;left:50%;bottom:2px;transform:translateX(-50%);display:grid;grid-template-columns:repeat(3,minmax(150px,1fr));gap:10px;width:96%}.fin-float-cards>div{background:rgba(255,255,255,.96);color:#0e2348;border-radius:16px;padding:14px 15px;box-shadow:0 14px 30px rgba(0,31,91,.2)}.fin-float-cards span,.fin-float-cards small{display:block;color:#657491;font-size:.76rem}.fin-float-cards b{display:block;margin:5px 0 3px;font-size:1.02rem;color:#135fc9}.fin-float-cards>div:nth-child(2) b{color:#1b9c53}.fin-float-cards>div:nth-child(3) b{color:#8245d2}@keyframes finFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@media(max-width:980px){.fin-hero-shell{grid-template-columns:1fr;padding:34px;min-height:auto}.fin-hero-copy{text-align:center}.fin-hero-copy>p{margin-left:auto;margin-right:auto}.fin-benefits{max-width:640px;margin:24px auto}.fin-privacy{margin:0 auto}.fin-hero-visual{min-height:500px}.fin-float-cards{position:relative;left:auto;bottom:auto;transform:none;margin-top:-36px;width:100%}}
+@media(max-width:640px){.fin-premium-hero{padding-top:10px}.fin-hero-shell{border-radius:24px;padding:24px 20px}.fin-hero-copy h1{font-size:2.5rem}.fin-hero-copy>p{font-size:1rem}.fin-benefits{grid-template-columns:1fr;text-align:left;gap:11px}.fin-privacy{width:100%;text-align:left}.fin-hero-visual{min-height:390px;margin-top:4px}.fin-hero-visual svg{max-height:390px}.fin-float-cards{grid-template-columns:1fr;gap:8px;margin-top:-20px}.fin-float-cards>div{padding:12px 14px}.fin-float-cards span,.fin-float-cards small{font-size:.72rem}.fin-float-cards b{font-size:1rem}}
+@media(prefers-reduced-motion:reduce){.fin-hero-visual svg{animation:none}}
+</style>
 </head>
 <body>
 <div class="topbar"><div class="ticker">
@@ -48,16 +54,87 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 <span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span>
 </div></div>
 <nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="brand-mark"><img class="logo-svg" src="assets/img/logo-central-ia.svg" alt=""></span><span class="brand-name">Central <span class="brand-ia">IA</span></span></a><div class="menu"><a href="index.html">Início</a><a href="index.html#ferramentas">Ferramentas</a><a class="active" href="calculadora-financiamento.html">Financiamento</a><a href="calculadora-cdi.html">CDI</a><a href="controle-manutencao-carro.html">Carro</a><a href="calculadora-imc.html">IMC</a><a href="gerador-prompt-ia.html">Gerador Prompt</a><a href="mentor-ia.html">Mentor IA</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div></nav>
-<header class="page-hero fin-hero"><div class="wrap">
-  <nav class="breadcrumb"><a href="index.html">Início</a><span>›</span><a href="index.html#ferramentas">Ferramentas</a><span>›</span><span>Calculadora de Financiamento</span></nav>
-  <span class="badge">Simulador completo e gratuito</span>
-  <h1>Calculadora de Financiamento</h1>
-  <p class="lead">Compare Price e SAC, descubra o custo total, veja se a parcela cabe na sua renda e simule o impacto de uma amortização extra.</p>
-</div></header>
+<header class="fin-premium-hero">
+  <div class="wrap">
+    <nav class="breadcrumb fin-breadcrumb"><a href="index.html">Início</a><span>›</span><a href="index.html#ferramentas">Ferramentas</a><span>›</span><span>Calculadora de Financiamento</span></nav>
+    <div class="fin-hero-shell">
+      <div class="fin-hero-copy">
+        <span class="fin-hero-badge">✦ Ferramenta gratuita</span>
+        <h1>Calculadora de <span>Financiamento</span></h1>
+        <p>Simule parcelas, juros e compare diferentes cenários de financiamento de forma rápida, simples e segura.</p>
+        <div class="fin-benefits" aria-label="Benefícios da calculadora">
+          <div>✓ Resultado imediato</div>
+          <div>✓ Simulação ilimitada</div>
+          <div>✓ SAC e PRICE</div>
+          <div>✓ Fácil de usar</div>
+          <div>✓ Comparação de parcelas</div>
+          <div>✓ Totalmente gratuito</div>
+        </div>
+        <div class="fin-privacy"><span>🔒</span><div><b>Seus dados permanecem no navegador.</b><small>Não armazenamos suas informações.</small></div></div>
+      </div>
+
+      <div class="fin-hero-visual" aria-label="Ilustração de casa, carro, calculadora e gráfico financeiro">
+        <svg viewBox="0 0 760 560" role="img" aria-hidden="true">
+          <defs>
+            <linearGradient id="sky" x1="0" x2="1"><stop offset="0" stop-color="#0b3ea6"/><stop offset="1" stop-color="#0f7df4"/></linearGradient>
+            <linearGradient id="house" x1="0" x2="1"><stop offset="0" stop-color="#f8fbff"/><stop offset="1" stop-color="#b8d4ff"/></linearGradient>
+            <linearGradient id="car" x1="0" x2="1"><stop offset="0" stop-color="#0f3f88"/><stop offset="1" stop-color="#2f7ee8"/></linearGradient>
+            <filter id="shadow"><feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#001b52" flood-opacity=".35"/></filter>
+          </defs>
+          <circle cx="380" cy="275" r="220" fill="url(#sky)" opacity=".42"/>
+          <g opacity=".92" fill="none" stroke="#73c6ff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M430 125 L495 178 L550 155 L615 95"/>
+            <path d="M592 103 L617 94 L610 120"/>
+          </g>
+          <g fill="#4da8ff" opacity=".8">
+            <rect x="438" y="224" width="25" height="88" rx="6"/><rect x="475" y="205" width="25" height="107" rx="6"/><rect x="512" y="177" width="25" height="135" rx="6"/><rect x="549" y="141" width="25" height="171" rx="6"/>
+          </g>
+          <g filter="url(#shadow)">
+            <path d="M180 336 V220 L312 142 L470 223 V336 Z" fill="url(#house)" stroke="#dbe8ff" stroke-width="5"/>
+            <path d="M230 336 V245 H315 V336" fill="#1b3767"/><rect x="340" y="235" width="82" height="70" rx="4" fill="#19315e"/>
+            <path d="M160 220 L310 126 L491 220" fill="none" stroke="#7db6ff" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="191" y="262" width="57" height="74" fill="#d5e6ff"/>
+          </g>
+          <g transform="translate(120 318)" filter="url(#shadow)">
+            <path d="M56 87 C76 42 137 20 226 21 C285 22 331 42 357 70 L392 76 C411 80 424 95 424 113 V129 H28 V111 C28 99 39 89 56 87 Z" fill="url(#car)" stroke="#8cc7ff" stroke-width="5"/>
+            <path d="M122 39 H250 C278 39 302 49 321 68 H91 C98 54 108 45 122 39Z" fill="#bfe5ff" opacity=".88"/>
+            <circle cx="105" cy="130" r="34" fill="#0d1d39"/><circle cx="105" cy="130" r="15" fill="#b9d4ff"/>
+            <circle cx="344" cy="130" r="34" fill="#0d1d39"/><circle cx="344" cy="130" r="15" fill="#b9d4ff"/>
+          </g>
+          <g transform="translate(478 258)" filter="url(#shadow)">
+            <rect x="0" y="0" width="205" height="260" rx="26" fill="#1c2f52" stroke="#8db7f3" stroke-width="6"/>
+            <rect x="28" y="25" width="149" height="60" rx="12" fill="#cce7ff"/>
+            <text x="102" y="66" text-anchor="middle" font-size="29" font-family="Arial" font-weight="700" fill="#0a2248">1.850,00</text>
+            <g fill="#2d4f80">
+              <rect x="28" y="104" width="36" height="30" rx="8"/><rect x="77" y="104" width="36" height="30" rx="8"/><rect x="126" y="104" width="36" height="30" rx="8"/>
+              <rect x="28" y="145" width="36" height="30" rx="8"/><rect x="77" y="145" width="36" height="30" rx="8"/><rect x="126" y="145" width="36" height="30" rx="8"/>
+              <rect x="28" y="186" width="36" height="30" rx="8"/><rect x="77" y="186" width="36" height="30" rx="8"/><rect x="126" y="186" width="36" height="30" rx="8"/>
+            </g>
+            <rect x="168" y="104" width="20" height="112" rx="9" fill="#1b7cf1"/>
+          </g>
+          <g transform="translate(585 125)"><circle cx="0" cy="0" r="50" fill="#1f8fff" opacity=".9"/><text x="0" y="13" text-anchor="middle" font-size="50" font-family="Arial" font-weight="700" fill="white">%</text></g>
+          <g transform="translate(425 112)"><circle cx="0" cy="0" r="33" fill="#2aa5ff"/><text x="0" y="11" text-anchor="middle" font-size="32" font-family="Arial" font-weight="700" fill="white">$</text></g>
+        </svg>
+        <div class="fin-float-cards">
+          <div><span>Parcela estimada</span><b>R$ 1.850,00</b><small>Valor aproximado</small></div>
+          <div><span>Juros aproximados</span><b>10,50% a.a.</b><small>Taxa de juros</small></div>
+          <div><span>Total financiado</span><b>R$ 250.000,00</b><small>Valor ilustrativo</small></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
 <main class="tool-page fin-pro"><div class="wrap">
   <section class="fin-app" aria-labelledby="simulador-titulo">
     <div class="fin-form-card">
-      <div class="fin-section-head"><div><span class="fin-kicker">SIMULAÇÃO</span><h2 id="simulador-titulo">Monte seu financiamento</h2></div><span class="fin-step">1</span></div>
+      <div class="fin-section-head fin-section-head-clean">
+        <div>
+          <span class="fin-kicker fin-kicker-pill">▣ SIMULAÇÃO</span>
+          <h2 id="simulador-titulo">Monte seu financiamento</h2>
+          <p class="fin-form-lead">Preencha os dados abaixo para simular e comparar as melhores condições.</p>
+        </div>
+        <div class="fin-form-mini-visual" aria-hidden="true"><span>🏠</span><span>🚙</span><span>🧮</span><b>↗</b></div>
+      </div>
       <div class="fin-type-tabs" role="group" aria-label="Tipo de financiamento">
         <button type="button" class="fin-type active" data-type="Veículo">🚗 Veículo</button>
         <button type="button" class="fin-type" data-type="Imóvel">🏠 Imóvel</button>
@@ -65,14 +142,15 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
         <button type="button" class="fin-type" data-type="Outro">📦 Outro</button>
       </div>
       <div class="fin-grid">
-        <label><span>Valor do bem</span><input class="money" id="fp_valor" value="R$ 60.000,00" inputmode="decimal"></label>
-        <label><span>Entrada</span><input class="money" id="fp_entrada" value="R$ 12.000,00" inputmode="decimal"></label>
-        <label><span>Taxa de juros</span><div class="fin-input-combo"><input id="fp_taxa" value="1,89" inputmode="decimal"><select id="fp_periodo"><option value="mes">% ao mês</option><option value="ano">% ao ano</option></select></div></label>
-        <label><span>Prazo</span><div class="fin-input-combo"><input id="fp_prazo" value="48" inputmode="numeric"><select id="fp_unidade"><option value="meses">meses</option><option value="anos">anos</option></select></div></label>
-        <label><span>Renda mensal (opcional)</span><input class="money" id="fp_renda" placeholder="R$ 5.000,00" inputmode="decimal"></label>
-        <label><span>Amortização extra (opcional)</span><input class="money" id="fp_extra" placeholder="R$ 5.000,00" inputmode="decimal"></label>
+        <label class="fin-field fin-field-value"><span>Valor do bem</span><input class="money" id="fp_valor" value="R$ 60.000,00" inputmode="decimal"></label>
+        <label class="fin-field fin-field-entry"><span>Entrada</span><input class="money" id="fp_entrada" value="R$ 12.000,00" inputmode="decimal"></label>
+        <label class="fin-field fin-field-rate"><span>Taxa de juros</span><div class="fin-input-combo"><input id="fp_taxa" value="1,89" inputmode="decimal"><select id="fp_periodo"><option value="mes">% ao mês</option><option value="ano">% ao ano</option></select></div></label>
+        <label class="fin-field fin-field-term"><span>Prazo</span><div class="fin-input-combo"><input id="fp_prazo" value="48" inputmode="numeric"><select id="fp_unidade"><option value="meses">meses</option><option value="anos">anos</option></select></div></label>
+        <label class="fin-field fin-field-income"><span>Renda mensal (opcional)</span><input class="money" id="fp_renda" placeholder="R$ 5.000,00" inputmode="decimal"></label>
+        <label class="fin-field fin-field-extra"><span>Amortização extra (opcional)</span><input class="money" id="fp_extra" placeholder="R$ 5.000,00" inputmode="decimal"></label>
       </div>
-      <button class="btn fin-primary" type="button" onclick="calcularFinPro()">Calcular e comparar</button>
+      <button class="btn fin-primary" type="button" onclick="calcularFinPro()"><span aria-hidden="true">▦</span> Calcular e comparar</button>
+      <div class="fin-safe-note"><span aria-hidden="true">🛡️</span><div><b>Simulação segura</b><small>Seus dados permanecem no navegador e não são enviados para nenhum servidor.</small></div></div>
       <p class="fin-helper">Estimativa educativa. O banco pode incluir CET, seguros, tarifas e outras condições.</p>
     </div>
 
@@ -120,6 +198,21 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 
 <style>
 .fin-pro{padding-top:22px}.fin-hero .lead{max-width:820px}.fin-app{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:24px;align-items:start}.fin-form-card,.fin-results-card{background:#fff;border:1px solid #dedbd3;border-radius:28px;padding:28px;box-shadow:0 18px 55px rgba(15,27,52,.08)}.fin-results-card{position:sticky;top:92px;min-height:520px}.fin-section-head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:20px}.fin-section-head h2{margin:5px 0 0;font-size:clamp(1.6rem,3vw,2.3rem)}.fin-kicker{font-size:.77rem;letter-spacing:.13em;font-weight:800;color:#244b93}.fin-step{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#10295d;color:#fff;font-weight:800}.fin-type-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:22px}.fin-type{border:1px solid #d8d5cc;border-radius:14px;background:#fbfaf7;padding:12px 8px;font:inherit;color:#253047;cursor:pointer}.fin-type.active{background:#10295d;color:#fff;border-color:#10295d}.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.fin-grid label>span{display:block;font-size:.9rem;font-weight:700;margin-bottom:7px}.fin-grid input,.fin-grid select{width:100%;min-height:50px;border:1px solid #cbc8bf;border-radius:12px;padding:0 13px;background:#fff;font:inherit;color:#172039}.fin-input-combo{display:grid;grid-template-columns:1fr 112px;gap:8px}.fin-primary{width:100%;margin-top:20px;min-height:54px;font-size:1.03rem}.fin-helper{font-size:.82rem;color:#667085;text-align:center;margin:12px 0 0}.fin-empty{min-height:455px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;color:#667085}.fin-empty span{font-size:4rem}.fin-empty h2{color:#15203a;margin:14px 0 5px}.fin-summary-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.fin-summary-head h2{margin:4px 0 0}.fin-status{padding:8px 12px;border-radius:999px;background:#eaf7ef;color:#177245;font-weight:800;font-size:.82rem}.fin-status.warn{background:#fff3dd;color:#9a5b00}.fin-metrics{display:grid;grid-template-columns:1fr 1fr;gap:11px}.fin-metric{border:1px solid #e2e0da;background:#faf9f6;border-radius:16px;padding:15px}.fin-metric span{display:block;color:#667085;font-size:.82rem}.fin-metric b{display:block;font-size:1.24rem;margin-top:4px;color:#10295d}.fin-compare{margin-top:18px;border:1px solid #dedbd3;border-radius:18px;overflow:hidden}.fin-compare-row{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:8px;padding:11px 13px;border-bottom:1px solid #e7e4dd;align-items:center}.fin-compare-row:last-child{border-bottom:0}.fin-compare-row.head{background:#f1f4fa;font-weight:800}.fin-chart-wrap{margin-top:18px}.fin-chart{width:100%;height:190px;display:block;background:#fbfaf7;border:1px solid #e2e0da;border-radius:16px}.fin-insight{margin-top:16px;padding:15px;border-radius:16px;background:#eef3ff;border-left:4px solid #244b93}.fin-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}.fin-actions .ghost{cursor:pointer}.fin-content-grid{display:grid;grid-template-columns:1.4fr .6fr;gap:24px;margin:24px 0}.fin-info-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 24px}.fin-info-cards>div{border:1px solid #dedbd3;border-radius:16px;padding:16px;background:#faf9f6}.fin-info-cards p{margin:7px 0 0;font-size:.92rem}.fin-history-item{padding:12px 0;border-bottom:1px solid #e6e3dc}.fin-history-item:last-child{border-bottom:0}.fin-history-item b,.fin-history-item span{display:block}.fin-history-item span{font-size:.84rem;color:#667085;margin-top:3px}.muted{color:#667085}.print-only{display:none}@media(max-width:900px){.fin-app,.fin-content-grid{grid-template-columns:1fr}.fin-results-card{position:static;min-height:auto}.fin-empty{min-height:260px}.fin-info-cards{grid-template-columns:1fr}.fin-type-tabs{grid-template-columns:1fr 1fr}}@media(max-width:560px){.fin-form-card,.fin-results-card{padding:20px;border-radius:21px}.fin-grid{grid-template-columns:1fr}.fin-metrics{grid-template-columns:1fr 1fr}.fin-compare-row{grid-template-columns:1.2fr .9fr .9fr;font-size:.84rem}.fin-input-combo{grid-template-columns:1fr 108px}}@media print{.topbar,.nav,.footer,.fin-form-card,.fin-content-grid,.faq-list,.related-tools,.fin-actions,.page-hero .breadcrumb,.page-hero .badge{display:none!important}.fin-app{display:block}.fin-results-card{box-shadow:none;border:0;position:static}.print-only{display:block}.tool-page{padding:0}.fin-chart{max-width:700px}}
+/* V76 — formulário premium sem marcador numérico */
+.fin-form-card{position:relative;overflow:hidden;background:linear-gradient(180deg,#fff 0%,#fbfdff 100%);border-color:#dfe7f2;box-shadow:0 24px 70px rgba(15,54,110,.10)}
+.fin-form-card:before{content:"";position:absolute;inset:0 0 auto;height:5px;background:linear-gradient(90deg,#0b4aa2,#1677ff,#36c5ff)}
+.fin-section-head-clean{align-items:center;margin-bottom:24px}
+.fin-kicker-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 13px;border-radius:999px;background:#eef6ff;color:#0b4aa2;letter-spacing:.12em}
+.fin-form-lead{margin:10px 0 0;color:#667085;line-height:1.55;max-width:520px}
+.fin-form-mini-visual{min-width:185px;display:flex;align-items:flex-end;justify-content:center;gap:6px;padding:17px 16px;border-radius:22px;background:linear-gradient(145deg,#edf6ff,#fff);border:1px solid #d8e8fb;box-shadow:inset 0 1px #fff,0 12px 24px rgba(41,102,180,.08);position:relative}
+.fin-form-mini-visual span{font-size:2rem;filter:drop-shadow(0 6px 6px rgba(20,65,120,.12))}.fin-form-mini-visual span:nth-child(2){font-size:2.35rem}.fin-form-mini-visual b{position:absolute;right:13px;top:8px;color:#1677ff;font-size:1.3rem}
+.fin-type-tabs{gap:0;border:1px solid #dce5f0;border-radius:18px;overflow:hidden;background:#f8fbff;margin-bottom:26px}
+.fin-type{border:0;border-right:1px solid #dce5f0;border-radius:0;background:transparent;min-height:58px;font-weight:700;transition:.2s ease}.fin-type:last-child{border-right:0}.fin-type:hover{background:#edf5ff}.fin-type.active{background:linear-gradient(135deg,#0b3b83,#135fc9);box-shadow:0 10px 22px rgba(16,69,145,.24)}
+.fin-grid{gap:20px 18px}.fin-field{position:relative}.fin-field>span{font-size:.93rem!important;color:#15203a}.fin-grid input,.fin-grid select{border-color:#d6dfeb;border-radius:14px;min-height:58px;background:#fff;box-shadow:0 3px 9px rgba(23,53,94,.035);transition:border-color .2s,box-shadow .2s,transform .2s}.fin-grid input:focus,.fin-grid select:focus{outline:0;border-color:#2784ee;box-shadow:0 0 0 4px rgba(39,132,238,.12)}
+.fin-primary{min-height:62px;border-radius:16px;background:linear-gradient(90deg,#0b3b83,#135fc9);box-shadow:0 14px 30px rgba(16,69,145,.22);font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px}.fin-primary:hover{transform:translateY(-1px);box-shadow:0 18px 34px rgba(16,69,145,.28)}
+.fin-safe-note{display:flex;align-items:center;gap:13px;margin-top:18px;padding:16px 18px;border:1px solid #cfe3fb;border-radius:16px;background:linear-gradient(90deg,#f2f8ff,#fbfdff);color:#12386f}.fin-safe-note>span{font-size:1.45rem}.fin-safe-note b,.fin-safe-note small{display:block}.fin-safe-note small{margin-top:4px;color:#58708e;line-height:1.45}
+.fin-helper{margin-top:16px;padding-top:15px;border-top:1px dashed #d9e1ec}
+@media(max-width:700px){.fin-section-head-clean{align-items:flex-start}.fin-form-mini-visual{display:none}.fin-type-tabs{grid-template-columns:1fr 1fr;gap:0}.fin-type{border-bottom:1px solid #dce5f0}.fin-type:nth-child(2){border-right:0}.fin-type:nth-child(3),.fin-type:nth-child(4){border-bottom:0}.fin-safe-note{align-items:flex-start}}
 </style>
 
 <script>
@@ -170,5 +263,5 @@ function renderHistoricoFin(){const el=document.getElementById('fin_historico');
 function limparHistoricoFin(){localStorage.removeItem('centralia_fin_hist');renderHistoricoFin();toast('Histórico limpo')}
 renderHistoricoFin();
 </script>
-<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=74"></script>
+<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=76"></script>
 </body></html>
