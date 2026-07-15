@@ -1,7 +1,7 @@
 # Central IA V74
 
-- Corrigido erro de sintaxe JavaScript que impedia toda a galeria de prompts de carregar.
-- Mantidas as imagens anteriores.
-- Mantidas e ativadas as 7 imagens enviadas mais recentemente.
-- IDs dos novos cards tornados únicos para favoritos, modal e cópia funcionarem corretamente.
-- Caminhos das imagens conferidos.
+- Menu principal padronizado em todas as páginas.
+- Itens fixos: Início, Ferramentas, Financiamento, CDI, Carro, IMC, Gerador Prompt, Mentor IA, Sobre e Contato.
+- Página atual destacada quando aplicável.
+- Menu móvel passa a exibir os mesmos itens do menu desktop.
+- Cache de CSS e JavaScript atualizado para v74.
