@@ -1,0 +1,20 @@
+/* Menu categorizado profissional — Central IA V117 */
+@media (min-width:760px){
+  html body .v113-header{position:sticky!important;top:0!important;overflow:visible!important}
+  html body .v113-inner{max-width:1440px!important;min-height:68px!important;margin:0 auto!important;padding:8px 18px 10px!important;display:flex!important;align-items:center!important;align-content:center!important;flex-wrap:wrap!important;gap:6px 14px!important;overflow:visible!important}
+  html body .v113-brand{flex:0 0 auto!important;margin-right:auto!important}
+  html body .v113-toggle{display:none!important}
+  html body .v113-nav{position:static!important;inset:auto!important;order:2!important;display:flex!important;flex:1 0 100%!important;width:100%!important;min-width:0!important;max-height:none!important;margin:0!important;padding:2px 0 0!important;align-items:center!important;justify-content:flex-start!important;flex-direction:row!important;flex-wrap:wrap!important;gap:4px!important;overflow:visible!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important}
+  html body .v113-nav>a,html body .v113-cat{width:auto!important;min-height:38px!important;padding:8px 10px!important;justify-content:center!important;font-size:.82rem!important}
+  html body .v113-group{position:relative!important;width:auto!important;overflow:visible!important}
+  html body .v113-drop{display:none!important;position:absolute!important;inset:auto auto auto 0!important;top:calc(100% + 7px)!important;min-width:270px!important;max-width:350px!important;margin:0!important;padding:9px!important;overflow:visible!important;background:#fff!important;border:1px solid #d9e3ef!important;border-radius:14px!important;box-shadow:0 22px 55px rgba(13,31,55,.24)!important}
+  html body .v113-group:hover>.v113-drop,html body .v113-group.open>.v113-drop{display:grid!important}
+  html body .v113-drop a{white-space:normal!important}
+  html body .v113-overlay,html body .v113-overlay.show{display:none!important}
+}
+@media (min-width:1200px){
+  html body .v113-inner{min-height:72px!important;flex-wrap:nowrap!important;gap:16px!important}
+  html body .v113-brand{margin-right:0!important}
+  html body .v113-nav{order:initial!important;flex:1 1 auto!important;width:auto!important;padding:0!important;margin-left:auto!important;justify-content:flex-end!important;flex-wrap:nowrap!important}
+  html body .v113-nav>a,html body .v113-cat{padding:8px 9px!important;font-size:.78rem!important}
+}
