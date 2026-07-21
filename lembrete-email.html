@@ -14,7 +14,7 @@
 <meta property="og:description" content="Crie lembretes rápidos, abra no Gmail e adicione eventos ao Google Agenda com a ferramenta de Lembrete Online.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://portalcentralia.com.br/lembrete-email.html">
-<link rel="stylesheet" href="assets/css/style.css?v=74">
+<link rel="stylesheet" href="assets/css/style.css?v=116">
 <link rel="icon" href="assets/img/favicon.ico" sizes="any">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -72,12 +72,242 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 @media(max-width:680px){.lr-quick-grid{grid-template-columns:1fr}.lr-quick-calendar{padding:15px 13px}.lr-quick-calendar strong{font-size:14px}.lr-quick-calendar small{font-size:11px}.lr-quick-actions{padding:13px}}
 </style>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<style id="v113-nav-css">
+.v113-header{position:sticky;top:0;z-index:2147483000;background:#fff;border-bottom:1px solid #dfe6ef;box-shadow:0 8px 24px rgba(20,43,78,.08)}
+.v113-inner{max-width:1280px;margin:0 auto;padding:0 18px;min-height:72px;display:flex;align-items:center;gap:18px}
+.v113-brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:#10243e;font:900 1.22rem Arial,sans-serif;white-space:nowrap;flex:0 0 auto}
+.v113-brand b{color:#1974d2}.v113-logo{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:#fff;box-shadow:0 5px 16px rgba(39,105,189,.15)}.v113-logo img{max-width:34px;max-height:34px}
+.v113-nav{display:flex;align-items:center;gap:4px;margin-left:auto;overflow:visible}
+.v113-nav>a,.v113-cat{border:0;background:transparent;color:#26384e;text-decoration:none;font:700 .84rem Arial,sans-serif;min-height:40px;padding:8px 9px;border-radius:9px;display:inline-flex;align-items:center;white-space:nowrap;cursor:pointer}
+.v113-nav>a:hover,.v113-nav>a.active,.v113-cat:hover,.v113-group.active-group>.v113-cat{background:#edf5ff;color:#1267c8}
+.v113-group{position:relative}.v113-cat span{font-size:.7rem;margin-left:5px;transition:.2s}
+.v113-drop{display:none;position:absolute;top:calc(100% + 9px);left:0;min-width:280px;padding:9px;background:#fff;border:1px solid #d9e3ef;border-radius:14px;box-shadow:0 22px 55px rgba(13,31,55,.24);z-index:2147483001}
+.v113-group:hover .v113-drop,.v113-group.open .v113-drop{display:grid}
+.v113-group.open>.v113-cat span{transform:rotate(180deg)}
+.v113-drop a{display:block;padding:11px 12px;border-radius:9px;color:#30435b;text-decoration:none;font:700 .91rem Arial,sans-serif;white-space:nowrap}
+.v113-drop a:hover,.v113-drop a.active{background:#edf5ff;color:#1267c8}
+.v113-toggle{display:none;margin-left:auto;width:46px;height:46px;border-radius:12px;border:1px solid #cdd8e6;background:#fff;color:#15345e;font-size:1.45rem;cursor:pointer}
+.v113-overlay{display:none}
+@media(max-width:980px){
+  .v113-inner{min-height:68px;padding:8px 14px}
+  .v113-toggle{display:grid;place-items:center}
+  .v113-nav{display:none;position:fixed;top:68px;left:10px;right:10px;max-height:calc(100vh - 82px);overflow-y:auto;overflow-x:hidden;background:#fff;border:1px solid #d9e3ef;border-radius:18px;padding:12px;box-shadow:0 24px 60px rgba(13,31,55,.28);z-index:2147483002;flex-direction:column;align-items:stretch;margin:0}
+  .v113-nav.open{display:flex}
+  .v113-nav>a,.v113-cat{width:100%;box-sizing:border-box;justify-content:space-between;padding:13px 14px;font-size:1rem}
+  .v113-group{width:100%}
+  .v113-group:hover .v113-drop{display:none}
+  .v113-group.open .v113-drop{display:grid}
+  .v113-drop{position:static;min-width:0;margin:3px 0 8px 12px;padding:6px;border:0;border-left:2px solid #d7e5f6;border-radius:0;box-shadow:none}
+  .v113-drop a{white-space:normal;padding:11px 12px}
+  .v113-overlay.show{display:block;position:fixed;inset:0;background:rgba(3,10,20,.52);z-index:2147482999}
+}
+@media(max-width:480px){.v113-brand{font-size:1.08rem}.v113-logo{width:38px;height:38px}.v113-inner{padding-left:10px;padding-right:10px}}
+@media print{.v113-header,.v113-overlay{display:none!important}}
+</style>
+
+
+
+
+
+<style id="v116-menu-desktop-tablet-final">
+/* Cabeçalho profissional: todas as categorias visíveis no computador e tablet */
+.v113-header{
+  position:sticky!important;
+  top:0!important;
+  z-index:2147483000!important;
+  overflow:visible!important;
+}
+.v113-inner{
+  max-width:1440px!important;
+  margin:0 auto!important;
+  padding:8px 18px!important;
+  min-height:68px!important;
+  display:flex!important;
+  align-items:center!important;
+  gap:14px!important;
+  overflow:visible!important;
+}
+.v113-brand{flex:0 0 auto!important}
+.v113-nav{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  flex-wrap:nowrap!important;
+  gap:3px!important;
+  margin-left:auto!important;
+  overflow:visible!important;
+  min-width:0!important;
+}
+.v113-nav>a,.v113-cat{
+  flex:0 0 auto!important;
+  width:auto!important;
+  min-height:38px!important;
+  padding:7px 8px!important;
+  font-size:.78rem!important;
+}
+.v113-group{position:relative!important;overflow:visible!important}
+.v113-drop{
+  position:absolute!important;
+  top:calc(100% + 8px)!important;
+  left:0!important;
+  min-width:260px!important;
+  max-width:340px!important;
+  z-index:2147483646!important;
+}
+
+/* Tablet: todas as categorias ficam em uma segunda linha organizada */
+@media (min-width:760px) and (max-width:1199px){
+  .v113-inner{
+    flex-wrap:wrap!important;
+    align-content:center!important;
+    padding:8px 14px 10px!important;
+    gap:6px 12px!important;
+  }
+  .v113-brand{margin-right:auto!important}
+  .v113-toggle{display:none!important}
+  .v113-nav{
+    order:2!important;
+    flex:1 0 100%!important;
+    width:100%!important;
+    justify-content:flex-start!important;
+    flex-wrap:wrap!important;
+    gap:3px!important;
+    margin:0!important;
+    padding-top:2px!important;
+  }
+  .v113-nav>a,.v113-cat{
+    font-size:.76rem!important;
+    padding:7px 8px!important;
+  }
+  .v113-drop{
+    top:calc(100% + 6px)!important;
+  }
+}
+
+/* Desktop amplo: categorias ao lado da logo em uma única linha */
+@media (min-width:1200px){
+  .v113-inner{flex-wrap:nowrap!important}
+  .v113-toggle{display:none!important}
+  .v113-nav{
+    flex:1 1 auto!important;
+    flex-wrap:nowrap!important;
+  }
+}
+
+/* Celular: somente um menu hambúrguer */
+@media (max-width:759px){
+  .v113-inner{
+    min-height:68px!important;
+    padding:8px 12px!important;
+    flex-wrap:nowrap!important;
+  }
+  .v113-toggle{
+    display:grid!important;
+    place-items:center!important;
+    margin-left:auto!important;
+  }
+  .v113-nav{
+    display:none!important;
+    position:fixed!important;
+    top:68px!important;
+    left:10px!important;
+    right:10px!important;
+    width:auto!important;
+    max-height:calc(100vh - 82px)!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    flex-direction:column!important;
+    flex-wrap:nowrap!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    margin:0!important;
+    padding:12px!important;
+    background:#fff!important;
+    border:1px solid #d9e3ef!important;
+    border-radius:18px!important;
+    box-shadow:0 24px 60px rgba(13,31,55,.28)!important;
+    z-index:2147483002!important;
+  }
+  .v113-nav.open{display:flex!important}
+  .v113-nav>a,.v113-cat{
+    width:100%!important;
+    box-sizing:border-box!important;
+    justify-content:space-between!important;
+    padding:13px 14px!important;
+    font-size:1rem!important;
+  }
+  .v113-group{width:100%!important}
+  .v113-drop{
+    position:static!important;
+    min-width:0!important;
+    max-width:none!important;
+    margin:3px 0 8px 12px!important;
+    padding:6px!important;
+    border:0!important;
+    border-left:2px solid #d7e5f6!important;
+    border-radius:0!important;
+    box-shadow:none!important;
+  }
+}
+</style>
+
 </head>
 <body class="lr-page">
+<header class="v113-header">
+  <div class="v113-inner">
+    <a class="v113-brand" href="index.html">
+      <span class="v113-logo"><img src="assets/img/logo-central-ia.svg" alt=""></span>
+      <span>Central <b>IA</b></span>
+    </a>
+    <button class="v113-toggle" type="button" aria-label="Abrir menu" aria-expanded="false">☰</button>
+    <nav class="v113-nav" aria-label="Navegação principal">
+      <a href="index.html">Início</a>
+      <div class="v113-group">
+<button class="v113-cat" type="button" aria-expanded="false">Finanças<span>⌄</span></button>
+<div class="v113-drop"><a href="calculadora-financiamento.html">Calculadora de financiamento</a><a href="calculadora-cdi.html">Calculadora de CDI</a><a href="calculadora-lucro.html">Calculadora de lucro</a><a href="gerador-orcamento.html">Gerador de orçamento</a><a href="gerador-recibo.html">Gerador de recibo</a><a href="conversor-moedas.html">Conversor de moedas</a></div>
+</div><div class="v113-group">
+<button class="v113-cat" type="button" aria-expanded="false">Veículos<span>⌄</span></button>
+<div class="v113-drop"><a href="controle-manutencao-carro.html">Controle de manutenção do carro</a></div>
+</div><div class="v113-group">
+<button class="v113-cat" type="button" aria-expanded="false">Inteligência Artificial<span>⌄</span></button>
+<div class="v113-drop"><a href="gerador-prompt-ia.html">Gerador de prompts</a><a href="mentor-ia.html">Mentor IA</a></div>
+</div><div class="v113-group active-group">
+<button class="v113-cat" type="button" aria-expanded="false">Organização e produtividade<span>⌄</span></button>
+<div class="v113-drop"><a href="lembrete-email.html" class="active">Lembretes</a></div>
+</div><div class="v113-group">
+<button class="v113-cat" type="button" aria-expanded="false">Saúde e bem-estar<span>⌄</span></button>
+<div class="v113-drop"><a href="calculadora-imc.html">Calculadora de IMC</a><a href="calculadora-agua-diaria.html">Calculadora de água diária</a><a href="bula-online.html">Bula Online</a></div>
+</div><div class="v113-group">
+<button class="v113-cat" type="button" aria-expanded="false">Utilidades<span>⌄</span></button>
+<div class="v113-drop"><a href="gerador-qr-code.html">Gerador de QR Code</a></div>
+</div>
+      <a href="sobre.html">Sobre</a>
+      <a href="contato.html">Contato</a>
+    </nav>
+  </div>
+</header>
+<div class="v113-overlay"></div>
+
 <div class="topbar"><div class="ticker">
 <span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span><span>🤖 Portal Central IA</span><span>🚀 Ferramentas gratuitas online</span>
 </div></div>
-<nav class="nav"><div class="wrap nav-inner"><a class="brand" href="index.html"><span class="brand-mark"><img class="logo-svg" src="assets/img/logo-central-ia.svg" alt="Logo Portal Central IA"></span><span class="brand-name">Central <span class="brand-ia">IA</span></span></a><div class="menu"><a href="index.html">Início</a><a href="index.html#ferramentas">Ferramentas</a><a href="calculadora-financiamento.html">Financiamento</a><a href="calculadora-cdi.html">CDI</a><a href="controle-manutencao-carro.html">Carro</a><a href="calculadora-imc.html">IMC</a><a href="gerador-prompt-ia.html">Gerador Prompt</a><a href="mentor-ia.html">Mentor IA</a><a href="sobre.html">Sobre</a><a href="contato.html">Contato</a></div></div></nav>
+
 <section class="lr-hero"><div class="lr-wrap lr-hero-grid"><div><span class="lr-badge">🔔 100% gratuito</span><h1>Criar Lembrete<br><span class="lr-gradient">Online Grátis</span></h1><p>Organize tarefas, consultas, pagamentos e compromissos. Salve no navegador, adicione ao Google Agenda, prepare um e-mail ou envie a mensagem para seu próprio WhatsApp.</p><div class="lr-benefits"><div class="lr-benefit">✓ Alerta sonoro</div><div class="lr-benefit">✓ Google Agenda</div><div class="lr-benefit">✓ Enviar ao WhatsApp</div><div class="lr-benefit">✓ E-mail como convidado</div><div class="lr-benefit">✓ Vários lembretes</div><div class="lr-benefit">✓ Compartilhamento rápido</div><div class="lr-benefit">✓ Dados no navegador</div></div></div><div class="lr-visual" aria-hidden="true"><div class="lr-phone"><div class="lr-phone-screen">🔔</div></div><div class="lr-float lr-f1">✅</div><div class="lr-float lr-f2">📅</div><div class="lr-float lr-f3">⏰</div></div></div></section>
 <main class="lr-main"><div class="lr-wrap"><div class="lr-layout"><section><div class="lr-card"><h2>🔔 Novo lembrete</h2><p class="lr-sub">Preencha os dados. O Google Agenda poderá avisar mesmo depois que você fechar esta página.</p><form id="reminderForm"><input type="hidden" id="editId"><div class="lr-grid"><div class="lr-field full"><label for="title">Título do lembrete *</label><input id="title" required placeholder="Ex.: Pagar conta de energia"></div><div class="lr-field"><label for="date">Data *</label><input id="date" type="date" required></div><div class="lr-field"><label for="time">Hora *</label><input id="time" type="time" required></div><div class="lr-field"><label for="email">Seu e-mail (opcional)</label><input id="email" type="email" placeholder="voce@gmail.com"><small>Será incluído como convidado no Google Agenda.</small></div><div class="lr-field"><label for="phone">Seu WhatsApp (opcional)</label><input id="phone" inputmode="tel" placeholder="5511999999999"><small>Digite país + DDD + número, somente números.</small></div><div class="lr-field"><label for="category">Categoria</label><select id="category"><option>Trabalho</option><option>Família</option><option>Saúde</option><option>Estudos</option><option>Financeiro</option><option>Outro</option></select></div><div class="lr-field"><label for="priority">Prioridade</label><select id="priority"><option>Baixa</option><option selected>Média</option><option>Alta</option></select></div><div class="lr-field"><label for="repeat">Repetir</label><select id="repeat"><option value="none">Não repetir</option><option value="daily">Todos os dias</option><option value="weekly">Toda semana</option><option value="monthly">Todo mês</option></select></div><div class="lr-field full"><label for="description">Descrição (opcional)</label><textarea id="description" placeholder="Detalhes importantes do lembrete..."></textarea></div></div><div class="lr-switches"><label class="lr-toggle"><span>🔊 Alerta sonoro nesta página</span><input id="sound" type="checkbox" checked></label><label class="lr-toggle"><span>🔔 Notificação do navegador</span><input id="browserNotification" type="checkbox"></label></div><div class="lr-actions"><button type="button" class="lr-btn lr-btn-light" id="clearBtn">Limpar</button><button type="button" class="lr-btn lr-btn-blue" id="permissionBtn">Permitir notificações</button><button type="submit" class="lr-btn lr-btn-primary">+ Salvar lembrete</button></div>
 <div class="lr-quick-actions" aria-label="Ações rápidas do lembrete">
@@ -90,7 +320,7 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
   <p class="lr-quick-help">Preencha título, data e hora. Você pode salvar o lembrete e usar qualquer uma das opções acima logo em seguida.</p>
 </div></form><div class="lr-calendar-callout"><div class="ico">📅</div><div><strong>Receba avisos mesmo com o site fechado</strong><p>Depois de salvar um lembrete, toque no botão azul <b>Salvar no Google Agenda</b>. Ele sincroniza o compromisso com seu celular e computador.</p></div></div><div class="lr-note">🛡️ Seus lembretes ficam salvos somente neste navegador. Para receber um aviso com a página fechada, use o botão azul <b>Salvar no Google Agenda</b>.</div></div><div class="lr-list-head"><h2>Seus lembretes <span class="lr-count" id="activeCount">0 ativos</span></h2><button class="lr-btn lr-btn-light" id="exportBtn">Exportar</button></div><div id="remindersList"></div></section><aside class="lr-side"><div class="lr-card"><h2>💡 Como receber o aviso</h2><div class="lr-tip"><span>📅</span><div><strong>Google Agenda</strong><p>É a opção mais confiável para alertar mesmo com o site fechado.</p></div></div><div class="lr-tip"><span>🔊</span><div><strong>Som no navegador</strong><p>Funciona enquanto esta página permanecer aberta.</p></div></div><div class="lr-tip"><span>💬</span><div><strong>WhatsApp</strong><p>Abre uma conversa com seu próprio número e deixa a mensagem pronta para enviar.</p></div></div><div class="lr-tip"><span>✉️</span><div><strong>E-mail</strong><p>Prepara uma mensagem para você enviar. O site não envia automaticamente.</p></div></div><div class="lr-tip"><span>📤</span><div><strong>Compartilhar</strong><p>Abra o menu do celular para enviar o lembrete por WhatsApp, Telegram, Gmail, notas e outros aplicativos.</p></div></div></div><div class="lr-card"><h2>📊 Estatísticas</h2><div class="lr-stats"><div class="lr-stat"><span>Ativos</span><b id="statActive">0</b></div><div class="lr-stat"><span>Concluídos</span><b id="statDone">0</b></div><div class="lr-stat"><span>Total</span><b id="statTotal">0</b></div><div class="lr-stat"><span>Próximo</span><b id="statNext">—</b></div></div></div><div class="lr-warning"><b>Importante:</b> um site estático não consegue enviar e-mail sozinho no futuro. Para alerta automático, salve o evento no Google Agenda. O e-mail informado será adicionado como convidado.</div></aside></div><section class="lr-related"><h2>Você também pode gostar</h2><div class="lr-related-grid"><a href="calculadora-imc.html"><b>⚖️ Calculadora de IMC</b><span>Calcule IMC, água e gasto calórico.</span></a><a href="calculadora-financiamento.html"><b>🏠 Financiamento</b><span>Simule parcelas e compare sistemas.</span></a><a href="gerador-qr-code.html"><b>▦ Gerador de QR Code</b><span>Crie QR Codes personalizados.</span></a><a href="gerador-prompt-ia.html"><b>✨ Gerador de Prompt IA</b><span>Explore modelos e copie prompts.</span></a></div></section></div></main>
 <footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para resolver tarefas do dia a dia.</p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="lgpd.html">LGPD</a></p></div></div></footer>
-<div id="toast" class="toast"></div><script src="assets/js/app.js?v=74"></script>
+<div id="toast" class="toast"></div><script src="assets/js/app.js?v=116"></script>
 <script>
 (function(){
 const KEY='centralia_reminders_v81'; let reminders=[]; let fired=new Set();
@@ -124,4 +354,25 @@ $('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(reminders,null,2
 load();reset();render();check();setInterval(check,15000);
 })();
 </script>
+
+
+
+
+
+
+
+
+<script id="v113-nav-js">
+(function(){
+ const h=document.querySelector('.v113-header'); if(!h) return;
+ const t=h.querySelector('.v113-toggle'), n=h.querySelector('.v113-nav'), o=document.querySelector('.v113-overlay');
+ const groups=[...h.querySelectorAll('.v113-group')];
+ function closeGroups(){groups.forEach(g=>{g.classList.remove('open');g.querySelector('.v113-cat')?.setAttribute('aria-expanded','false')})}
+ function closeMenu(){n?.classList.remove('open');o?.classList.remove('show');t?.setAttribute('aria-expanded','false');document.body.style.overflow='';closeGroups()}
+ t?.addEventListener('click',()=>{const open=!n.classList.contains('open');closeMenu();if(open){n.classList.add('open');o.classList.add('show');t.setAttribute('aria-expanded','true');document.body.style.overflow='hidden'}})
+ groups.forEach(g=>g.querySelector('.v113-cat')?.addEventListener('click',e=>{if(window.innerWidth>759)return;e.preventDefault();e.stopPropagation();const open=!g.classList.contains('open');closeGroups();g.classList.toggle('open',open);g.querySelector('.v113-cat').setAttribute('aria-expanded',String(open))}))
+ o?.addEventListener('click',closeMenu);document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});n?.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));window.addEventListener('resize',()=>{if(window.innerWidth>759)closeMenu()});
+})();
+</script>
+
 </body></html>
