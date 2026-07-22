@@ -14,7 +14,7 @@
 <meta property="og:description" content="Crie lembretes rápidos, abra no Gmail e adicione eventos ao Google Agenda com a ferramenta de Lembrete Online.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://portalcentralia.com.br/lembrete-email.html">
-<link rel="stylesheet" href="assets/css/style.css?v=116">
+<link rel="stylesheet" href="assets/css/style.css?v=125">
 <link rel="icon" href="assets/img/favicon.ico" sizes="any">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -267,6 +267,95 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 }
 </style>
 
+
+<style id="v121-institucional-somente-rodape">
+.v113-nav > a[href="sobre.html"],
+.v113-nav > a[href="contato.html"],
+.v118-institutional{display:none!important}
+</style>
+
+<style id="v122-submenu-utilidades-sem-corte">
+@media (min-width:981px){
+  html body .v113-nav .v113-group:last-of-type > .v113-drop{
+    left:auto!important;
+    right:10px!important;
+    width:240px!important;
+    min-width:240px!important;
+    max-width:calc(100vw - 48px)!important;
+    overflow:visible!important;
+    contain:none!important;
+    box-sizing:border-box!important;
+  }
+  html body .v113-nav .v113-group:last-of-type > .v113-drop a{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
+
+<style id="v123-submenu-qrcode-curto">
+@media (min-width:981px){
+  html body .v113-nav .v113-group:last-of-type > .v113-drop{
+    left:auto!important;
+    right:8px!important;
+    width:190px!important;
+    min-width:190px!important;
+    max-width:calc(100vw - 48px)!important;
+    padding:6px!important;
+    contain:none!important;
+    box-sizing:border-box!important;
+  }
+  html body .v113-nav .v113-group:last-of-type > .v113-drop a[href="gerador-qr-code.html"]{
+    width:100%!important;
+    padding:9px 8px!important;
+    font-size:.80rem!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
+
+<style id="v124-qrcode-fora-do-layout">
+@media (min-width:760px){
+  html body .v113-drop.v124-qrcode-float{
+    position:fixed!important;
+    left:var(--v124-left,12px)!important;
+    right:auto!important;
+    top:var(--v124-top,80px)!important;
+    bottom:auto!important;
+    width:min(190px,calc(100vw - 24px))!important;
+    min-width:0!important;
+    max-width:calc(100vw - 24px)!important;
+    height:auto!important;
+    margin:0!important;
+    padding:6px!important;
+    overflow:hidden!important;
+    contain:none!important;
+    transform:none!important;
+    box-sizing:border-box!important;
+    z-index:2147483647!important;
+  }
+  html body .v113-drop.v124-qrcode-float a[href="gerador-qr-code.html"]{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:9px 8px!important;
+    font-size:.80rem!important;
+    line-height:1.25!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
 </head>
 <body class="lr-page">
 <header class="v113-header">
@@ -318,7 +407,7 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
   <p class="lr-quick-help">Preencha título, data e hora. Você pode salvar o lembrete e usar qualquer uma das opções acima logo em seguida.</p>
 </div></form><div class="lr-calendar-callout"><div class="ico">📅</div><div><strong>Receba avisos mesmo com o site fechado</strong><p>Depois de salvar um lembrete, toque no botão azul <b>Salvar no Google Agenda</b>. Ele sincroniza o compromisso com seu celular e computador.</p></div></div><div class="lr-note">🛡️ Seus lembretes ficam salvos somente neste navegador. Para receber um aviso com a página fechada, use o botão azul <b>Salvar no Google Agenda</b>.</div></div><div class="lr-list-head"><h2>Seus lembretes <span class="lr-count" id="activeCount">0 ativos</span></h2><button class="lr-btn lr-btn-light" id="exportBtn">Exportar</button></div><div id="remindersList"></div></section><aside class="lr-side"><div class="lr-card"><h2>💡 Como receber o aviso</h2><div class="lr-tip"><span>📅</span><div><strong>Google Agenda</strong><p>É a opção mais confiável para alertar mesmo com o site fechado.</p></div></div><div class="lr-tip"><span>🔊</span><div><strong>Som no navegador</strong><p>Funciona enquanto esta página permanecer aberta.</p></div></div><div class="lr-tip"><span>💬</span><div><strong>WhatsApp</strong><p>Abre uma conversa com seu próprio número e deixa a mensagem pronta para enviar.</p></div></div><div class="lr-tip"><span>✉️</span><div><strong>E-mail</strong><p>Prepara uma mensagem para você enviar. O site não envia automaticamente.</p></div></div><div class="lr-tip"><span>📤</span><div><strong>Compartilhar</strong><p>Abra o menu do celular para enviar o lembrete por WhatsApp, Telegram, Gmail, notas e outros aplicativos.</p></div></div></div><div class="lr-card"><h2>📊 Estatísticas</h2><div class="lr-stats"><div class="lr-stat"><span>Ativos</span><b id="statActive">0</b></div><div class="lr-stat"><span>Concluídos</span><b id="statDone">0</b></div><div class="lr-stat"><span>Total</span><b id="statTotal">0</b></div><div class="lr-stat"><span>Próximo</span><b id="statNext">—</b></div></div></div><div class="lr-warning"><b>Importante:</b> um site estático não consegue enviar e-mail sozinho no futuro. Para alerta automático, salve o evento no Google Agenda. O e-mail informado será adicionado como convidado.</div></aside></div><section class="lr-related"><h2>Você também pode gostar</h2><div class="lr-related-grid"><a href="calculadora-imc.html"><b>⚖️ Calculadora de IMC</b><span>Calcule IMC, água e gasto calórico.</span></a><a href="calculadora-financiamento.html"><b>🏠 Financiamento</b><span>Simule parcelas e compare sistemas.</span></a><a href="gerador-qr-code.html"><b>▦ Gerador de QR Code</b><span>Crie QR Codes personalizados.</span></a><a href="gerador-prompt-ia.html"><b>✨ Gerador de Prompt IA</b><span>Explore modelos e copie prompts.</span></a></div></section></div></main>
 <footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para resolver tarefas do dia a dia.</p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="lgpd.html">LGPD</a></p></div></div></footer>
-<div id="toast" class="toast"></div><script src="assets/js/app.js?v=116"></script>
+<div id="toast" class="toast"></div><script src="assets/js/app.js?v=125"></script>
 <script>
 (function(){
 const KEY='centralia_reminders_v81'; let reminders=[]; let fired=new Set();
@@ -373,4 +462,39 @@ load();reset();render();check();setInterval(check,15000);
 })();
 </script>
 
+
+<script id="v124-qrcode-position-script">
+(function(){
+  function setupQrDropdown(){
+    var link=document.querySelector('.v113-drop a[href="gerador-qr-code.html"]');
+    if(!link)return;
+    var drop=link.closest('.v113-drop');
+    var group=drop&&drop.closest('.v113-group');
+    var button=group&&group.querySelector('.v113-cat');
+    if(!drop||!button)return;
+    drop.classList.add('v124-qrcode-float');
+    function place(){
+      if(window.innerWidth<760){
+        drop.style.removeProperty('--v124-left');
+        drop.style.removeProperty('--v124-top');
+        return;
+      }
+      var rect=button.getBoundingClientRect();
+      var width=Math.min(190,window.innerWidth-24);
+      var left=Math.min(rect.right-width,window.innerWidth-width-12);
+      left=Math.max(12,left);
+      var top=Math.min(rect.bottom+7,window.innerHeight-70);
+      drop.style.setProperty('--v124-left',left+'px');
+      drop.style.setProperty('--v124-top',Math.max(12,top)+'px');
+    }
+    place();
+    button.addEventListener('click',function(){requestAnimationFrame(place)});
+    group.addEventListener('mouseenter',place);
+    window.addEventListener('resize',place,{passive:true});
+    window.addEventListener('scroll',place,{passive:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupQrDropdown);
+  else setupQrDropdown();
+})();
+</script>
 </body></html>

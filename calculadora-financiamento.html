@@ -14,7 +14,7 @@
 <meta property="og:description" content="Compare financiamento Price e SAC, calcule parcelas, juros, comprometimento de renda e amortização extra gratuitamente.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://portalcentralia.com.br/calculadora-financiamento.html">
-<link rel="stylesheet" href="assets/css/style.css?v=116">
+<link rel="stylesheet" href="assets/css/style.css?v=125">
 <link rel="icon" href="assets/img/favicon.ico" sizes="any">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -314,6 +314,95 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 }
 </style>
 
+
+<style id="v121-institucional-somente-rodape">
+.v113-nav > a[href="sobre.html"],
+.v113-nav > a[href="contato.html"],
+.v118-institutional{display:none!important}
+</style>
+
+<style id="v122-submenu-utilidades-sem-corte">
+@media (min-width:981px){
+  html body .v113-nav .v113-group:last-of-type > .v113-drop{
+    left:auto!important;
+    right:10px!important;
+    width:240px!important;
+    min-width:240px!important;
+    max-width:calc(100vw - 48px)!important;
+    overflow:visible!important;
+    contain:none!important;
+    box-sizing:border-box!important;
+  }
+  html body .v113-nav .v113-group:last-of-type > .v113-drop a{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
+
+<style id="v123-submenu-qrcode-curto">
+@media (min-width:981px){
+  html body .v113-nav .v113-group:last-of-type > .v113-drop{
+    left:auto!important;
+    right:8px!important;
+    width:190px!important;
+    min-width:190px!important;
+    max-width:calc(100vw - 48px)!important;
+    padding:6px!important;
+    contain:none!important;
+    box-sizing:border-box!important;
+  }
+  html body .v113-nav .v113-group:last-of-type > .v113-drop a[href="gerador-qr-code.html"]{
+    width:100%!important;
+    padding:9px 8px!important;
+    font-size:.80rem!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
+
+<style id="v124-qrcode-fora-do-layout">
+@media (min-width:760px){
+  html body .v113-drop.v124-qrcode-float{
+    position:fixed!important;
+    left:var(--v124-left,12px)!important;
+    right:auto!important;
+    top:var(--v124-top,80px)!important;
+    bottom:auto!important;
+    width:min(190px,calc(100vw - 24px))!important;
+    min-width:0!important;
+    max-width:calc(100vw - 24px)!important;
+    height:auto!important;
+    margin:0!important;
+    padding:6px!important;
+    overflow:hidden!important;
+    contain:none!important;
+    transform:none!important;
+    box-sizing:border-box!important;
+    z-index:2147483647!important;
+  }
+  html body .v113-drop.v124-qrcode-float a[href="gerador-qr-code.html"]{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:9px 8px!important;
+    font-size:.80rem!important;
+    line-height:1.25!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
 </head>
 <body>
 <header class="v113-header">
@@ -496,9 +585,9 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 <section class="fin-section"><span class="fin-kicker2">SCORE E APROVAÇÃO</span><h2>Como aumentar suas chances de conseguir boas condições</h2><p>Score não é o único fator analisado. Bancos também consideram renda, estabilidade, histórico de pagamento, relacionamento financeiro, valor da entrada e nível de endividamento. Melhorar o perfil leva tempo e consistência.</p><div class="fin-checklist"><div class="fin-checkitem"><span>1</span><div><b>Pague contas em dia</b><br>Regularidade melhora a percepção de risco.</div></div><div class="fin-checkitem"><span>2</span><div><b>Reduza dívidas caras</b><br>Cartão e cheque especial comprometem renda.</div></div><div class="fin-checkitem"><span>3</span><div><b>Organize comprovantes</b><br>Renda bem documentada facilita a análise.</div></div><div class="fin-checkitem"><span>4</span><div><b>Aumente a entrada</b><br>Menor risco pode melhorar as condições.</div></div><div class="fin-checkitem"><span>5</span><div><b>Evite pedidos simultâneos</b><br>Muitas consultas em pouco tempo podem sinalizar urgência.</div></div><div class="fin-checkitem"><span>6</span><div><b>Compare instituições</b><br>Cada banco possui política de crédito própria.</div></div></div></section>
 <section class="fin-section"><span class="fin-kicker2">CHECKLIST</span><h2>Antes de assinar, confirme estes pontos</h2><div class="fin-checklist"><div class="fin-checkitem"><span>✓</span><div><b>Parcela com margem</b><br>O orçamento continua respirando após o pagamento?</div></div><div class="fin-checkitem"><span>✓</span><div><b>CET conferido</b><br>Você conhece todos os encargos?</div></div><div class="fin-checkitem"><span>✓</span><div><b>Reserva preservada</b><br>A entrada não consumiu todo o caixa?</div></div><div class="fin-checkitem"><span>✓</span><div><b>Custos paralelos</b><br>Seguro, impostos e manutenção foram incluídos?</div></div><div class="fin-checkitem"><span>✓</span><div><b>Contrato lido</b><br>Tarifas, datas e regras estão claras?</div></div><div class="fin-checkitem"><span>✓</span><div><b>Propostas comparadas</b><br>Você analisou mais de uma instituição?</div></div></div></section>
 <section class="fin-section fin-guide-premium"><div class="fin-guide-cover fin-guide-cover-image">
-      <img src="assets/img/guia-financiamento-capa.png" alt="Capa do ebook Guia Completo do Financiamento Inteligente" loading="lazy">
+      <img src="assets/img/guia-financiamento-capa.png?v=126" alt="Capa do Guia Financiamento Inteligente - Edição 2026" loading="lazy">
     </div>
-    <div><h2>Baixe o material completo antes de fechar negócio</h2><p>Um guia aprofundado para comparar propostas, entender CET, escolher entre SAC e Price, planejar a entrada, negociar com bancos e evitar decisões impulsivas.</p><ul><li>26 capítulos educativos;</li><li>Tabelas comparativas;</li><li>Casos práticos;</li><li>Checklist de aprovação;</li><li>Plano de ação financeiro.</li></ul><a href="assets/downloads/guia-completo-financiamento-inteligente.pdf" download>📥 Baixar guia de 31 páginas</a></div></section>
+    <div><h2>Baixe o Guia Financiamento Inteligente - Edição 2026</h2><p>Um guia aprofundado para comparar propostas, entender CET, escolher entre SAC e Price, planejar a entrada, negociar com bancos e evitar decisões impulsivas.</p><ul><li>26 capítulos educativos;</li><li>Tabelas comparativas;</li><li>Casos práticos;</li><li>Checklist de aprovação;</li><li>Plano de ação financeiro.</li></ul><a href="assets/downloads/guia-completo-financiamento-inteligente.pdf?v=126" download>📥 Baixar guia de 31 páginas</a></div></section>
 <section class="fin-section fin-faq2"><span class="fin-kicker2">DÚVIDAS FREQUENTES</span><h2>Perguntas sobre financiamento</h2><details><summary>Qual porcentagem da renda posso comprometer?</summary><p>Não existe um limite universal. O ideal é preservar margem para despesas essenciais, imprevistos e objetivos futuros. Avalie o orçamento completo, não apenas a aprovação do banco.</p></details><details><summary>Taxa zero realmente existe?</summary><p>Pode existir subsídio comercial, mas é importante comparar o preço à vista, tarifas e condições. O custo pode estar embutido em outro ponto da operação.</p></details><details><summary>Vale a pena financiar sem entrada?</summary><p>Normalmente aumenta o saldo financiado e os juros. Pode fazer sentido em situações específicas, mas exige atenção redobrada ao custo total e à reserva financeira.</p></details><details><summary>Posso quitar antes do prazo?</summary><p>Em geral, sim. A quitação antecipada deve descontar juros futuros, conforme as condições legais e contratuais aplicáveis.</p></details><details><summary>É melhor reduzir prazo ou parcela ao amortizar?</summary><p>Reduzir o prazo costuma economizar mais juros; reduzir a parcela melhora o fluxo mensal. A melhor escolha depende da sua prioridade.</p></details><details><summary>O banco pode mudar a parcela?</summary><p>Depende do contrato, índice de correção e modalidade. Leia as regras de reajuste e atualização antes de assinar.</p></details><details><summary>O seguro é obrigatório?</summary><p>Algumas operações possuem seguros exigidos pela modalidade; outras oferecem produtos opcionais. Confirme o que é obrigatório e o que pode ser retirado.</p></details><details><summary>Financiamento ou consórcio?</summary><p>Financiamento entrega o crédito imediatamente, mas cobra juros. Consórcio não possui juros tradicionais, porém tem taxas e depende de contemplação.</p></details></section>
 <section class="fin-section"><h2>Ferramentas relacionadas</h2><div class="fin-related2"><a href="calculadora-cdi.html">📈 Calculadora CDI</a><a href="controle-manutencao-carro.html">🚗 Controle do carro</a><a href="gerador-orcamento.html">🧾 Gerador de orçamento</a><a href="lembrete-email.html">🔔 Criar lembrete</a></div></section>
 
@@ -584,7 +673,7 @@ function renderHistoricoFin(){const el=document.getElementById('fin_historico');
 function limparHistoricoFin(){localStorage.removeItem('centralia_fin_hist');renderHistoricoFin();toast('Histórico limpo')}
 renderHistoricoFin();
 </script>
-<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=116"></script>
+<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=125"></script>
 
 
 
@@ -606,4 +695,39 @@ renderHistoricoFin();
 })();
 </script>
 
+
+<script id="v124-qrcode-position-script">
+(function(){
+  function setupQrDropdown(){
+    var link=document.querySelector('.v113-drop a[href="gerador-qr-code.html"]');
+    if(!link)return;
+    var drop=link.closest('.v113-drop');
+    var group=drop&&drop.closest('.v113-group');
+    var button=group&&group.querySelector('.v113-cat');
+    if(!drop||!button)return;
+    drop.classList.add('v124-qrcode-float');
+    function place(){
+      if(window.innerWidth<760){
+        drop.style.removeProperty('--v124-left');
+        drop.style.removeProperty('--v124-top');
+        return;
+      }
+      var rect=button.getBoundingClientRect();
+      var width=Math.min(190,window.innerWidth-24);
+      var left=Math.min(rect.right-width,window.innerWidth-width-12);
+      left=Math.max(12,left);
+      var top=Math.min(rect.bottom+7,window.innerHeight-70);
+      drop.style.setProperty('--v124-left',left+'px');
+      drop.style.setProperty('--v124-top',Math.max(12,top)+'px');
+    }
+    place();
+    button.addEventListener('click',function(){requestAnimationFrame(place)});
+    group.addEventListener('mouseenter',place);
+    window.addEventListener('resize',place,{passive:true});
+    window.addEventListener('scroll',place,{passive:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupQrDropdown);
+  else setupQrDropdown();
+})();
+</script>
 </body></html>

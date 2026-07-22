@@ -6,15 +6,15 @@
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Calculadora de Lucro Online Grátis | Portal Central IA</title>
+<title>Calculadora de Lucro Avançada | Margem, markup e ponto de equilíbrio</title>
 <link rel="canonical" href="https://portalcentralia.com.br/calculadora-lucro.html">
 
-<meta name="description" content="Calcule lucro, margem e faturamento com a Calculadora de Lucro Online Grátis para produtos e serviços.">
+<meta name="description" content="Calcule lucro líquido, margem, markup, ponto de equilíbrio, impostos, taxas, frete e compare produtos em um simulador completo para empreendedores.">
 <meta property="og:title" content="Calculadora de Lucro Online Grátis | Portal Central IA">
 <meta property="og:description" content="Calcule lucro, margem e faturamento com a Calculadora de Lucro Online Grátis para produtos e serviços.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://portalcentralia.com.br/calculadora-lucro.html">
-<link rel="stylesheet" href="assets/css/style.css?v=116">
+<link rel="stylesheet" href="assets/css/style.css?v=136">
 <link rel="icon" href="assets/img/favicon.ico" sizes="any">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -236,6 +236,369 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 }
 </style>
 
+
+<style id="v121-institucional-somente-rodape">
+.v113-nav > a[href="sobre.html"],
+.v113-nav > a[href="contato.html"],
+.v118-institutional{display:none!important}
+</style>
+
+<style id="v122-submenu-utilidades-sem-corte">
+@media (min-width:981px){
+  html body .v113-nav .v113-group:last-of-type > .v113-drop{
+    left:auto!important;
+    right:10px!important;
+    width:240px!important;
+    min-width:240px!important;
+    max-width:calc(100vw - 48px)!important;
+    overflow:visible!important;
+    contain:none!important;
+    box-sizing:border-box!important;
+  }
+  html body .v113-nav .v113-group:last-of-type > .v113-drop a{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
+
+<style id="v123-submenu-qrcode-curto">
+@media (min-width:981px){
+  html body .v113-nav .v113-group:last-of-type > .v113-drop{
+    left:auto!important;
+    right:8px!important;
+    width:190px!important;
+    min-width:190px!important;
+    max-width:calc(100vw - 48px)!important;
+    padding:6px!important;
+    contain:none!important;
+    box-sizing:border-box!important;
+  }
+  html body .v113-nav .v113-group:last-of-type > .v113-drop a[href="gerador-qr-code.html"]{
+    width:100%!important;
+    padding:9px 8px!important;
+    font-size:.80rem!important;
+    line-height:1.2!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
+
+<style id="v124-qrcode-fora-do-layout">
+@media (min-width:760px){
+  html body .v113-drop.v124-qrcode-float{
+    position:fixed!important;
+    left:var(--v124-left,12px)!important;
+    right:auto!important;
+    top:var(--v124-top,80px)!important;
+    bottom:auto!important;
+    width:min(190px,calc(100vw - 24px))!important;
+    min-width:0!important;
+    max-width:calc(100vw - 24px)!important;
+    height:auto!important;
+    margin:0!important;
+    padding:6px!important;
+    overflow:hidden!important;
+    contain:none!important;
+    transform:none!important;
+    box-sizing:border-box!important;
+    z-index:2147483647!important;
+  }
+  html body .v113-drop.v124-qrcode-float a[href="gerador-qr-code.html"]{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    margin:0!important;
+    padding:9px 8px!important;
+    font-size:.80rem!important;
+    line-height:1.25!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:clip!important;
+    box-sizing:border-box!important;
+  }
+}
+</style>
+
+<style id="lucro-premium-v131">
+:root{--lp-bg:#061326;--lp-panel:#0b1d36;--lp-panel2:#102541;--lp-line:#1d3a61;--lp-blue:#2584ff;--lp-cyan:#28c7ff;--lp-green:#2ddb8f;--lp-purple:#8a5cff;--lp-text:#eef6ff;--lp-muted:#a9bdd4;--lp-warn:#ffca58;--lp-danger:#ff6767}
+.lp-page{background:radial-gradient(circle at 75% 5%,rgba(37,132,255,.16),transparent 32%),linear-gradient(180deg,#061326,#07172c 48%,#061326);color:var(--lp-text);overflow:hidden}
+.lp-page *{box-sizing:border-box}.lp-page a{text-decoration:none}
+.lp-wrap{width:min(1180px,calc(100% - 32px));margin:auto}
+.lp-hero{position:relative;padding:58px 0 34px;border-bottom:1px solid rgba(86,140,205,.16)}
+.lp-hero-grid{display:grid;grid-template-columns:1.03fr .97fr;gap:38px;align-items:center}
+.lp-kicker{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(62,151,255,.5);background:rgba(19,71,135,.32);padding:8px 12px;border-radius:999px;font-weight:800;font-size:.8rem;color:#cce6ff}
+.lp-hero h1{font-size:clamp(2.6rem,5vw,4.8rem);line-height:1.02;letter-spacing:-.05em;margin:18px 0}.lp-hero h1 span{color:var(--lp-blue)}
+.lp-lead{font-size:1.08rem;line-height:1.72;color:var(--lp-muted);max-width:650px}
+.lp-actions{display:flex;flex-wrap:wrap;gap:12px;margin:25px 0}
+.lp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:50px;padding:13px 18px;border-radius:12px;font-weight:900;border:1px solid transparent;cursor:pointer}
+.lp-btn.primary{background:linear-gradient(135deg,#1f80ff,#0e5fd1);color:#fff;box-shadow:0 14px 35px rgba(28,108,232,.32)}
+.lp-btn.secondary{background:rgba(255,255,255,.03);border-color:#315177;color:#e7f1ff}
+.lp-trust-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}.lp-trust{padding:13px;border:1px solid #1d3d64;border-radius:13px;background:#0a1b32}.lp-trust b{display:block;font-size:.87rem}.lp-trust small{color:#86a0bc}
+.lp-hero-visual{position:relative}.lp-hero-visual img{width:100%;border-radius:26px;display:block;border:1px solid #294c78;box-shadow:0 30px 70px rgba(0,0,0,.38)}
+.lp-floating{position:absolute;background:rgba(7,22,43,.91);border:1px solid #315b8a;border-radius:14px;padding:13px 15px;backdrop-filter:blur(12px);box-shadow:0 16px 35px rgba(0,0,0,.3)}.lp-floating b{display:block;font-size:1.05rem}.lp-floating small{color:#9eb5cc}.lp-floating.f1{left:-18px;bottom:20px}.lp-floating.f2{right:-12px;top:18px}
+.lp-impact{padding:20px 0}.lp-impact-grid{display:grid;grid-template-columns:140px 1fr 1fr 1fr;gap:0;background:linear-gradient(90deg,#0b203c,#102845);border:1px solid #21436c;border-radius:18px;overflow:hidden}.lp-impact-item{padding:21px;border-right:1px solid #21436c}.lp-impact-item:last-child{border-right:0}.lp-ring{width:82px;height:82px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--lp-blue) 0 80%,#173252 80% 100%);position:relative}.lp-ring::after{content:"";position:absolute;inset:8px;border-radius:50%;background:#0c2039}.lp-ring b{position:relative;z-index:1;font-size:1.22rem}
+.lp-section{padding:58px 0}.lp-section.alt{background:rgba(255,255,255,.012);border-top:1px solid rgba(75,124,180,.12);border-bottom:1px solid rgba(75,124,180,.12)}
+.lp-heading{max-width:780px;margin-bottom:26px}.lp-heading span{color:#50b7ff;font-size:.78rem;font-weight:900;text-transform:uppercase;letter-spacing:.13em}.lp-heading h2{font-size:clamp(1.8rem,3vw,2.65rem);margin:9px 0 10px}.lp-heading p{color:var(--lp-muted);line-height:1.7;margin:0}
+.lp-benefits{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.lp-card{background:linear-gradient(180deg,#0b1f39,#0a1a30);border:1px solid #1c3a60;border-radius:17px;padding:20px}.lp-card .icon{font-size:1.7rem}.lp-card h3{font-size:1.02rem;margin:14px 0 8px}.lp-card p{color:#9bb0c8;line-height:1.55;font-size:.9rem;margin:0}
+.lp-stories{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.lp-story{display:grid;grid-template-columns:58px 1fr;gap:14px}.lp-avatar{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:1.65rem;background:linear-gradient(135deg,#163c6c,#1c7bc8)}.lp-story blockquote{margin:8px 0;color:#afc2d7;line-height:1.55}.lp-tag{display:inline-block;background:rgba(45,219,143,.13);color:#70f2b7;padding:5px 8px;border-radius:999px;font-size:.75rem;font-weight:800}
+.lp-tool-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;align-items:start}.lp-panel{background:linear-gradient(180deg,#0b1f39,#09182c);border:1px solid #21436d;border-radius:20px;padding:22px}.lp-panel h3{margin:0 0 17px;font-size:1.35rem}
+.lp-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.lp-field label{display:block;font-size:.82rem;color:#a8bdd3;margin-bottom:6px}.lp-field input,.lp-field select{width:100%;height:46px;border-radius:11px;border:1px solid #27486f;background:#0b1a2e;color:#fff;padding:0 12px;outline:none}.lp-field input:focus{border-color:#2b89ff;box-shadow:0 0 0 3px rgba(43,137,255,.14)}
+.lp-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.lp-result{background:#0c2039;border:1px solid #20426b;border-radius:14px;padding:16px}.lp-result small{display:block;color:#92a9c1;margin-bottom:8px}.lp-result strong{font-size:1.32rem}.lp-result.good strong{color:#4ce8a0}.lp-result.warn strong{color:#ffd162}
+.lp-insight{margin-top:13px;padding:14px;border-radius:13px;background:rgba(37,132,255,.11);border:1px solid rgba(37,132,255,.35);color:#cde5ff;line-height:1.55}
+.lp-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}.lp-product{background:#0d203a;border:1px solid #244870;border-radius:15px;padding:15px}.lp-product h4{margin:0 0 12px}.lp-product dl{display:grid;grid-template-columns:1fr auto;gap:8px;margin:0}.lp-product dt{color:#8fa8c1}.lp-product dd{margin:0;font-weight:800}.lp-winner{margin-top:13px;padding:14px;text-align:center;border-radius:13px;background:rgba(255,202,88,.11);border:1px solid rgba(255,202,88,.35);color:#ffd86f;font-weight:900}
+.lp-chart-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}.lp-chart{min-height:310px}.lp-bars{height:230px;display:flex;align-items:end;gap:18px;padding:20px 12px 28px;border-bottom:1px solid #284868;position:relative}.lp-bar-group{flex:1;display:flex;align-items:end;justify-content:center;gap:5px;height:100%;position:relative}.lp-bar{width:24px;border-radius:7px 7px 0 0}.lp-bar.rev{background:linear-gradient(#2c93ff,#1558c5)}.lp-bar.profit{background:linear-gradient(#38e69a,#14945f)}.lp-bar.margin{background:linear-gradient(#9d73ff,#6b3ed1)}.lp-month{position:absolute;bottom:-23px;font-size:.72rem;color:#8ea7c0}
+.lp-donut{width:190px;height:190px;border-radius:50%;margin:18px auto;display:grid;place-items:center;background:conic-gradient(#2b8cff 0 50%,#825cff 50% 66%,#2ddb8f 66% 76%,#ffca58 76% 86%,#ff7b64 86% 100%)}.lp-donut::after{content:"R$ 60\A custo total";white-space:pre;text-align:center;display:grid;place-items:center;width:108px;height:108px;border-radius:50%;background:#0a1a30;font-weight:900}
+.lp-learning{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.lp-learn h3{font-size:1rem}.lp-learn a{display:inline-block;margin-top:13px;color:#55b8ff;font-weight:800}
+.lp-errors{display:grid;gap:10px}.lp-error{display:flex;gap:10px;color:#b6c7d9}.lp-error span{color:#ff7373}
+.lp-margins{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.lp-margin-card{text-align:center;padding:18px 10px;border:1px solid #1f3f65;border-radius:15px;background:#0b1d35}.lp-margin-card strong{display:block;color:#ffd064;margin-top:9px}
+.lp-faq{display:grid;grid-template-columns:1fr 1fr;gap:11px}.lp-faq details{background:#0b1e37;border:1px solid #204166;border-radius:13px;padding:15px}.lp-faq summary{cursor:pointer;font-weight:800}.lp-faq p{color:#a5b9cf;line-height:1.6}
+.lp-cta{padding:36px 0 70px}.lp-cta-box{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:28px;border:1px solid #285180;border-radius:18px;background:linear-gradient(90deg,#0c2748,#0f3260)}.lp-cta-box h2{margin:0;font-size:1.6rem}.lp-cta-box p{margin:6px 0 0;color:#a8bed4}
+@media(max-width:1050px){.lp-hero-grid,.lp-tool-grid,.lp-chart-grid{grid-template-columns:1fr}.lp-benefits{grid-template-columns:repeat(3,1fr)}.lp-learning{grid-template-columns:1fr 1fr}.lp-margins{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.lp-wrap{width:min(100% - 22px,1180px)}.lp-hero{padding-top:38px}.lp-hero-grid{gap:24px}.lp-hero h1{font-size:2.7rem}.lp-trust-row,.lp-stories,.lp-form-grid,.lp-result-grid,.lp-compare,.lp-faq{grid-template-columns:1fr}.lp-impact-grid{grid-template-columns:1fr}.lp-impact-item{border-right:0;border-bottom:1px solid #21436c}.lp-benefits,.lp-learning,.lp-margins{grid-template-columns:1fr}.lp-floating{position:static;margin-top:10px}.lp-cta-box{align-items:flex-start;flex-direction:column}.lp-actions .lp-btn{width:100%}}
+</style>
+
+
+<style id="lucro-mobile-fix-v132">
+@media (max-width:760px){
+  .lp-page{overflow-x:hidden!important}
+  .lp-wrap{width:calc(100% - 20px)!important;max-width:100%!important}
+  .lp-section{padding:42px 0!important}
+  .lp-panel{padding:16px!important;border-radius:16px!important;overflow:hidden!important}
+  .lp-panel h3{font-size:1.18rem!important;line-height:1.25!important}
+  .lp-heading h2{font-size:1.78rem!important;line-height:1.15!important}
+  .lp-heading p{font-size:.96rem!important}
+  .lp-chart-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+  .lp-chart{min-width:0!important;width:100%!important;min-height:0!important}
+  .lp-bars{
+    width:100%!important;
+    max-width:100%!important;
+    height:210px!important;
+    gap:3px!important;
+    padding:18px 2px 28px!important;
+    overflow:hidden!important;
+  }
+  .lp-bar-group{
+    flex:1 1 0!important;
+    min-width:0!important;
+    gap:2px!important;
+  }
+  .lp-bar{
+    width:clamp(5px,2.35vw,9px)!important;
+    max-width:9px!important;
+    min-width:5px!important;
+  }
+  .lp-month{font-size:.65rem!important;bottom:-22px!important}
+  .lp-chart p{font-size:.73rem!important;line-height:1.45!important}
+  .lp-donut{
+    width:min(176px,70vw)!important;
+    height:min(176px,70vw)!important;
+    margin:18px auto!important;
+  }
+  .lp-donut::after{
+    width:min(102px,41vw)!important;
+    height:min(102px,41vw)!important;
+    font-size:.88rem!important;
+  }
+  #lpCostLegend{font-size:.86rem!important}
+  .lp-result strong{font-size:1.16rem!important}
+  .lp-form-grid{gap:10px!important}
+  .lp-field input,.lp-field select{height:44px!important}
+}
+@media (max-width:390px){
+  .lp-hero h1{font-size:2.28rem!important}
+  .lp-panel{padding:14px!important}
+  .lp-bars{height:190px!important}
+  .lp-bar{width:6px!important}
+}
+</style>
+
+
+<style id="lucro-mobile-charts-v134">
+@media (max-width:760px){
+  .lp-page,
+  .lp-section,
+  .lp-wrap,
+  .lp-chart-grid,
+  .lp-panel,
+  .lp-chart{
+    min-width:0!important;
+    max-width:100%!important;
+  }
+
+  .lp-page{
+    overflow-x:hidden!important;
+  }
+
+  .lp-chart-grid{
+    display:block!important;
+    width:100%!important;
+  }
+
+  .lp-chart-grid > .lp-panel{
+    width:100%!important;
+    max-width:100%!important;
+    margin:0 0 14px!important;
+    overflow:hidden!important;
+  }
+
+  /* Gráfico de barras: 6 meses dentro da largura do celular */
+  .lp-bars{
+    display:grid!important;
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    align-items:end!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:200px!important;
+    gap:4px!important;
+    padding:16px 0 28px!important;
+    overflow:hidden!important;
+  }
+
+  .lp-bar-group{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    display:flex!important;
+    justify-content:center!important;
+    align-items:flex-end!important;
+    gap:2px!important;
+    overflow:visible!important;
+  }
+
+  .lp-bar{
+    flex:0 1 7px!important;
+    width:7px!important;
+    min-width:4px!important;
+    max-width:7px!important;
+  }
+
+  .lp-month{
+    width:100%!important;
+    left:0!important;
+    text-align:center!important;
+    font-size:.61rem!important;
+    white-space:nowrap!important;
+  }
+
+  .lp-chart p{
+    white-space:normal!important;
+    overflow-wrap:anywhere!important;
+    margin-bottom:0!important;
+  }
+
+  /* Gráfico circular centralizado e limitado à largura do card */
+  .lp-donut{
+    width:min(210px,72vw)!important;
+    height:min(210px,72vw)!important;
+    max-width:100%!important;
+    max-height:none!important;
+    margin:18px auto 22px!important;
+    flex:none!important;
+  }
+
+  .lp-donut::after{
+    width:min(118px,40vw)!important;
+    height:min(118px,40vw)!important;
+    font-size:.9rem!important;
+    line-height:1.25!important;
+  }
+
+  #lpCostLegend{
+    width:100%!important;
+    max-width:100%!important;
+    padding:0!important;
+    font-size:.86rem!important;
+    overflow-wrap:anywhere!important;
+  }
+
+  #lpCostLegend > div{
+    white-space:normal!important;
+    line-height:1.45!important;
+  }
+}
+
+@media (max-width:390px){
+  .lp-bars{
+    height:185px!important;
+    gap:2px!important;
+  }
+
+  .lp-bar{
+    width:6px!important;
+    max-width:6px!important;
+  }
+
+  .lp-donut{
+    width:min(190px,70vw)!important;
+    height:min(190px,70vw)!important;
+  }
+}
+</style>
+
+
+<style id="lucro-educativo-v135">
+.lp-tool-followup{margin-top:18px}
+.lp-tool-followup .lp-panel{width:100%}
+.lp-edu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}
+.lp-edu-card{background:linear-gradient(180deg,#0b1f39,#09182c);border:1px solid #21436d;border-radius:18px;padding:22px}
+.lp-edu-card h3{margin:0 0 10px;color:#eef6ff;font-size:1.15rem}
+.lp-edu-card p,.lp-edu-card li{color:#a9bdd4;line-height:1.65}
+.lp-edu-card ul{padding-left:18px;margin:10px 0 0}
+.lp-playbook{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.lp-playbook-step{display:flex;gap:14px;background:#0b1e37;border:1px solid #204166;border-radius:16px;padding:18px}
+.lp-playbook-step span{flex:0 0 42px;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#123762;color:#7fc2ff;font-weight:900}
+.lp-playbook-step h3{margin:0 0 6px;font-size:1.05rem}
+.lp-playbook-step p{margin:0;color:#a5b9cf;line-height:1.58}
+.lp-case-table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:14px}
+.lp-case-table th,.lp-case-table td{padding:12px;border:1px solid #21436d;text-align:left}
+.lp-case-table th{background:#102947;color:#eaf5ff}
+.lp-case-table td{background:#0b1d35;color:#afc2d7}
+.lp-case-table strong{color:#54e4a2}
+.lp-note{margin-top:16px;padding:16px;border-left:4px solid #2584ff;border-radius:10px;background:rgba(37,132,255,.09);color:#c8def4;line-height:1.65}
+@media(max-width:900px){.lp-edu-grid{grid-template-columns:1fr 1fr}.lp-playbook{grid-template-columns:1fr}}
+@media(max-width:600px){.lp-edu-grid{grid-template-columns:1fr}.lp-case-table{font-size:.82rem}.lp-case-table th,.lp-case-table td{padding:9px 7px}}
+</style>
+
+
+<style id="lucro-donut-dinamico-v136">
+.lp-donut{position:relative}
+.lp-donut::after{display:none!important;content:none!important}
+.lp-donut-center{
+  position:absolute;
+  inset:50% auto auto 50%;
+  transform:translate(-50%,-50%);
+  width:108px;
+  height:108px;
+  border-radius:50%;
+  background:#0a1a30;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:10px;
+  color:#eef6ff;
+  pointer-events:none;
+}
+.lp-donut-center strong{font-size:1rem;line-height:1.15}
+.lp-donut-center span{font-size:.72rem;line-height:1.2;color:#a9bdd4;margin-top:4px}
+@media(max-width:760px){
+  .lp-donut-center{
+    width:min(118px,40vw)!important;
+    height:min(118px,40vw)!important;
+  }
+  .lp-donut-center strong{font-size:.92rem}
+  .lp-donut-center span{font-size:.68rem}
+}
+</style>
+
 </head>
 <body>
 <header class="v113-header">
@@ -276,40 +639,317 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 <span>🌦️ Clima <b data-weather>São Paulo --°C</b></span><span>💵 Dólar <b data-usd>carregando</b></span><span>💶 Euro <b data-eur>carregando</b></span><span>₿ Bitcoin <b data-btc>carregando</b></span>
 </div></div>
 
-<header class="page-hero"><div class="wrap">
-  <nav class="breadcrumb"><a href="index.html">Início</a><span>›</span><a href="index.html#ferramentas">Ferramentas</a><span>›</span><span>Calculadora de Lucro</span></nav>
-  <span class="badge">Ferramenta gratuita</span>
-  <h1>Calculadora de Lucro Online Grátis</h1>
-  <p class="lead">A Calculadora de Lucro Online Grátis ajuda pequenos empreendedores, autônomos e vendedores a entenderem se o preço de venda realmente gera ganho. Muitos negócios olham apenas para o faturamento, mas o que sustenta a empresa é a diferença entre custo e venda. Com esta ferramenta, você informa o custo do produto ou serviço, o preço de venda e a quantidade vendida para calcular o lucro total, a margem percentual e o faturamento estimado. Ela pode ser usada por quem vende produtos físicos, serviços, comida, peças, cursos, atendimentos ou qualquer oferta com preço definido. O objetivo é tornar a precificação mais clara, evitando que a pessoa venda muito, mas ganhe pouco por não considerar corretamente o custo.</p>
-</div></header>
-<main class="tool-page"><div class="wrap tool-layout">
-  <article class="content-card prose">
-    <h2>Como esta ferramenta ajuda</h2>
-    <p>A ferramenta mostra de forma simples se um preço cobre o custo e deixa margem positiva. Ela é útil para testar promoções, lotes, kits e reajustes antes de anunciar uma oferta.</p>
-    <h2>Como usar</h2>
-    <ol class="steps"><li>Digite o custo unitário do produto ou serviço.</li>
-<li>Informe o preço de venda unitário.</li>
-<li>Digite a quantidade vendida ou simulada.</li>
-<li>Clique em calcular lucro.</li>
-<li>Analise lucro total, margem e faturamento.</li></ol>
-    <h2>Exemplo prático</h2>
-    <div class="example-box"><p>Se um produto custa <b>R$ 30,00</b>, é vendido por <b>R$ 50,00</b> e você vende <b>20 unidades</b>, a ferramenta mostra lucro total de R$ 400,00, faturamento de R$ 1.000,00 e margem aproximada de 40%.</p></div>
-    <h2>Perguntas frequentes</h2>
-    <div class="faq-list"><details class="faq-item"><summary>Qual a diferença entre lucro e faturamento?</summary><p>Faturamento é o total vendido. Lucro é o que sobra depois de descontar os custos.</p></details>
-<details class="faq-item"><summary>O que é margem de lucro?</summary><p>É o percentual que representa o lucro em relação ao preço de venda.</p></details>
-<details class="faq-item"><summary>Esta calculadora considera impostos e taxas?</summary><p>Não. Ela faz uma conta simples de custo, venda e quantidade. Impostos e taxas devem ser considerados à parte.</p></details>
-<details class="faq-item"><summary>Serve para serviços?</summary><p>Sim. Basta usar como custo o valor gasto para entregar o serviço.</p></details>
-<details class="faq-item"><summary>Como saber se minha margem está boa?</summary><p>Depende do setor, despesas fixas, impostos e estratégia de preço.</p></details></div>
-    <div class="disclaimer"><b>Aviso importante:</b> Os resultados são estimativas simples. Para decisões empresariais completas, considere impostos, taxas de cartão, comissões, frete, perdas, despesas fixas e orientação contábil quando necessário.</div>
-    <h2>Ferramentas relacionadas</h2>
-    <div class="related-tools"><a href="gerador-orcamento.html">Gerador de Orçamento</a>
-<a href="calculadora-cdi.html">Calculadora CDI</a>
-<a href="controle-manutencao-carro.html">Controle do Carro</a></div>
-    <p><a class="ghost" href="index.html">← Voltar para a página inicial</a></p>
-  </article>
-  <aside class="tool-widget"><div class="panel" id="lucro"><h2>💸 Simulador de Lucro</h2><div class="form"><label>Custo unitário</label><input class="money" id="lucro_custo" placeholder="Custo"><label>Preço de venda</label><input class="money" id="lucro_venda" placeholder="Preço de venda"><label>Quantidade</label><input id="lucro_qtd" value="1"><button class="btn" onclick="calcLucro()">Calcular lucro</button><div class="result" id="lucro_result"><h3>Resultado</h3><small>Estimativa educativa.</small></div></div></div></aside>
-</div></main>
-<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=116"></script>
+
+<main class="lp-page">
+<section class="lp-hero">
+  <div class="lp-wrap lp-hero-grid">
+    <div>
+      <span class="lp-kicker">💹 Calculadora de lucro completa</span>
+      <h1>Você está lucrando ou apenas <span>faturando?</span></h1>
+      <p class="lp-lead">Descubra quanto realmente sobra depois de custos, impostos, comissões, frete e descontos. Simule preços, compare produtos e encontre o ponto de equilíbrio do seu negócio.</p>
+      <div class="lp-actions"><a class="lp-btn primary" href="#simulador">Calcular meu lucro agora</a><a class="lp-btn secondary" href="#historias">Ver exemplos reais</a></div>
+      <div class="lp-trust-row">
+        <div class="lp-trust"><b>✓ 100% gratuito</b><small>Sem cadastro</small></div>
+        <div class="lp-trust"><b>⚡ Resultado imediato</b><small>Atualização ao digitar</small></div>
+        <div class="lp-trust"><b>🔒 Mais privacidade</b><small>Dados não são enviados</small></div>
+      </div>
+    </div>
+    <div class="lp-hero-visual">
+      <img src="assets/img/lucro-premium/empreendedor-dashboard.webp?v=131" alt="Empreendedor analisando um dashboard de lucro">
+      <div class="lp-floating f1"><small>Lucro líquido estimado</small><b>R$ 7.920,00</b></div>
+      <div class="lp-floating f2"><small>Margem do negócio</small><b>32,0%</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-impact">
+  <div class="lp-wrap lp-impact-grid">
+    <div class="lp-impact-item"><div class="lp-ring"><b>80%</b></div></div>
+    <div class="lp-impact-item"><b>Muitos pequenos negócios</b><p>vendem sem acompanhar corretamente a margem e os custos ocultos.</p></div>
+    <div class="lp-impact-item"><b>Melhores decisões</b><p>começam quando faturamento, custos e lucro deixam de ser confundidos.</p></div>
+    <div class="lp-impact-item"><b>Mais controle</b><p>para precificar, promover e crescer com segurança.</p></div>
+  </div>
+</section>
+
+<section class="lp-section">
+  <div class="lp-wrap">
+    <div class="lp-heading"><span>Benefícios</span><h2>Por que usar esta calculadora?</h2><p>Ela transforma números soltos em informações que ajudam você a decidir preço, desconto, meta de vendas e prioridade de produtos.</p></div>
+    <div class="lp-benefits">
+      <article class="lp-card"><div class="icon">🎯</div><h3>Defina preços melhores</h3><p>Veja quanto precisa cobrar para cobrir todos os custos e ainda deixar margem.</p></article>
+      <article class="lp-card"><div class="icon">📈</div><h3>Aumente a margem</h3><p>Identifique quais custos estão consumindo seu resultado.</p></article>
+      <article class="lp-card"><div class="icon">🛡️</div><h3>Evite prejuízos</h3><p>Teste promoções e descontos antes de publicar uma oferta.</p></article>
+      <article class="lp-card"><div class="icon">⚖️</div><h3>Compare produtos</h3><p>Descubra qual item entrega mais lucro, não apenas mais faturamento.</p></article>
+      <article class="lp-card"><div class="icon">🧭</div><h3>Planeje metas</h3><p>Calcule quantas vendas são necessárias para alcançar o ponto de equilíbrio.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section alt" id="historias">
+  <div class="lp-wrap">
+    <div class="lp-heading"><span>Exemplos educativos</span><h2>Histórias de quem passou a enxergar o lucro real</h2><p>Casos ilustrativos mostram como custos esquecidos podem mudar completamente a percepção sobre um negócio.</p></div>
+    <div class="lp-stories">
+      <article class="lp-card lp-story"><div class="lp-avatar">👩‍🍳</div><div><h3>Maria — Confeitaria</h3><blockquote>“Eu faturava R$ 9.500 e achava que quase tudo era ganho. Somando embalagens, gás, entregas e desperdício, o lucro real ficou em R$ 2.800.”</blockquote><span class="lp-tag">Controle + clareza</span></div></article>
+      <article class="lp-card lp-story"><div class="lp-avatar">🛒</div><div><h3>Carlos — Marketplace</h3><blockquote>“Vendia muito, mas a comissão e o frete consumiam a margem. Ajustei preços e priorizei os produtos mais rentáveis.”</blockquote><span class="lp-tag">Margem + estratégia</span></div></article>
+      <article class="lp-card lp-story"><div class="lp-avatar">✨</div><div><h3>Fernanda — Lash Designer</h3><blockquote>“Eu cobrava abaixo do necessário e não incluía materiais, tempo e deslocamento. A conta mostrou quanto deveria cobrar.”</blockquote><span class="lp-tag">Preço + sustentabilidade</span></div></article>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section" id="simulador">
+  <div class="lp-wrap">
+    <div class="lp-heading"><span>Ferramenta principal</span><h2>Simulador de lucro avançado</h2><p>Preencha os dados do produto ou serviço. Os resultados, comparações e gráficos serão atualizados automaticamente.</p></div>
+    <div class="lp-tool-grid">
+      <section class="lp-panel">
+        <h3>🧮 Dados da venda</h3>
+        <div class="lp-form-grid">
+          <div class="lp-field"><label>Custo do produto ou serviço (R$)</label><input id="lpCusto" inputmode="decimal" value="50,00"></div>
+          <div class="lp-field"><label>Preço de venda (R$)</label><input id="lpVenda" inputmode="decimal" value="120,00"></div>
+          <div class="lp-field"><label>Impostos (%)</label><input id="lpImposto" inputmode="decimal" value="6,00"></div>
+          <div class="lp-field"><label>Comissão e taxas (%)</label><input id="lpComissao" inputmode="decimal" value="16,00"></div>
+          <div class="lp-field"><label>Frete ou entrega (R$)</label><input id="lpFrete" inputmode="decimal" value="10,00"></div>
+          <div class="lp-field"><label>Outras despesas (R$)</label><input id="lpOutros" inputmode="decimal" value="8,00"></div>
+          <div class="lp-field"><label>Desconto (%)</label><input id="lpDesconto" inputmode="decimal" value="0,00"></div>
+          <div class="lp-field"><label>Quantidade vendida</label><input id="lpQtd" inputmode="numeric" value="1"></div>
+          <div class="lp-field"><label>Custos fixos mensais (R$)</label><input id="lpFixos" inputmode="decimal" value="1000,00"></div>
+          <div class="lp-field"><label>Meta mensal de vendas</label><input id="lpMeta" inputmode="numeric" value="100"></div>
+        </div>
+        <div class="lp-actions"><button class="lp-btn primary" id="lpCalcular">Calcular lucro</button><button class="lp-btn secondary" id="lpLimpar">Restaurar exemplo</button></div>
+      </section>
+      <section class="lp-panel">
+        <h3>📊 Seus resultados</h3>
+        <div class="lp-result-grid">
+          <div class="lp-result"><small>Faturamento</small><strong id="rFaturamento">R$ 120,00</strong></div>
+          <div class="lp-result"><small>Lucro bruto</small><strong id="rBruto">R$ 70,00</strong></div>
+          <div class="lp-result good"><small>Lucro líquido</small><strong id="rLiquido">R$ 25,60</strong></div>
+          <div class="lp-result good"><small>Margem</small><strong id="rMargem">21,3%</strong></div>
+          <div class="lp-result"><small>Markup</small><strong id="rMarkup">2,40x</strong></div>
+          <div class="lp-result warn"><small>Ponto de equilíbrio</small><strong id="rEquilibrio">40 vendas</strong></div>
+        </div>
+        <div class="lp-insight" id="lpInsight">Com os valores informados, cada venda deixa uma estimativa de lucro líquido positivo.</div>
+      </section>
+    </div>
+  </div>
+
+<div class="lp-tool-followup">
+  <article class="lp-panel">
+      <h3>Custos: para onde o dinheiro vai?</h3>
+      <div class="lp-donut" id="lpDonut"><div class="lp-donut-center"><strong id="lpDonutTotal">R$ 0,00</strong><span>total da venda</span></div></div>
+      <div id="lpCostLegend" class="lp-errors"></div>
+    </article>
+</div>
+</section>
+
+<section class="lp-section alt">
+  <div class="lp-wrap">
+    <div class="lp-heading"><span>Comparação</span><h2>Qual produto é mais lucrativo?</h2><p>Preço maior não significa lucro maior. Compare dois produtos usando custo, venda e taxas.</p></div>
+    <div class="lp-panel">
+      <div class="lp-compare">
+        <div class="lp-product"><h4>Produto A</h4><div class="lp-form-grid"><div class="lp-field"><label>Custo</label><input id="aCusto" value="60,00"></div><div class="lp-field"><label>Venda</label><input id="aVenda" value="100,00"></div><div class="lp-field"><label>Taxas (%)</label><input id="aTaxa" value="0"></div></div><dl><dt>Lucro estimado</dt><dd id="aLucro">R$ 40,00</dd><dt>Margem</dt><dd id="aMargem">40,0%</dd></dl></div>
+        <div class="lp-product"><h4>Produto B</h4><div class="lp-form-grid"><div class="lp-field"><label>Custo</label><input id="bCusto" value="120,00"></div><div class="lp-field"><label>Venda</label><input id="bVenda" value="150,00"></div><div class="lp-field"><label>Taxas (%)</label><input id="bTaxa" value="0"></div></div><dl><dt>Lucro estimado</dt><dd id="bLucro">R$ 30,00</dd><dt>Margem</dt><dd id="bMargem">20,0%</dd></dl></div>
+      </div>
+      <div class="lp-winner" id="lpWinner">🏆 Produto A é mais lucrativo.</div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section"><div class="lp-wrap"><article class="lp-panel lp-chart">
+      <h3>Evolução ilustrativa do negócio</h3>
+      <div class="lp-bars" id="lpBars"></div>
+      <p style="color:#91a9c1;font-size:.82rem">Azul: faturamento · Verde: lucro líquido · Roxo: margem relativa.</p>
+    </article></div></section>
+
+<section class="lp-section alt">
+  <div class="lp-wrap">
+    <div class="lp-heading"><span>Aprendizado</span><h2>Conceitos para tomar decisões melhores</h2><p>Entenda o significado dos principais indicadores antes de alterar preços ou planejar promoções.</p></div>
+    <div class="lp-learning">
+      <article class="lp-card lp-learn"><div class="icon">💰</div><h3>Lucro líquido</h3><p>É o valor que sobra depois de custos, taxas, impostos, frete e demais despesas da venda.</p><a href="#simulador">Aplicar no simulador →</a></article>
+      <article class="lp-card lp-learn"><div class="icon">％</div><h3>Markup</h3><p>Mostra quantas vezes o preço de venda representa o custo direto do produto ou serviço.</p><a href="#simulador">Ver o índice →</a></article>
+      <article class="lp-card lp-learn"><div class="icon">◔</div><h3>Margem de lucro</h3><p>Percentual do preço de venda que permanece como lucro após os custos considerados.</p><a href="#simulador">Calcular margem →</a></article>
+      <article class="lp-card lp-learn"><div class="icon">⚖️</div><h3>Ponto de equilíbrio</h3><p>Número mínimo de vendas necessário para que a margem de contribuição cubra os custos fixos.</p><a href="#simulador">Descobrir a meta →</a></article>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section">
+  <div class="lp-wrap lp-chart-grid">
+    <article class="lp-panel">
+      <h3>Erros que destroem o lucro</h3>
+      <div class="lp-errors">
+        <div class="lp-error"><span>✕</span>Confundir faturamento com dinheiro disponível.</div>
+        <div class="lp-error"><span>✕</span>Ignorar impostos, comissões e taxas de plataforma.</div>
+        <div class="lp-error"><span>✕</span>Oferecer desconto sem recalcular a margem.</div>
+        <div class="lp-error"><span>✕</span>Misturar despesas pessoais e empresariais.</div>
+        <div class="lp-error"><span>✕</span>Não incluir desperdícios, devoluções e retrabalho.</div>
+        <div class="lp-error"><span>✕</span>Definir preço apenas copiando concorrentes.</div>
+      </div>
+    </article>
+    <article class="lp-panel">
+      <h3>Checklist antes de anunciar</h3>
+      <div class="lp-errors">
+        <div>✓ Some custo, embalagem, mão de obra e perdas.</div>
+        <div>✓ Confira taxas de cartão, marketplace e afiliados.</div>
+        <div>✓ Defina a margem mínima aceitável.</div>
+        <div>✓ Simule preço normal e promocional.</div>
+        <div>✓ Calcule quantas vendas pagam os custos fixos.</div>
+        <div>✓ Revise os números sempre que um custo mudar.</div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="lp-section alt">
+  <div class="lp-wrap">
+    <div class="lp-heading"><span>Referências educativas</span><h2>Margens ilustrativas por segmento</h2><p>Faixas apenas orientativas. A margem adequada depende de impostos, localização, volume, risco, posicionamento e custos específicos.</p></div>
+    <div class="lp-margins">
+      <div class="lp-margin-card">🍽️<b>Alimentação</b><strong>10%–20%</strong></div>
+      <div class="lp-margin-card">👕<b>Moda</b><strong>30%–50%</strong></div>
+      <div class="lp-margin-card">💄<b>Cosméticos</b><strong>40%–70%</strong></div>
+      <div class="lp-margin-card">🛠️<b>Serviços</b><strong>50%–90%</strong></div>
+      <div class="lp-margin-card">💻<b>Produtos digitais</b><strong>70%–95%</strong></div>
+    </div>
+  </div>
+</section>
+
+
+<section class="lp-section alt">
+  <div class="lp-wrap">
+    <div class="lp-heading">
+      <span>Educação para empreendedores</span>
+      <h2>Conheça os números que sustentam um negócio saudável</h2>
+      <p>Vender mais é importante, mas crescer com segurança exige acompanhar margem, caixa, custos, estoque e capacidade de entrega.</p>
+    </div>
+    <div class="lp-edu-grid">
+      <article class="lp-edu-card"><h3>Capital de giro</h3><p>É o dinheiro necessário para manter a operação funcionando entre o pagamento dos custos e o recebimento das vendas.</p><ul><li>Evita atrasos com fornecedores.</li><li>Protege períodos de baixa.</li><li>Reduz dependência de crédito caro.</li></ul></article>
+      <article class="lp-edu-card"><h3>Pró-labore e lucro</h3><p>Pró-labore remunera o trabalho do dono. Lucro é o resultado do negócio após custos e despesas.</p><ul><li>Separe conta pessoal e empresarial.</li><li>Defina retirada mensal sustentável.</li><li>Reserve parte para reinvestimento.</li></ul></article>
+      <article class="lp-edu-card"><h3>Margem de contribuição</h3><p>É quanto sobra de cada venda depois dos custos variáveis. Esse valor ajuda a pagar custos fixos e formar lucro.</p><ul><li>Ajuda a definir metas.</li><li>Mostra quais produtos sustentam a operação.</li><li>Orienta promoções.</li></ul></article>
+      <article class="lp-edu-card"><h3>Fluxo de caixa</h3><p>Lucro no papel não garante dinheiro disponível hoje. Prazos de recebimento e pagamento podem apertar o caixa.</p><ul><li>Registre entradas e saídas.</li><li>Acompanhe vencimentos.</li><li>Planeje compras e parcelas.</li></ul></article>
+      <article class="lp-edu-card"><h3>Estoque e desperdício</h3><p>Produto parado, vencido ou danificado representa dinheiro imobilizado e margem perdida.</p><ul><li>Controle giro de estoque.</li><li>Evite compras sem previsão de venda.</li><li>Meça perdas e devoluções.</li></ul></article>
+      <article class="lp-edu-card"><h3>Preço percebido</h3><p>O preço não depende apenas do custo. Qualidade, confiança, atendimento e diferenciação também influenciam quanto o cliente aceita pagar.</p><ul><li>Comunique benefícios.</li><li>Evite competir apenas por preço.</li><li>Construa posicionamento.</li></ul></article>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section">
+  <div class="lp-wrap">
+    <div class="lp-heading">
+      <span>Plano de ação</span>
+      <h2>Rotina financeira simples para pequenos negócios</h2>
+      <p>Uma rotina curta e consistente ajuda a evitar decisões no escuro e melhora a qualidade das próximas escolhas.</p>
+    </div>
+    <div class="lp-playbook">
+      <div class="lp-playbook-step"><span>1</span><div><h3>Registre todos os custos</h3><p>Inclua matéria-prima, embalagem, taxas, deslocamento, energia, comissões e desperdícios.</p></div></div>
+      <div class="lp-playbook-step"><span>2</span><div><h3>Revise os preços</h3><p>Atualize o cálculo quando fornecedor, frete, imposto ou plataforma alterar valores.</p></div></div>
+      <div class="lp-playbook-step"><span>3</span><div><h3>Acompanhe a margem</h3><p>Observe quais produtos vendem bem e quais realmente deixam resultado positivo.</p></div></div>
+      <div class="lp-playbook-step"><span>4</span><div><h3>Proteja o caixa</h3><p>Planeje pagamentos antes de retirar dinheiro ou assumir novos compromissos.</p></div></div>
+      <div class="lp-playbook-step"><span>5</span><div><h3>Crie uma reserva</h3><p>Separe uma parte do resultado para emergências, manutenção e meses de menor movimento.</p></div></div>
+      <div class="lp-playbook-step"><span>6</span><div><h3>Reinvista com objetivo</h3><p>Direcione recursos para ações mensuráveis, como estoque rentável, divulgação ou melhoria do atendimento.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section alt">
+  <div class="lp-wrap">
+    <div class="lp-heading">
+      <span>Exemplo completo</span>
+      <h2>Como uma venda aparentemente boa pode perder margem</h2>
+      <p>Veja como custos pequenos, quando somados, alteram o resultado final.</p>
+    </div>
+    <div class="lp-panel">
+      <table class="lp-case-table">
+        <thead><tr><th>Item</th><th>Valor</th><th>Impacto</th></tr></thead>
+        <tbody>
+          <tr><td>Preço de venda</td><td>R$ 120,00</td><td>Faturamento bruto</td></tr>
+          <tr><td>Custo do produto</td><td>R$ 50,00</td><td>Principal custo direto</td></tr>
+          <tr><td>Impostos e taxas</td><td>R$ 26,40</td><td>22% da venda</td></tr>
+          <tr><td>Frete e despesas</td><td>R$ 18,00</td><td>Entrega e custos adicionais</td></tr>
+          <tr><td><strong>Lucro líquido estimado</strong></td><td><strong>R$ 25,60</strong></td><td><strong>Margem aproximada de 21,3%</strong></td></tr>
+        </tbody>
+      </table>
+      <div class="lp-note">Esse exemplo é educativo. Custos fixos, devoluções, inadimplência, sazonalidade e tributos específicos podem reduzir ainda mais o resultado.</div>
+    </div>
+  </div>
+</section>
+
+<section class="lp-section">
+  <div class="lp-wrap">
+    <div class="lp-heading"><span>Dúvidas frequentes</span><h2>Perguntas sobre lucro e precificação</h2></div>
+    <div class="lp-faq">
+      <details><summary>Qual é a diferença entre faturamento e lucro?</summary><p>Faturamento é a soma das vendas. Lucro é o valor que sobra após descontar todos os custos e despesas considerados.</p></details>
+      <details><summary>Esta calculadora serve para serviços?</summary><p>Sim. Inclua materiais, horas de trabalho, deslocamento, plataforma e outros gastos necessários para entregar o serviço.</p></details>
+      <details><summary>Posso usar para Shopee, Mercado Livre, Amazon ou Hotmart?</summary><p>Sim. Informe as comissões, taxas e despesas correspondentes à plataforma utilizada.</p></details>
+      <details><summary>Qual margem de lucro é ideal?</summary><p>Não existe uma única margem ideal. Ela deve cobrir despesas fixas, impostos, riscos, reinvestimento e remuneração do negócio.</p></details>
+      <details><summary>Como calcular uma promoção?</summary><p>Coloque o preço já com desconto ou use o campo de desconto. Verifique se o lucro continua positivo e se a margem permanece aceitável.</p></details>
+      <details><summary>Quando devo revisar meus preços?</summary><p>Sempre que mudar custo de fornecedor, frete, taxa, imposto, salário, inflação ou posicionamento comercial.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="lp-cta">
+  <div class="lp-wrap lp-cta-box">
+    <div><h2>Empresas que conhecem seus números crescem com mais segurança.</h2><p>Use os resultados como referência educativa e consulte um contador quando a decisão exigir análise fiscal ou contábil.</p></div>
+    <div class="lp-actions"><a class="lp-btn primary" href="#simulador">Calcular meu lucro</a><a class="lp-btn secondary" href="index.html#ferramentas">Outras ferramentas</a></div>
+  </div>
+</section>
+</main>
+
+
+<script id="lucro-premium-js-v131">
+(function(){
+ const $=id=>document.getElementById(id);
+ const brl=new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'});
+ const pct=n=>(isFinite(n)?n:0).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+ const num=v=>{v=String(v??'').trim().replace(/\s/g,'').replace(/\./g,'').replace(',','.');const n=parseFloat(v);return isFinite(n)?n:0};
+ function calc(){
+   const custo=num($('lpCusto').value), venda=num($('lpVenda').value), imposto=num($('lpImposto').value), com=num($('lpComissao').value), frete=num($('lpFrete').value), outros=num($('lpOutros').value), desc=num($('lpDesconto').value), qtd=Math.max(1,num($('lpQtd').value)), fixos=num($('lpFixos').value);
+   const vendaLiquida=venda*(1-desc/100), fat=vendaLiquida*qtd, custoTotal=(custo+frete+outros)*qtd, taxas=fat*((imposto+com)/100), bruto=(vendaLiquida-custo)*qtd, liquido=fat-custoTotal-taxas, margem=fat>0?liquido/fat*100:0, markup=custo>0?vendaLiquida/custo:0, contrib=vendaLiquida-custo-frete-outros-vendaLiquida*((imposto+com)/100), pe=contrib>0?Math.ceil(fixos/contrib):0;
+   $('rFaturamento').textContent=brl.format(fat);$('rBruto').textContent=brl.format(bruto);$('rLiquido').textContent=brl.format(liquido);$('rMargem').textContent=pct(margem);$('rMarkup').textContent=markup.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'x';$('rEquilibrio').textContent=pe?pe+' vendas':'Sem margem';
+   $('lpInsight').textContent=liquido>0?`Com essas vendas, o lucro líquido estimado é ${brl.format(liquido)}. Para cobrir ${brl.format(fixos)} de custos fixos, seriam necessárias aproximadamente ${pe||0} vendas.`:`A simulação indica prejuízo de ${brl.format(Math.abs(liquido))}. Revise preço, desconto ou custos antes de vender.`;
+   updateDonut(custo*qtd,taxas,frete*qtd,outros*qtd,Math.max(0,liquido));
+   updateBars(fat,Math.max(0,liquido),Math.max(0,margem));
+ }
+ function compare(){
+   function one(prefix){const c=num($(prefix+'Custo').value),v=num($(prefix+'Venda').value),t=num($(prefix+'Taxa').value),l=v-c-v*t/100,m=v?l/v*100:0;$(prefix+'Lucro').textContent=brl.format(l);$(prefix+'Margem').textContent=pct(m);return {l,m}}
+   const a=one('a'),b=one('b');$('lpWinner').textContent=a.l===b.l?'⚖️ Os dois produtos têm o mesmo lucro estimado.':a.l>b.l?'🏆 Produto A é mais lucrativo.':'🏆 Produto B é mais lucrativo.';
+ }
+ function updateBars(fat,lucro,margem){
+   const months=['Jan','Fev','Mar','Abr','Mai','Jun']; const factors=[.48,.62,.70,.76,.88,1];
+   $('lpBars').innerHTML=months.map((m,i)=>{const f=factors[i];const rev=Math.max(8,Math.min(100,fat*f/Math.max(fat,1)*92));const prof=Math.max(5,Math.min(100,lucro*f/Math.max(fat,1)*220));const mar=Math.max(5,Math.min(100,margem*f));return `<div class="lp-bar-group"><span class="lp-bar rev" style="height:${rev}%"></span><span class="lp-bar profit" style="height:${prof}%"></span><span class="lp-bar margin" style="height:${mar}%"></span><span class="lp-month">${m}</span></div>`}).join('');
+ }
+ function updateDonut(custo,taxas,frete,outros,lucro){
+   const vals=[
+     Math.max(0,custo),
+     Math.max(0,taxas),
+     Math.max(0,frete),
+     Math.max(0,outros),
+     Math.max(0,lucro)
+   ];
+   const total=vals.reduce((a,b)=>a+b,0);
+   const base=total||1;
+   const cols=['#2b8cff','#825cff','#2ddb8f','#ffca58','#ff7b64'];
+   let acc=0,parts=[];
+   vals.forEach((v,i)=>{
+     const s=acc/base*100;
+     acc+=v;
+     const e=acc/base*100;
+     parts.push(`${cols[i]} ${s}% ${e}%`);
+   });
+   $('lpDonut').style.background=total>0
+     ? `conic-gradient(${parts.join(',')})`
+     : 'conic-gradient(#173252 0 100%)';
+   $('lpDonutTotal').textContent=brl.format(total);
+   const names=['Custo direto','Impostos/taxas','Frete','Outras despesas','Lucro'];
+   $('lpCostLegend').innerHTML=names.map((n,i)=>
+     `<div><span style="color:${cols[i]}">●</span> ${n}: ${pct(vals[i]/base*100)} <small style="color:#7892ad">(${brl.format(vals[i])})</small></div>`
+   ).join('');
+ }
+ function restore(){[['lpCusto','50,00'],['lpVenda','120,00'],['lpImposto','6,00'],['lpComissao','16,00'],['lpFrete','10,00'],['lpOutros','8,00'],['lpDesconto','0,00'],['lpQtd','1'],['lpFixos','1000,00'],['lpMeta','100']].forEach(x=>$(x[0]).value=x[1]);calc()}
+ ['lpCusto','lpVenda','lpImposto','lpComissao','lpFrete','lpOutros','lpDesconto','lpQtd','lpFixos','lpMeta'].forEach(id=>$(id)?.addEventListener('input',calc));
+ ['aCusto','aVenda','aTaxa','bCusto','bVenda','bTaxa'].forEach(id=>$(id)?.addEventListener('input',compare));
+ $('lpCalcular')?.addEventListener('click',calc);$('lpLimpar')?.addEventListener('click',restore);calc();compare();
+})();
+</script>
+
+<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=136"></script>
 
 
 
@@ -331,4 +971,39 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 })();
 </script>
 
+
+<script id="v124-qrcode-position-script">
+(function(){
+  function setupQrDropdown(){
+    var link=document.querySelector('.v113-drop a[href="gerador-qr-code.html"]');
+    if(!link)return;
+    var drop=link.closest('.v113-drop');
+    var group=drop&&drop.closest('.v113-group');
+    var button=group&&group.querySelector('.v113-cat');
+    if(!drop||!button)return;
+    drop.classList.add('v124-qrcode-float');
+    function place(){
+      if(window.innerWidth<760){
+        drop.style.removeProperty('--v124-left');
+        drop.style.removeProperty('--v124-top');
+        return;
+      }
+      var rect=button.getBoundingClientRect();
+      var width=Math.min(190,window.innerWidth-24);
+      var left=Math.min(rect.right-width,window.innerWidth-width-12);
+      left=Math.max(12,left);
+      var top=Math.min(rect.bottom+7,window.innerHeight-70);
+      drop.style.setProperty('--v124-left',left+'px');
+      drop.style.setProperty('--v124-top',Math.max(12,top)+'px');
+    }
+    place();
+    button.addEventListener('click',function(){requestAnimationFrame(place)});
+    group.addEventListener('mouseenter',place);
+    window.addEventListener('resize',place,{passive:true});
+    window.addEventListener('scroll',place,{passive:true});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupQrDropdown);
+  else setupQrDropdown();
+})();
+</script>
 </body></html>
