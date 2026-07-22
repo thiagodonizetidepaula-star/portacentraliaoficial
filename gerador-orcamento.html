@@ -14,7 +14,7 @@
 <meta property="og:description" content="Monte um orçamento simples para cliente, com serviço, valor, validade, impressão e envio por e-mail.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://portalcentralia.com.br/gerador-orcamento.html">
-<link rel="stylesheet" href="assets/css/style.css?v=144">
+<link rel="stylesheet" href="assets/css/style.css?v=145">
 <link rel="icon" href="assets/img/favicon.ico" sizes="any">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -392,7 +392,7 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
       <a href="index.html">Início</a>
       <div class="v113-group active-group">
 <button class="v113-cat" type="button" aria-expanded="false">Finanças<span>⌄</span></button>
-<div class="v113-drop"><a href="calculadora-financiamento.html">Calculadora de financiamento</a><a href="calculadora-cdi.html">Calculadora de CDI</a><a href="calculadora-lucro.html">Calculadora de lucro</a><a href="gerador-orcamento.html" class="active">Gerador de orçamento</a><a href="gerador-recibo.html">Gerador de recibo</a><a href="conversor-moedas.html">Conversor de moedas</a></div>
+<div class="v113-drop"><a href="calculadora-financiamento.html">Calculadora de financiamento</a><a href="calculadora-cdi.html">Calculadora de CDI</a><a href="calculadora-lucro.html">Calculadora de lucro</a><a href="gerador-orcamento.html" class="active">Gerador de orçamento</a><a href="conversor-moedas.html">Conversor de moedas</a></div>
 </div><div class="v113-group">
 <button class="v113-cat" type="button" aria-expanded="false">Veículos<span>⌄</span></button>
 <div class="v113-drop"><a href="controle-manutencao-carro.html">Controle de manutenção do carro</a></div>
@@ -634,71 +634,4 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
    $('orc_doc').innerHTML=`<div class="doc-top"><div><h2>ORÇAMENTO</h2><p><b>${esc(empresa)}</b>${contato?'<br>'+esc(contato):''}</p></div><div><b>Validade:</b> ${esc(valid)}<br><b>Cliente:</b> ${esc(cliente)}</div></div>${serv?`<p><b>Descrição:</b> ${esc(serv)}</p>`:''}<table><thead><tr><th>Item</th><th>Qtd.</th><th>Unitário</th><th>Total</th></tr></thead><tbody>${rows||'<tr><td colspan="4">Nenhum item informado.</td></tr>'}</tbody></table><div class="orc-total"><div class="orc-total-box"><span>Subtotal</span><b>${brl.format(x.subtotal)}</b><span>Custos extras</span><b>${brl.format(x.extras)}</b><span>Preço sugerido</span><strong>${brl.format(x.total)}</strong><span>Pagamento</span><b>${x.parcelas>1?x.parcelas+'x de '+brl.format(x.parcela):'À vista'}</b></div></div><p><b>Prazo:</b> ${esc(prazo)}</p><p><b>Condição de pagamento:</b> ${esc(pag)}</p><p style="margin-top:28px;color:#667b90">Este documento é uma proposta comercial e deve ser complementado por contrato ou documento fiscal quando necessário.</p>`;
    calc();
  }
- function printDoc(){render();const w=window.open('','_blank');w.document.write(`<html><head><title>Orçamento</title><style>body{font-family:Arial;padding:30px;color:#223}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #ddd;text-align:left}.doc-top{display:flex;justify-content:space-between;border-bottom:2px solid #ddd;margin-bottom:18px}.orc-total{display:flex;justify-content:flex-end}.orc-total-box{display:grid;grid-template-columns:1fr auto;gap:8px;width:320px;padding:14px;background:#f5f5f5}</style></head><body>${$('orc_doc').innerHTML}</body></html>`);w.document.close();w.focus();w.print()}
- function download(){render();const text=$('orc_doc').innerText;const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));a.download='orcamento-central-ia.txt';a.click();URL.revokeObjectURL(a.href)}
- function reset(){document.querySelectorAll('#criador input,#criador textarea').forEach(i=>i.value='');$('orValidade').value='15 dias';$('orParcelas').value='1';$('orcItems').innerHTML='';add('Serviço principal',1,'500,00');add('Materiais',1,'150,00');render()}
- $('addItem').addEventListener('click',()=>add());$('gerarOrcamento').addEventListener('click',render);$('printOrcamento').addEventListener('click',printDoc);$('downloadOrcamento').addEventListener('click',download);$('limparOrcamento').addEventListener('click',reset);
- ['orDeslocamento','orOutros','orImposto','orDesconto','orMargem','orParcelas'].forEach(id=>$(id).addEventListener('input',calc));
- add('Serviço principal',1,'500,00');add('Materiais',1,'150,00');render();
- window.orcamento=render;
-})();
-</script>
-
-<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=143"></script>
-
-
-
-
-
-
-
-
-<script id="v113-nav-js">
-(function(){
- const h=document.querySelector('.v113-header'); if(!h) return;
- const t=h.querySelector('.v113-toggle'), n=h.querySelector('.v113-nav'), o=document.querySelector('.v113-overlay');
- const groups=[...h.querySelectorAll('.v113-group')];
- function closeGroups(){groups.forEach(g=>{g.classList.remove('open');g.querySelector('.v113-cat')?.setAttribute('aria-expanded','false')})}
- function closeMenu(){n?.classList.remove('open');o?.classList.remove('show');t?.setAttribute('aria-expanded','false');document.body.style.overflow='';closeGroups()}
- t?.addEventListener('click',()=>{const open=!n.classList.contains('open');closeMenu();if(open){n.classList.add('open');o.classList.add('show');t.setAttribute('aria-expanded','true');document.body.style.overflow='hidden'}})
- groups.forEach(g=>g.querySelector('.v113-cat')?.addEventListener('click',e=>{if(window.innerWidth>759)return;e.preventDefault();e.stopPropagation();const open=!g.classList.contains('open');closeGroups();g.classList.toggle('open',open);g.querySelector('.v113-cat').setAttribute('aria-expanded',String(open))}))
- o?.addEventListener('click',closeMenu);document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMenu()});n?.querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMenu));window.addEventListener('resize',()=>{if(window.innerWidth>759)closeMenu()});
-})();
-</script>
-
-
-<script id="v124-qrcode-position-script">
-(function(){
-  function setupQrDropdown(){
-    var link=document.querySelector('.v113-drop a[href="gerador-qr-code.html"]');
-    if(!link)return;
-    var drop=link.closest('.v113-drop');
-    var group=drop&&drop.closest('.v113-group');
-    var button=group&&group.querySelector('.v113-cat');
-    if(!drop||!button)return;
-    drop.classList.add('v124-qrcode-float');
-    function place(){
-      if(window.innerWidth<760){
-        drop.style.removeProperty('--v124-left');
-        drop.style.removeProperty('--v124-top');
-        return;
-      }
-      var rect=button.getBoundingClientRect();
-      var width=Math.min(190,window.innerWidth-24);
-      var left=Math.min(rect.right-width,window.innerWidth-width-12);
-      left=Math.max(12,left);
-      var top=Math.min(rect.bottom+7,window.innerHeight-70);
-      drop.style.setProperty('--v124-left',left+'px');
-      drop.style.setProperty('--v124-top',Math.max(12,top)+'px');
-    }
-    place();
-    button.addEventListener('click',function(){requestAnimationFrame(place)});
-    group.addEventListener('mouseenter',place);
-    window.addEventListener('resize',place,{passive:true});
-    window.addEventListener('scroll',place,{passive:true});
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setupQrDropdown);
-  else setupQrDropdown();
-})();
-</script>
-</body></html>
+ function printDoc(){render();const w=window.open('','_blank');w.document.write(`<html><head><title>Orçamento</title><style>body{font-family:Arial;padding:30px;color:#223}table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #ddd;text-align:left}.doc-top{display:flex;justify-content:space-between;border-bottom:2px solid #ddd;margin-bottom:18px}.orc-total{display:flex;justify-content:flex-end}.orc-total-box{display:grid;grid-template-columns:1fr auto;gap:8px;width:320px;padding:14px;background:#f5f5f5}</style></head><body>${$('orc_doc').innerHTML}</body></html>
