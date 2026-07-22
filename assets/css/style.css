@@ -1007,3 +1007,45 @@ h1, h2, h3, h4, h5, h6 {
   .portal-presentation{padding:22px}
   .presentation-benefits{grid-template-columns:1fr}
 }
+
+
+/* V144 - menu centralizado no desktop */
+@media (min-width:1101px){
+  .v113-inner{
+    width:min(1280px,calc(100% - 32px))!important;
+    max-width:1280px!important;
+    margin:0 auto!important;
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr)!important;
+    align-items:center!important;
+    gap:20px!important;
+  }
+  .v113-brand{
+    justify-self:start!important;
+    white-space:nowrap!important;
+  }
+  .v113-nav{
+    width:100%!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:clamp(10px,1.2vw,22px)!important;
+    margin:0!important;
+    padding:0!important;
+    min-width:0!important;
+  }
+  .v113-nav>a,.v113-cat{
+    white-space:nowrap!important;
+    font-size:clamp(.72rem,.82vw,.88rem)!important;
+  }
+  .v113-toggle{display:none!important}
+  .topbar,.topbar .ticker{min-height:34px!important}
+  .topbar .ticker{padding-block:5px!important;line-height:1.2!important}
+}
+@media (min-width:1101px) and (max-width:1400px){
+  .v113-inner{width:calc(100% - 20px)!important;gap:12px!important}
+  .v113-nav{gap:8px!important}
+  .v113-nav>a,.v113-cat{font-size:.71rem!important}
+  .v113-logo{width:42px!important;height:42px!important}
+}
+
