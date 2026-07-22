@@ -1,0 +1,74 @@
+<svg width="760" height="620" viewBox="0 0 760 620" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="scaleBody" x1="130" y1="80" x2="560" y2="520" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#233B63"/>
+      <stop offset="1" stop-color="#07172E"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="120" y1="105" x2="580" y2="500" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FBFF"/>
+      <stop offset="0.45" stop-color="#BFCDE0"/>
+      <stop offset="1" stop-color="#758BA6"/>
+    </linearGradient>
+    <linearGradient id="tape" x1="120" y1="420" x2="650" y2="570" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFD952"/>
+      <stop offset="1" stop-color="#F2A900"/>
+    </linearGradient>
+    <radialGradient id="dial" cx="0" cy="0" r="1" gradientTransform="translate(365 245) rotate(90) scale(112)">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#DCE6F2"/>
+    </radialGradient>
+    <filter id="shadow" x="40" y="30" width="670" height="570" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="24" stdDeviation="22" flood-color="#00132F" flood-opacity="0.42"/>
+    </filter>
+    <filter id="tapeShadow" x="60" y="350" width="650" height="240" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="13" stdDeviation="11" flood-color="#00132F" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#shadow)" transform="rotate(-7 365 310)">
+    <rect x="128" y="94" width="470" height="405" rx="54" fill="url(#metal)"/>
+    <rect x="148" y="114" width="430" height="365" rx="42" fill="url(#scaleBody)"/>
+    <path d="M173 150C275 119 448 115 552 156" stroke="#43618A" stroke-width="4" opacity="0.5"/>
+    <circle cx="364" cy="245" r="112" fill="#0B1D37" opacity="0.85"/>
+    <circle cx="364" cy="245" r="98" fill="url(#dial)" stroke="#7B8FA9" stroke-width="7"/>
+    <g stroke="#26384D" stroke-linecap="round">
+      <path d="M364 157V171" stroke-width="4"/>
+      <path d="M408 169L401 182" stroke-width="4"/>
+      <path d="M442 201L430 208" stroke-width="4"/>
+      <path d="M452 245H438" stroke-width="4"/>
+      <path d="M440 289L428 282" stroke-width="4"/>
+      <path d="M408 322L401 309" stroke-width="4"/>
+      <path d="M364 333V319" stroke-width="4"/>
+      <path d="M320 321L327 309" stroke-width="4"/>
+      <path d="M287 289L299 282" stroke-width="4"/>
+      <path d="M276 245H290" stroke-width="4"/>
+      <path d="M288 201L300 208" stroke-width="4"/>
+      <path d="M321 169L328 182" stroke-width="4"/>
+    </g>
+    <g fill="#26384D" font-family="Arial, sans-serif" font-weight="700" font-size="18" text-anchor="middle">
+      <text x="364" y="188">0</text><text x="414" y="207">20</text><text x="430" y="252">40</text><text x="411" y="296">60</text><text x="364" y="315">80</text><text x="317" y="296">100</text><text x="298" y="252">120</text><text x="315" y="207">140</text>
+    </g>
+    <path d="M364 245L399 184" stroke="#E64343" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="364" cy="245" r="12" fill="#182A42" stroke="#F2F6FB" stroke-width="4"/>
+    <rect x="205" y="380" width="318" height="26" rx="13" fill="#314D74" opacity="0.58"/>
+  </g>
+
+  <g filter="url(#tapeShadow)">
+    <path d="M90 472C180 425 296 458 365 508C430 554 524 566 658 504" stroke="url(#tape)" stroke-width="46" stroke-linecap="round"/>
+    <path d="M90 472C180 425 296 458 365 508C430 554 524 566 658 504" stroke="#805600" stroke-opacity="0.25" stroke-width="2"/>
+    <g stroke="#6C4A00" stroke-width="3">
+      <path d="M126 458L132 477"/><path d="M166 448L171 470"/><path d="M208 447L211 470"/><path d="M250 456L249 480"/><path d="M291 472L287 495"/><path d="M331 494L324 515"/><path d="M373 516L367 537"/><path d="M418 536L414 558"/><path d="M466 546L465 569"/><path d="M515 543L519 565"/><path d="M566 530L574 551"/><path d="M617 511L628 531"/>
+    </g>
+    <g fill="#6C4A00" font-family="Arial, sans-serif" font-size="18" font-weight="800" text-anchor="middle">
+      <text x="128" y="493">10</text><text x="210" y="488">20</text><text x="289" y="512">30</text><text x="369" y="553">40</text><text x="466" y="586">50</text><text x="568" y="568">60</text><text x="635" y="540">70</text>
+    </g>
+    <circle cx="612" cy="486" r="56" fill="url(#tape)" stroke="#D58E00" stroke-width="8"/>
+    <circle cx="612" cy="486" r="25" fill="#E7A900" stroke="#8E5D00" stroke-width="5"/>
+  </g>
+
+  <g opacity="0.92">
+    <path d="M555 166C580 112 624 92 670 118C653 166 615 190 555 166Z" fill="#29A85C"/>
+    <path d="M573 171C600 134 632 121 659 127" stroke="#1B7540" stroke-width="5" stroke-linecap="round"/>
+    <path d="M538 190C563 161 596 159 621 181C598 211 565 217 538 190Z" fill="#48C877"/>
+  </g>
+</svg>
