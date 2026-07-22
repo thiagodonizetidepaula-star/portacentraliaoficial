@@ -14,7 +14,7 @@
 <meta property="og:description" content="Monte um orçamento simples para cliente, com serviço, valor, validade, impressão e envio por e-mail.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://portalcentralia.com.br/gerador-orcamento.html">
-<link rel="stylesheet" href="assets/css/style.css?v=141">
+<link rel="stylesheet" href="assets/css/style.css?v=143">
 <link rel="icon" href="assets/img/favicon.ico" sizes="any">
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
@@ -371,6 +371,14 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 .orc-hero-image img{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;object-position:center;border-radius:18px}
 @media(max-width:720px){.orc-hero-image{padding:7px!important}.orc-hero-image img{max-height:340px}}
 </style>
+
+<style id="orcamento-pc-image-fix-v143">
+@media (min-width:1001px){
+.orc-hero-card.orc-hero-image{height:520px!important;display:flex!important;align-items:center!important;justify-content:center!important;overflow:hidden!important;padding:12px!important}
+.orc-hero-image img{width:100%!important;height:100%!important;max-height:none!important;aspect-ratio:auto!important;object-fit:contain!important;object-position:center!important;border-radius:18px!important;background:rgba(255,255,255,.03)}
+}
+@media (min-width:721px) and (max-width:1000px){.orc-hero-image img{height:auto!important;max-height:500px!important;object-fit:contain!important}}
+</style>
 </head>
 <body>
 <header class="v113-header">
@@ -422,7 +430,7 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
       <div class="orc-actions"><a class="orc-btn primary" href="#criador">Criar orçamento agora</a><a class="orc-btn secondary" href="#exemplos">Ver exemplos de uso</a></div>
     </div>
     <div class="orc-hero-card orc-hero-image">
-      <img src="assets/img/gerador-orcamento-profissional.webp" width="1440" height="960" alt="Profissional e cliente aprovando um orçamento em uma reunião" fetchpriority="high">
+      <img src="assets/img/gerador-orcamento-profissional.webp?v=143" width="1440" height="960" alt="Profissional e cliente aprovando um orçamento em uma reunião" fetchpriority="high">
     </div>
 </div>
 </section>
@@ -636,7 +644,7 @@ button,input,select,textarea,option,table,th,td,pre,code,.topbar,.topbar *,.tick
 })();
 </script>
 
-<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=141"></script>
+<footer class="footer"><div class="wrap footer-grid"><div><h3>Central IA</h3><p>Ferramentas gratuitas para empreendedores, autônomos e pessoas que querem resolver tarefas do dia a dia com rapidez.</p><p><small>As ferramentas são informativas e não substituem orientação profissional quando ela for necessária.</small></p></div><div><b>Institucional</b><p><a href="sobre.html">Sobre</a></p><p><a href="contato.html">Contato</a></p><p><a href="faq.html">Perguntas frequentes</a></p><p><a href="mapa-site.html">Mapa do site</a></p></div><div><b>Legal</b><p><a href="privacidade.html">Política de Privacidade</a></p><p><a href="termos.html">Termos de Uso</a></p><p><a href="cookies.html">Política de Cookies</a></p><p><a href="lgpd.html">LGPD</a></p><p><a href="aviso-legal.html">Aviso Legal</a></p></div></div></footer><div id="toast" class="toast"></div><script src="assets/js/app.js?v=143"></script>
 
 
 
