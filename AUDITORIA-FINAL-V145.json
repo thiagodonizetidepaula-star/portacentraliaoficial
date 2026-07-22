@@ -1,0 +1,10 @@
+{
+  "paginas_html_verificadas": 23,
+  "imagens_verificadas": 85,
+  "imagens_ausentes": [],
+  "imagens_corrompidas": [],
+  "links_internos_ausentes_apos_correcao": [],
+  "erros_sintaxe_javascript": [],
+  "ids_duplicados_detectados": {},
+  "gerador_recibo_removido": true
+}
