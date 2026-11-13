@@ -7,8 +7,8 @@
 <meta name="description" content="Portal Central IA. Sites cinematográficos, aplicativos personalizados, automações inteligentes e identidade digital.">
 <meta name="robots" content="noindex">
 <title>Portal Central IA — Estúdio Digital</title>
-<link rel="stylesheet" href="cinema.css?v=camadas-1">
-<script src="cinema.js?v=camadas-1" defer></script>
+<link rel="stylesheet" href="cinema.css?v=sinais-2">
+<script src="cinema.js?v=sinais-2" defer></script>
 </head>
 <body>
 <a class="skip" href="#conteudo">Pular para o conteúdo</a>
@@ -34,8 +34,27 @@
       <div class="scene">
         <img class="scene-image scene-background" src="cena-fundo.webp" alt="" width="1672" height="941" fetchpriority="high">
         <div class="scene-light" aria-hidden="true"></div>
+        <svg class="scene-image scene-wires" viewBox="0 0 640 360" aria-hidden="true">
+          <g class="wire" style="--signal: #69eaff; --phase: 0s"><path d="M268 157 C234 159 230 131 202 133"/><path pathLength="100" d="M268 157 C234 159 230 131 202 133"/></g>
+          <g class="wire" style="--signal: #71a7ff; --phase: -.7s"><path d="M267 182 C235 175 227 203 205 198"/><path pathLength="100" d="M267 182 C235 175 227 203 205 198"/></g>
+          <g class="wire" style="--signal: #69eaff; --phase: -1.3s"><path d="M397 152 C427 165 443 133 475 134"/><path pathLength="100" d="M397 152 C427 165 443 133 475 134"/></g>
+          <g class="wire" style="--signal: #ba8cff; --phase: -2s"><path d="M394 182 C425 169 430 203 455 200"/><path pathLength="100" d="M394 182 C425 169 430 203 455 200"/></g>
+        </svg>
         <div class="scene-layer scene-notebook" aria-hidden="true">
           <img class="scene-image" src="cena-notebook.webp" alt="" width="1672" height="941">
+          <svg class="scene-image notebook-graph" viewBox="0 0 640 360">
+            <defs>
+              <clipPath id="notebook-display"><path d="M273 136 395 125 386 207 264 207Z"/></clipPath>
+              <linearGradient id="display-trace"><stop stop-color="#41defe"/><stop offset=".56" stop-color="#6a99ff"/><stop offset="1" stop-color="#e179ff"/></linearGradient>
+            </defs>
+            <g clip-path="url(#notebook-display)">
+              <path class="graph-shade" d="M273 136 395 125 386 207 264 207Z"/>
+              <path class="graph-grid" d="M268 146 393 137M268 161 391 153M267 176 390 169M265 191 388 185M287 130 279 209M310 130 302 209M333 127 325 209M356 125 348 209M379 123 371 209"/>
+              <path class="graph-line graph-secondary" d="M261 192 276 187 285 191 297 175 311 183 324 170 338 180 350 161 367 168 381 148 397 151"/>
+              <path class="graph-line graph-primary" d="M261 184 276 177 285 182 297 162 311 172 324 156 338 165 350 146 367 153 381 135 397 137"/>
+              <circle class="graph-tip" cx="381" cy="135" r="2.2"/>
+            </g>
+          </svg>
         </div>
         <div class="scene-layer scene-sites">
           <img class="scene-image" src="cena-sites.webp" alt="" width="1672" height="941">

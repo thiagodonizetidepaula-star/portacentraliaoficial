@@ -106,3 +106,29 @@
   .scene-layer:has(.scene-link) { --entry-x: 0px; }
   .scene-link { align-items: end; border-radius: 6px; }
 }
+
+.scene-wires path {
+  fill: none;
+  stroke: var(--signal);
+  stroke-linecap: round;
+}
+.scene-wires path:first-child { stroke-width: 1.15; opacity: .62; }
+.scene-wires path:last-child {
+  stroke-width: 2.5;
+  stroke-dasharray: 6 94;
+  filter: drop-shadow(0 0 3px var(--signal));
+  opacity: .95;
+}
+.graph-shade { fill: #030f26; fill-opacity: .83; }
+.graph-grid { fill: none; stroke: #74caff; stroke-opacity: .25; stroke-width: .5; }
+.graph-line { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.graph-primary { stroke: url(#display-trace); stroke-width: 2; filter: drop-shadow(0 0 2px #75bfff); }
+.graph-secondary { stroke: #80c9ff; stroke-width: .8; opacity: .64; }
+.graph-tip { fill: #e6d0ff; filter: drop-shadow(0 0 2px #d88cff); }
+@media (prefers-reduced-motion: no-preference) {
+  .scene-wires path:last-child { animation: travel-signal 2.7s var(--phase) linear infinite; }
+}
+@keyframes travel-signal {
+  from { stroke-dashoffset: 6; }
+  to { stroke-dashoffset: -94; }
+}
