@@ -99,3 +99,46 @@ if (!motion.matches && 'IntersectionObserver' in window) {
   }, {rootMargin: '160px'});
   loadNotebook.observe(notebook);
 }
+
+// Keep ambient animation scoped to the section being viewed.
+const animatedSections = [...document.querySelectorAll('.hero,.section')];
+if ('IntersectionObserver' in window) {
+  const sectionObserver = new IntersectionObserver(entries => {
+    for (const entry of entries) {
+      entry.target.classList.toggle('in-view', entry.isIntersecting);
+      entry.target.classList.toggle('motion-paused', !entry.isIntersecting);
+    }
+  }, {rootMargin: '80px'});
+  animatedSections.forEach(section => sectionObserver.observe(section));
+}
+document.addEventListener('visibilitychange', () => {
+  document.body.classList.toggle('motion-paused', document.hidden);
+});
+const header = document.querySelector('.header');
+function updateHeader() {
+  header.classList.toggle('scrolled', window.scrollY > 30);
+}
+addEventListener('scroll', updateHeader, {passive: true});
+updateHeader();
+if (!motion.matches && 'IntersectionObserver' in window) {
+  const headings = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.remove('waiting');
+        headings.unobserve(entry.target);
+      }
+    });
+  }, {threshold: .2});
+  document.querySelectorAll('.section h2').forEach(heading => {
+    heading.classList.add('section-heading', 'observe', 'waiting');
+    headings.observe(heading);
+  });
+  document.querySelectorAll('.solution').forEach((card, index) => {
+    card.style.setProperty('--reveal-delay', (index % 2) * .08 + 's');
+  });
+}
+motion.addEventListener('change', event => {
+  if (event.matches) {
+    document.querySelectorAll('.waiting').forEach(node => node.classList.remove('waiting'));
+  }
+});

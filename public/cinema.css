@@ -132,3 +132,73 @@
   from { stroke-dashoffset: 6; }
   to { stroke-dashoffset: -94; }
 }
+
+/* Shared lighting and motion language for the showroom. */
+.section { position: relative; }
+.section h2 { max-width: 1000px; text-wrap: balance; }
+.section.wrap::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, #65dfff55, #a58aff44, transparent);
+}
+.hero-copy { z-index: 1; }
+.hero-copy em { background: linear-gradient(100deg, #a5fbff, #45eaff 55%, #a7a0ff); background-clip: text; color: transparent; }
+.header { transition: background .35s, box-shadow .35s; }
+.header.scrolled { background: #030916f5; box-shadow: 0 12px 45px #0006; }
+.solution, .steps article {
+  transition: border-color .3s, box-shadow .3s, transform .4s cubic-bezier(.2,.7,.2,1), opacity .6s, translate .6s;
+}
+.solution .visual { border: 1px solid #97cfff20; }
+.solution h3 { letter-spacing: -.025em; }
+.solution a { padding-block: 9px; }
+.solution-rail a { border-radius: 9px; transition: background .3s, color .3s; }
+.solution-rail a:is(:hover, :focus-visible) { background: #64dfff12; }
+.button { position: relative; overflow: hidden; }
+.button::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, #ffffff35 50%, transparent 70%);
+  transform: translateX(-130%); transition: transform .7s;
+}
+.button:is(:hover, :focus-visible)::after { transform: translateX(130%); }
+.button:active { translate: 0 1px; }
+.tabs { flex-wrap: wrap; }
+.tabs button { transition: background .3s, border-color .3s, box-shadow .3s; }
+.tabs button[aria-selected=true] { box-shadow: inset 0 0 24px #46efff18, 0 0 22px #46efff12; }
+.contact { isolation: isolate; overflow: hidden; }
+.contact::before {
+  content: ""; position: absolute; z-index: -1; width: 50%; aspect-ratio: 1;
+  right: -15%; top: -55%; border-radius: 50%;
+  background: radial-gradient(circle, #7459df25, #20c8f314 40%, transparent 68%);
+}
+.scene-layer:has(.scene-link:hover) .scene-image,
+.scene-layer:has(.scene-link:focus-visible) .scene-image {
+  filter: drop-shadow(0 0 6px #67dcff90);
+}
+.scene-layer .scene-image { transition: filter .3s; }
+.scene-link { background: linear-gradient(transparent 60%, #06172b88); }
+@media (hover: hover) and (pointer: fine) {
+  .solution:hover { border-color: #72ddffa0; box-shadow: 0 16px 40px #0005, 0 0 25px #42dfff12; transform: translateY(-5px); }
+  .steps article:hover { border-color: #a097ff90; box-shadow: 0 12px 32px #0004; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .section-heading.observe { transition: opacity .7s, translate .7s; }
+  .solution.observe { transition-delay: var(--reveal-delay, 0s); }
+  .scene-apps, .scene-brand { animation: panel-arrive .95s var(--delay) cubic-bezier(.2,.75,.25,1) both, panel-float 7s 1.6s ease-in-out infinite !important; }
+  .scene-sites, .scene-flows { animation: panel-arrive .95s var(--delay) cubic-bezier(.2,.75,.25,1) both, panel-float 8s 2s ease-in-out infinite reverse !important; }
+  .section.in-view .phone-chart { animation: chart-breathe 4s ease-in-out infinite; transform-origin: bottom; }
+  .section.in-view .planet { animation: planet-drift 9s ease-in-out infinite; }
+  .section.in-view .identity b { animation: mark-light 5s ease-in-out infinite; }
+  .scene-light { animation: pedestal-light 2s ease-out both, pedestal-breathe 4s 2s ease-in-out infinite; }
+  .motion-paused *, .motion-paused *::before, .motion-paused *::after { animation-play-state: paused !important; }
+}
+@keyframes panel-float { 50% { transform: translateY(-4px); } }
+@keyframes chart-breathe { 50% { transform: scaleY(.77); filter: brightness(1.2); } }
+@keyframes planet-drift { 50% { translate: 3% -5%; filter: brightness(1.16); } }
+@keyframes mark-light { 50% { filter: drop-shadow(0 0 16px #a4dfff90); } }
+@keyframes pedestal-breathe { 50% { opacity: .8; transform: scale(1.05); } }
+@media(max-width:640px) {
+  .section h2 { line-height: 1.04; }
+  .scene { width: 100%; }
+  .scene-link { font-size: .65rem; }
+  .solution p { line-height: 1.55; }
+  .contact .button { margin-top: 6px; }
+}
