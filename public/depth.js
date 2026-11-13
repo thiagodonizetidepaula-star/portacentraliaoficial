@@ -4,10 +4,11 @@ const hero = stage.closest('.hero');
 const context = canvas.getContext('2d');
 if (!context) throw new Error("Canvas 2D unavailable");
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-const points = Array.from({length: 38}, () => ({
+const points = Array.from({length: matchMedia("(max-width: 640px)").matches ? 10 : 24}, () => ({
   x: Math.random(), y: Math.random(), phase: Math.random() * Math.PI * 2
 }));
 let width, height, visible = false, frame = 0;
+let elapsed = 0, previousTime = 0;
 let pointerX = 0, pointerY = 0, driftX = 0, driftY = 0;
 
 new ResizeObserver(() => {
@@ -45,6 +46,14 @@ const anchors = [
 
 function updateSignals(time) {
   const t = time / 1000;
+  const delay = 2.1;
+  wirePaths.forEach((paths, index) => {
+    const cycle = Math.max(0, t - delay - index * .16) % 3.4;
+    const progress = Math.min(1, cycle / 2.6);
+    paths[1].style.strokeDashoffset = String(6 - progress * 106);
+    paths[1].style.opacity = t < delay || cycle > 2.65 ? '0' : '1';
+    layers[index + 1].style.setProperty('--arrival-glow', String(cycle > 2.4 && cycle < 3.1 ? Math.sin((cycle - 2.4) / .7 * Math.PI) : 0));
+  });
   const points = graphX.map((x, index) => {
     const variation = Math.sin(t * 2.2 - index * .77) * 4
       + Math.sin(t * 3.6 - index * 1.34) * 2.4;
@@ -75,15 +84,17 @@ function draw(time) {
   if (!width) return;
   driftX += (pointerX - driftX) * .08;
   driftY += (pointerY - driftY) * .08;
-  stage.style.setProperty('--drift-x', (driftX * 18).toFixed(2) + 'px');
-  stage.style.setProperty('--drift-y', (driftY * 12 - Math.min(1, scrollY / hero.offsetHeight) * 9).toFixed(2) + 'px');
-  updateSignals(time);
+  stage.style.setProperty('--drift-x', (driftX * 6).toFixed(2) + 'px');
+  stage.style.setProperty('--drift-y', (driftY * 6).toFixed(2) + 'px');
+  elapsed += previousTime ? Math.min(50, time - previousTime) : 0;
+  previousTime = time;
+  updateSignals(elapsed);
   context.clearRect(0, 0, width, height);
   const scroll = Math.min(1, scrollY / hero.offsetHeight);
   for (const point of points) {
     const pulse = (Math.sin(time * .0016 + point.phase) + 1) / 2;
     const x = point.x * width + driftX * 34;
-    const y = point.y * height + driftY * 24 - scroll * 28;
+    const y = ((point.y + elapsed * .000007 * (1 + point.phase / 6)) % 1) * height + driftY * 8 - scroll * 12;
     context.fillStyle = 'rgba(133,233,255,' + (.15 + pulse * .56) + ')';
     context.beginPath();
     context.arc(x, y, .5 + pulse * 1.4, 0, Math.PI * 2);
@@ -92,6 +103,7 @@ function draw(time) {
 }
 function sync() {
   cancelAnimationFrame(frame);
+  previousTime = 0;
   if (visible && !document.hidden && !reduced.matches) frame = requestAnimationFrame(draw);
   else {
     context.clearRect(0, 0, width || 0, height || 0);

@@ -202,3 +202,57 @@
   .solution p { line-height: 1.55; }
   .contact .button { margin-top: 6px; }
 }
+
+/* Interior graphics are clipped inside each screen's perspective plane. */
+.graph-shade { fill-opacity: 1; }
+.workflow-track { fill: none; stroke: #519ec8; stroke-width: 1; }
+.workflow-node rect { fill: #102e50; stroke: #5edbff; stroke-width: .6; }
+.workflow-node text { fill: #d4faff; font: 9px system-ui; text-anchor: middle; }
+.app-curve { fill: none; stroke: #65eaff; stroke-width: 1.5; }
+.app-point { fill: #d6faff; }
+.live-bar { fill: #55ddff; }
+.hologram-sheet { fill: #1a87b8; fill-opacity: .65; stroke: #79edff; stroke-width: .65; }
+.hologram-sheet:nth-child(even) { fill: #7041be; stroke: #b39dff; }
+.energy-ring { fill: none; stroke: #63edff; stroke-width: 2; stroke-dasharray: 80 35 20 70; opacity: .7; }
+.ring-two { stroke: #a995ff; opacity: .4; }
+.floor-reflection { fill: #63ddff; opacity: .08; }
+.scene-layer:has(.scene-link) .scene-image:first-child { filter: drop-shadow(0 0 5px rgb(82 226 255 / var(--arrival-glow, 0))); }
+.scene-layer:has(.scene-link:is(:hover,:focus-visible,:active)) { scale: 1.02; }
+.scene-layer { transition: scale .3s ease; }
+.scene-wires path:last-child { animation: none; }
+@media (prefers-reduced-motion:no-preference) {
+ .hero-copy { animation: title-appear 1s both; }
+ .scene-notebook { animation: notebook-rise 1.5s .3s both, notebook-life 6s 1.8s ease-in-out infinite; }
+ .scene-sites { animation-duration: .95s, 5s !important; }
+ .scene-apps { animation-duration: .95s, 6s !important; }
+ .scene-flows { animation-duration: .95s, 7s !important; }
+ .scene-brand { animation-duration: .95s, 8s !important; }
+ .scene-wires { animation: connections-appear .7s 1.7s both; }
+ .graph-primary { animation: trace-reveal 2s .9s both; }
+ .graph-tip { animation: point-light 2.4s 1s infinite; }
+ .workflow-node { animation: workflow-light 4.8s calc(var(--step) * .65s + 2s) infinite; }
+ .app-curve { animation: curve-life 4s ease-in-out infinite; transform-origin: 70px 40px; }
+ .app-point { animation: point-light 3s calc(var(--step) * .35s) infinite; }
+ .live-bar { animation: bar-entry 1.2s calc(.8s + var(--step) * .1s) both, bar-life 4s calc(2s + var(--step) * .4s) ease-in-out infinite; }
+ .hologram-sheet { animation: layer-life 5s calc(var(--step) * -.6s) ease-in-out infinite; }
+ .energy-ring { animation: energy-turn 28s linear infinite; transform-origin: 0 0; }
+ .ring-two { animation-direction: reverse; animation-duration: 36s; }
+ .floor-reflection { animation: reflection-life 6s ease-in-out infinite; }
+}
+@keyframes title-appear { from { opacity:0; translate:0 16px; } to { opacity:1; translate:0 0; } }
+@keyframes notebook-life { 50% { transform:translateY(-6px); } }
+@keyframes connections-appear { from { opacity:0; } to { opacity:1; } }
+@keyframes trace-reveal { from { stroke-dasharray:100; stroke-dashoffset:100; } to { stroke-dasharray:100; stroke-dashoffset:0; } }
+@keyframes workflow-light { 0%,24%,100% { opacity:.55; } 8%,16% { opacity:1; filter:drop-shadow(0 0 2px #8efaff); } }
+@keyframes point-light { 0%,100% { opacity:.45; } 35% { opacity:1; } }
+@keyframes curve-life { 50% { transform:scaleY(.8); } }
+@keyframes bar-entry { from { transform:scaleY(.05); } to { transform:scaleY(1); } }
+@keyframes bar-life { 50% { transform:scaleY(.83); } }
+@keyframes layer-life { 50% { transform:translateY(-2px); opacity:.8; } }
+@keyframes energy-turn { to { transform:rotate(360deg); } }
+@keyframes reflection-life { 50% { opacity:.15; } }
+@media(max-width:640px) { .scene-wires path:last-child,.graph-primary { filter:none; } }
+@media(prefers-reduced-motion:reduce) {
+ .scene-layer { translate:none!important; scale:1!important; }
+ .scene-wires path:last-child { display:none; }
+}
