@@ -87,7 +87,7 @@ if (!motion.matches && 'IntersectionObserver' in window) {
       card.style.setProperty('--y', (event.clientY - bounds.top) + 'px');
     }, {passive: true});
   });
-  import('./depth.js').catch(() => {});
+  import('./depth.js?v=camadas-1').catch(() => {});
 }
 
 const notebook = document.querySelector('#notebook-view');

@@ -2,6 +2,7 @@ const canvas = document.querySelector('#depth');
 const stage = canvas.parentElement;
 const hero = stage.closest('.hero');
 const context = canvas.getContext('2d');
+if (!context) throw new Error("Canvas 2D unavailable");
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const points = Array.from({length: 38}, () => ({
   x: Math.random(), y: Math.random(), phase: Math.random() * Math.PI * 2
@@ -19,6 +20,7 @@ new ResizeObserver(() => {
 }).observe(stage);
 
 hero.addEventListener('pointermove', event => {
+  if (event.pointerType === "touch") return;
   const bounds = hero.getBoundingClientRect();
   pointerX = (event.clientX - bounds.left) / bounds.width - .5;
   pointerY = (event.clientY - bounds.top) / bounds.height - .5;
@@ -33,8 +35,8 @@ function draw(time) {
   if (!width) return;
   driftX += (pointerX - driftX) * .08;
   driftY += (pointerY - driftY) * .08;
-  stage.style.setProperty('--drift-x', (driftX * 28).toFixed(2) + 'px');
-  stage.style.setProperty('--drift-y', (driftY * 20).toFixed(2) + 'px');
+  stage.style.setProperty('--drift-x', (driftX * 18).toFixed(2) + 'px');
+  stage.style.setProperty('--drift-y', (driftY * 12 - Math.min(1, scrollY / hero.offsetHeight) * 9).toFixed(2) + 'px');
   context.clearRect(0, 0, width, height);
   const scroll = Math.min(1, scrollY / hero.offsetHeight);
   for (const point of points) {
@@ -50,7 +52,11 @@ function draw(time) {
 function sync() {
   cancelAnimationFrame(frame);
   if (visible && !document.hidden && !reduced.matches) frame = requestAnimationFrame(draw);
-  else context.clearRect(0, 0, width || 0, height || 0);
+  else {
+    context.clearRect(0, 0, width || 0, height || 0);
+    stage.style.removeProperty("--drift-x");
+    stage.style.removeProperty("--drift-y");
+  }
 }
 new IntersectionObserver(([entry]) => {
   visible = entry.isIntersecting;

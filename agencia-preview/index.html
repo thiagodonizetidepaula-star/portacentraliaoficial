@@ -7,8 +7,8 @@
 <meta name="description" content="Portal Central IA. Sites cinematográficos, aplicativos personalizados, automações inteligentes e identidade digital.">
 <meta name="robots" content="noindex">
 <title>Portal Central IA — Estúdio Digital</title>
-<link rel="stylesheet" href="cinema.css">
-<script src="cinema.js" defer></script>
+<link rel="stylesheet" href="cinema.css?v=camadas-1">
+<script src="cinema.js?v=camadas-1" defer></script>
 </head>
 <body>
 <a class="skip" href="#conteudo">Pular para o conteúdo</a>
@@ -24,16 +24,37 @@
 </header>
 <main id="conteudo">
   <section class="hero" id="inicio" aria-labelledby="hero-title">
-    <picture class="backdrop" aria-hidden="true"><source media="(max-width: 640px)" srcset="estudio-mobile.webp"><img src="estudio.webp" alt="" width="1672" height="941" fetchpriority="high"></picture>
+    <div class="backdrop scene-ambience" aria-hidden="true"></div>
     <div class="atmosphere" aria-hidden="true"></div>
     <div class="hero-copy wrap">
       <h1 id="hero-title">CRIAMOS O IMPOSSÍVEL<br><em>DE IGNORAR.</em></h1>
       <p>Sites cinematográficos, aplicativos e automações para marcas que querem ser lembradas.</p>
     </div>
-    <div class="hero-stage" aria-hidden="true">
-      <canvas id="depth"></canvas>
-      <div class="holo holo-left"><span>✦</span><div><strong>Experiências digitais</strong><small>Design em movimento</small></div></div>
-      <div class="holo holo-right"><span>⌘</span><div><strong>Sistemas conectados</strong><small>Automações e IA</small></div></div>
+    <div class="hero-stage">
+      <div class="scene">
+        <img class="scene-image scene-background" src="cena-fundo.webp" alt="" width="1672" height="941" fetchpriority="high">
+        <div class="scene-light" aria-hidden="true"></div>
+        <div class="scene-layer scene-notebook" aria-hidden="true">
+          <img class="scene-image" src="cena-notebook.webp" alt="" width="1672" height="941">
+        </div>
+        <div class="scene-layer scene-sites">
+          <img class="scene-image" src="cena-sites.webp" alt="" width="1672" height="941">
+          <a class="scene-link" href="#laboratorio" data-demo="site">Sites<span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="scene-layer scene-apps">
+          <img class="scene-image" src="cena-apps.webp" alt="" width="1672" height="941">
+          <a class="scene-link" href="#laboratorio" data-demo="app">Aplicativos<span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="scene-layer scene-flows">
+          <img class="scene-image" src="cena-fluxos.webp" alt="" width="1672" height="941">
+          <a class="scene-link" href="#laboratorio" data-demo="flow">Automações<span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="scene-layer scene-brand">
+          <img class="scene-image" src="cena-marca.webp" alt="" width="1672" height="941">
+          <a class="scene-link" href="#laboratorio" data-demo="brand">Identidade<span aria-hidden="true">↗</span></a>
+        </div>
+      </div>
+      <canvas id="depth" aria-hidden="true"></canvas>
     </div>
     <div class="hero-actions">
       <a class="button primary" href="#contato">Comece agora <span aria-hidden="true">→</span></a>
