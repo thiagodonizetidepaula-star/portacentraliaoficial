@@ -35,6 +35,19 @@ http.createServer(async(req,res)=>{
  const u=new URL(req.url,'http://localhost');
  if(req.method!=='GET')return json(res,405,{error:'Método não permitido'});
  if(u.pathname==='/health')return json(res,200,{ok:true});
+ const libraryFiles={
+  '/biblioteca':['./biblioteca.html','text/html; charset=utf-8'],
+  '/biblioteca/':['./biblioteca.html','text/html; charset=utf-8'],
+  '/biblioteca.html':['./biblioteca.html','text/html; charset=utf-8'],
+  '/biblioteca.css':['./biblioteca.css','text/css; charset=utf-8'],
+  '/biblioteca.js':['./biblioteca.js','text/javascript; charset=utf-8'],
+  '/biblioteca-data.js':['./biblioteca-data.js','text/javascript; charset=utf-8']
+ };
+ if(Object.prototype.hasOwnProperty.call(libraryFiles,u.pathname)){
+  const [file,kind]=libraryFiles[u.pathname];
+  try{const buffer=await readFile(new URL(file,import.meta.url));res.writeHead(200,{'Content-Type':kind,'X-Content-Type-Options':'nosniff','Cache-Control':'no-store'});return res.end(buffer)}
+  catch{return json(res,500,{error:'Biblioteca indisponível'})}
+ }
  if(u.pathname==='/api/quota'){
   try{const v=await loadUsage();return json(res,200,{month:v.month,used:v.used,limit:LIMIT,remaining:Math.max(0,LIMIT-v.used),enabled:!!process.env.GOOGLE_PLACES_API_KEY})}
   catch{return json(res,200,{month:month(),used:0,limit:LIMIT,remaining:0,enabled:false,reason:'Busca bloqueada até configurar chave Google e contador persistente no servidor.'})}
