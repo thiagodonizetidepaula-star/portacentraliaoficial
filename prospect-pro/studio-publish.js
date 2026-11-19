@@ -103,9 +103,12 @@ async function publish(){
  try{
   let rows;
   if(data.publishedId){
-   rows=await api('/rest/v1/prospect_site_previews?id=eq.'+encodeURIComponent(data.publishedId)+'&select=id,slug',payload,'PATCH',session.access_token);
-   // PATCH defaults to minimal response; request representation below uses a GET to verify.
-   rows=[{id:data.publishedId,slug}];
+   const c=await config();
+   const r=await fetch(c.supabaseUrl+'/rest/v1/prospect_site_previews?id=eq.'+encodeURIComponent(data.publishedId)+'&select=id,slug',{
+     method:'PATCH',headers:{'Content-Type':'application/json',apikey:c.publishableKey,Authorization:'Bearer '+session.access_token,Prefer:'return=representation'},body:JSON.stringify(payload)
+   });
+   const j=await r.json();if(!r.ok||!Array.isArray(j)||!j.length)throw Error(j.message||'A atualização não foi autorizada');
+   rows=j;
   }else{
    const c=await config();
    const r=await fetch(c.supabaseUrl+'/rest/v1/prospect_site_previews?select=id,slug',{
