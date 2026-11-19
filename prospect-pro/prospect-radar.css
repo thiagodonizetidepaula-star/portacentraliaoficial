@@ -60,3 +60,10 @@
 @media(max-width:920px){.opportunity-grid{grid-template-columns:1fr}.radar-stage{min-height:355px}}
 @media(max-width:650px){.prospection-intro{display:block}.radar-live{width:fit-content;margin-top:12px}.radar-stage{min-height:380px}.radar-topline{left:12px;right:12px}.radar-center-label{top:31%}.radar-center-label strong{font-size:25px}.radar-steps{bottom:12px}.radar-result-bar{align-items:start;flex-direction:column}.opportunity-card{padding:16px}.opp-toolbar{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.radar-sweep,.radar-pin{animation:none!important}.opportunity-card{transition:none!important}}
+
+.prospect-auth{background:#1e2444;border:1px solid #66599a;border-radius:14px;padding:19px;margin:15px 0 20px;box-shadow:inset 0 1px #ffffff0b}
+.prospect-auth strong{color:#f5f4ff;font-size:14px}.prospect-auth p{font-size:12px;line-height:1.5;color:#c1c9e3}
+.prospect-auth-fields{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.prospect-auth-fields input{flex:1 1 180px;min-width:0;min-height:42px;border:1px solid #44466e;background:#111a30;border-radius:9px;padding:10px 11px;color:#fff;font-size:12px}
+.prospect-auth-fields .btn{min-height:42px}
+.prospect-auth[hidden]{display:none!important}
