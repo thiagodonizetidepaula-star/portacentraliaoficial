@@ -86,7 +86,9 @@ http.createServer(async(req,res)=>{
   '/biblioteca.html':['./biblioteca.html','text/html; charset=utf-8'],
   '/biblioteca.css':['./biblioteca.css','text/css; charset=utf-8'],
   '/biblioteca.js':['./biblioteca.js','text/javascript; charset=utf-8'],
-  '/biblioteca-data.js':['./biblioteca-data.js','text/javascript; charset=utf-8']
+  '/biblioteca-data.js':['./biblioteca-data.js','text/javascript; charset=utf-8'],
+  '/studio-flow.js':['./studio-flow.js','text/javascript; charset=utf-8'],
+  '/studio-publish.js':['./studio-publish.js','text/javascript; charset=utf-8']
  };
  if(Object.prototype.hasOwnProperty.call(libraryFiles,u.pathname)){
   const [file,kind]=libraryFiles[u.pathname];
