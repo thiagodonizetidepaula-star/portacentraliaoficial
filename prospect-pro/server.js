@@ -83,7 +83,8 @@ http.createServer(async(req,res)=>{
   '/studio-publish.js':['./studio-publish.js','text/javascript; charset=utf-8'],
   '/prospect-radar.css':['./prospect-radar.css','text/css; charset=utf-8'],
   '/prospect-radar.js':['./prospect-radar.js','text/javascript; charset=utf-8'],
-  '/prospect-auth.js':['./prospect-auth.js','text/javascript; charset=utf-8']
+  '/prospect-auth.js':['./prospect-auth.js','text/javascript; charset=utf-8'],
+  '/prospect-crm.js':['./prospect-crm.js','text/javascript; charset=utf-8']
  };
  if(Object.prototype.hasOwnProperty.call(libraryFiles,u.pathname)){
   const [file,kind]=libraryFiles[u.pathname];
