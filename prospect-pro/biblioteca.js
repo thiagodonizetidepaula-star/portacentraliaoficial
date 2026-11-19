@@ -64,7 +64,7 @@ $('saveProject').onclick=()=>{if(!selected)return;readFields();selected.template
 function renderProjects(){
  $('projectsList').innerHTML=projects.length?projects.map(p=>'<div class="project-row"><strong>'+esc(p.name)+'</strong><span>'+esc(p.industry)+' · '+esc(p.city)+'<br>Atualizado: '+esc(new Date(p.updatedAt||Date.now()).toLocaleDateString('pt-BR'))+'</span><div class="project-actions"><button data-load="'+esc(p.id)+'">Continuar editando</button><button data-remove="'+esc(p.id)+'">Excluir</button></div></div>').join(''):'<p>Você ainda não salvou nenhum site. Abra um modelo e clique em “Salvar projeto”.</p>';
  document.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{const p=projects.find(x=>x.id===b.dataset.load);if(p)start(p.templateId,p)});
- document.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{if(!confirm('Excluir este rascunho local?'))return;projects=projects.filter(p=>p.id!==b.dataset.remove);persist();renderProjects()});
+ document.querySelectorAll('[data-public]').forEach(b=>b.onclick=()=>window.open('/mvp/'+encodeURIComponent(b.dataset.public),'_blank','noopener'));document.querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{if(!confirm('Excluir este rascunho local?'))return;projects=projects.filter(p=>p.id!==b.dataset.remove);persist();renderProjects()});
 }
 $('downloadSite').onclick=()=>{if(!selected)return;readFields();const html=buildSite(selected,template);const blob=new Blob([html],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=slug(selected.name)+'-site.html';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);notify('Site HTML gerado. Revise fotos, dados e contato antes de publicar.')};
 $('copyHtml').onclick=async()=>{if(!selected)return;readFields();try{await navigator.clipboard.writeText(buildSite(selected,template));notify('Código HTML copiado')}catch{notify('Não foi possível copiar. Use Baixar site HTML.')}};
@@ -138,7 +138,7 @@ function buildSite(info,t){
  '<main id="inicio">'+hero+sections+contactHtml+'</main><footer class="footer container"><span>© '+new Date().getFullYear()+' '+n+'</span><span>'+kind+' · '+city+'</span></footer></body></html>';
 }
 window.PortalSiteStudio={
- start,buildSite,getDefault,pendingLead,templates,
+ start,buildSite,getDefault,pendingLead,templates,renderProjects,
  getCurrent:()=>{if(!selected||!template)return null;readFields();return {data:{...selected},template:{...template}};},
  updatePublished:(id,pubSlug)=>{if(selected){selected.publishedId=id;selected.publicSlug=pubSlug}}
 };
