@@ -51,12 +51,12 @@ http.createServer(async(req,res)=>{
  if(u.pathname==='/health')return json(res,200,{ok:true});
  if(u.pathname==='/api/public-config')return json(res,200,{supabaseUrl:endpoint,publishableKey:publicKey,configured:!!endpoint&&!!publicKey});
  if(u.pathname.startsWith('/mvp/')){
-  const slug=decodeURIComponent(u.pathname.slice(5));
+  const slug=u.pathname.slice(5);
   if(!safeSlug(slug))return json(res,404,{error:'Prévia não encontrada'});
   try{
    const p=await publicPreview(slug);
    if(!p)return json(res,404,{error:'Demonstração indisponível ou não publicada'});
-   const base='https://'+(req.headers.host||'portal-prospect-pro.onrender.com');
+   const base=process.env.PREVIEW_PUBLIC_ORIGIN||'https://portal-prospect-pro.onrender.com';
    const url=base+'/mvp/'+slug;
    const title=String(p.business_name||'Site demonstrativo').slice(0,90)+' | Demonstração Portal Central IA';
    const desc=String(p.description||'Uma proposta de site criada para esta empresa.').slice(0,160);
