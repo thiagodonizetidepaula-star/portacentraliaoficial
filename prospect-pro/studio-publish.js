@@ -88,6 +88,31 @@ $('verifyOtp').onclick=async()=>{
 };
 $('pubLogout').onclick=()=>{saveSession(null);showAuth(false);status('Sessão encerrada.');};
 function makeSlug(name){const base=String(name||'empresa').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,63)||'empresa';const rand=Math.random().toString(36).slice(2,8);return base+'-'+rand}
+async function markLead(data,fields){
+ const id=data?.leadId;if(!id)return;
+ // The owner should see the preview immediately in the browser he used to build it.
+ try{
+  const leads=JSON.parse(localStorage.getItem('prospect_pro_leads')||'[]');
+  if(Array.isArray(leads)){
+   const l=leads.find(x=>x.id===id);
+   if(l){if(fields.preview_slug)l.previewSlug=fields.preview_slug;
+    if(fields.stage)l.stage=fields.stage;
+    if(fields.message_opened_at)l.messageOpenedAt=fields.message_opened_at;
+    l.updatedAt=new Date().toISOString();
+    localStorage.setItem('prospect_pro_leads',JSON.stringify(leads));
+   }
+  }
+ }catch{}
+ const user=await activeUser();if(!user)return;
+ const c=await config();
+ const r=await fetch(c.supabaseUrl+'/rest/v1/prospect_crm_leads?id=eq.'+encodeURIComponent(id)+'&owner_id=eq.'+encodeURIComponent(user.id),{
+  method:'PATCH',headers:{'Content-Type':'application/json',apikey:c.publishableKey,Authorization:'Bearer '+session.access_token,Prefer:'return=representation'},
+  body:JSON.stringify({...fields,updated_at:new Date().toISOString()})
+ });
+ if(!r.ok){const j=await r.json().catch(()=>({}));throw Error(j.message||'Não foi possível vincular o lead ao site')}
+ // No record could mean that the lead was not saved to the cloud yet.
+ const rows=await r.json();if(!Array.isArray(rows)||!rows.length)throw Error('Site publicado; este lead ainda não consta na nuvem. Abra Oportunidades e confirme o cadastro para sincronizar.');
+}
 function businessMsg(p,link){
  return 'Olá! Tudo bem? Sou do Portal Central IA. Preparei uma proposta demonstrativa de site para '+p.name+' e gostaria de apresentar uma ideia que pode ajudar na presença digital da empresa.\n\nAqui está a prévia: '+link+'\n\nPosso explicar como funcionaria? Sem compromisso. Se não for do seu interesse, basta me avisar.';
 }
@@ -119,6 +144,7 @@ async function publish(){
   const row=rows[0];if(!row?.id)throw Error('Não foi possível confirmar o registro');
   engine.updatePublished(row.id,row.slug);
   $('saveProject').click();
+  try{await markLead(data,{preview_slug:row.slug,stage:'Site criado'})}catch(e){status('Site publicado; vínculo com oportunidade pendente: '+e.message)}
   const link=location.origin+'/mvp/'+row.slug;lastPublic={link,data};
   $('publicLink').value=link;$('publicMessage').value=businessMsg(data,link);
   $('publishAuth').hidden=true;$('publishReady').hidden=true;$('publishResult').hidden=false;
@@ -137,7 +163,8 @@ $('openBusinessWhatsapp').onclick=()=>{
  if(!/^55\d{10,11}$/.test(number)){status('Informe um WhatsApp com DDD no editor. Sem número válido não é possível abrir uma conversa.');return}
  const message=$('publicMessage').value.trim();
  window.open('https://wa.me/'+number+'?text='+encodeURIComponent(message),'_blank','noopener');
- status('WhatsApp aberto. Revise a proposta antes de enviar; o aplicativo não envia por você.');
+ markLead(lastPublic.data,{stage:'Proposta pronta',message_opened_at:new Date().toISOString()}).catch(e=>status('WhatsApp aberto. Não foi possível sincronizar o estado: '+e.message));
+ status('WhatsApp aberto: clique em Enviar e depois confirme o envio na aba Oportunidades.');
 };
 // If the email link returns with a session, restore the working draft in this browser.
 (function restoreEmailLogin(){
