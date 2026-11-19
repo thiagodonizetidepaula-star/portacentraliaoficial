@@ -75,3 +75,18 @@
 .quota-progress span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#5b8df6,#a27cff);transition:width .3s ease}
 .quota-progress span.quota-warning{background:linear-gradient(90deg,#dea94e,#e47f6a)}
 .quota-foot{color:#a9b2d1;font-size:10px;line-height:1.6}
+
+/* Persisted CRM and proposal tracking */
+.crm-lead-note{color:#98a9ca;font-size:11px;line-height:1.55;margin-top:6px}
+.crm-sent{color:#8be0bc;font-weight:750}
+.crm-search-history{border:1px solid #374368;padding:13px 15px;margin:18px 0 0;border-radius:12px;background:#141c36}
+.crm-search-history summary{cursor:pointer;color:#c8c4ff;font-size:12px;font-weight:800;padding:4px}
+.crm-search-history[open] summary{margin-bottom:12px}
+.search-bookmark{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid #303b54;padding:13px 2px}
+.search-bookmark strong{color:#e5edff;font-size:12px}
+.sent-row{border:1px solid #314762;border-radius:12px;background:#15233b;padding:16px;margin-top:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sent-row strong{color:#f4f9ff;font-size:13px}
+.sent-actions{display:flex;gap:8px;flex-wrap:wrap}
+.sent-actions a{text-decoration:none;display:flex;align-items:center}
+#leadRows .actions{flex-wrap:wrap;min-width:230px}
+@media(max-width:690px){.search-bookmark,.sent-row{align-items:start;flex-direction:column}.search-bookmark .mini,.sent-actions{width:100%}.sent-actions>*{flex:1}}
