@@ -34,6 +34,7 @@ async function authenticated(){
 async function updateAuth(){
  if(await authenticated()){
   $a('prospectAuthPanel').hidden=true;
+  if(window.PortalCRM?.sync)window.PortalCRM.sync();
   return;
  }
  const q=await fetch('/api/quota',{cache:'no-store'}).then(r=>r.json()).catch(()=>null);
@@ -52,6 +53,7 @@ async function doLogin(){
   $a('radarPassword').value='';$a('prospectAuthPanel').hidden=true;
   show('Acesso confirmado.');
   if(typeof refreshQuota==='function')refreshQuota();
+  if(window.PortalCRM?.sync)window.PortalCRM.sync();
  }catch(e){show('Não foi possível entrar: '+e.message)}
  finally{$a('radarLogin').disabled=false}
 }
@@ -75,6 +77,7 @@ async function verifyOtp(){
   sessionStorage.setItem(key,JSON.stringify(s));$a('prospectAuthPanel').hidden=true;
   show('Autenticado. Você pode realizar sua pesquisa.');
   if(typeof refreshQuota==='function')refreshQuota();
+  if(window.PortalCRM?.sync)window.PortalCRM.sync();
  }catch(e){show('Código não verificado: '+e.message)}
 }
 $a('radarLogin').onclick=doLogin;
