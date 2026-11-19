@@ -139,7 +139,8 @@ async function search(){
    byId('searchResults').innerHTML='<div class="radar-empty">'+escR(q.reason||'Configure a API Google Places para consultar empresas automaticamente.')+'</div>';
    return;
   }
-  if(q.loginRequired&&!auth?.access_token){
+  if(q.loginRequired){
+   try{sessionStorage.removeItem('prospect_publisher_session_v1')}catch{}
    byId('prospectAuthPanel').hidden=false;
    setStage('idle',0,'Entre com a sua conta autorizada para iniciar a busca segura.');
    byId('searchResults').innerHTML='<div class="radar-empty">A busca automática exige login para proteger sua cota Google. Entre acima e clique em Buscar.</div>';
