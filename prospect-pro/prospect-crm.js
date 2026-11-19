@@ -38,11 +38,11 @@ const toRow=(l,user)=>({
  business_category:plain(l.category).slice(0,150),
  city:plain(l.city).slice(0,150),phone:plain(l.phone).slice(0,45),
  address:plain(l.address).slice(0,320),website:plain(l.website).slice(0,400),
- origin:plain(l.origin)||'manual',stage:plain(l.stage)||'Novo',
+ origin:plain(l.origin)||(l.googleId?'google-places':'manual'),stage:plain(l.stage)||'Novo',
  preview_slug:plain(l.previewSlug)||null,
  proposal_sent_at:l.proposalSentAt||null,message_opened_at:l.messageOpenedAt||null,
  archived_at:l.archivedAt||null,opted_out:!!l.optedOut,
- operator_confirmed:!!(l.operatorConfirmed||l.origin==='manual'),notes:plain(l.notes).slice(0,2000),
+ operator_confirmed:!!(l.operatorConfirmed||(!l.googleId&&l.origin!=='google-places')),notes:plain(l.notes).slice(0,2000),
  updated_at:l.updatedAt||new Date().toISOString()
 });
 const fromRow=r=>({
@@ -53,7 +53,7 @@ const fromRow=r=>({
  optedOut:!!r.opted_out,operatorConfirmed:!!r.operator_confirmed,notes:r.notes,
  updatedAt:r.updated_at
 });
-function approved(l){return !!(l.name&&l.operatorConfirmed||l.origin==='manual')}
+function approved(l){return !!(l.name&&(l.operatorConfirmed||(!l.googleId&&l.origin!=='google-places')))}
 const originalSave=save,originalRender=render,originalPage=page;
 let lastSerialized=new Map();
 function snapshot(){
