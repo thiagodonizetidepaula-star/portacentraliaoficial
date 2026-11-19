@@ -8,7 +8,9 @@ const lead=app.pendingLead;
 document.title='Criar sites premium | Portal Prospect PRO';
 document.querySelector('.intro').hidden=true;
 document.querySelector('.workspace-nav').hidden=true;
-$('galleryView').hidden=true;$('projectsView').hidden=true;$('studioView').hidden=false;
+const projectMode=new URLSearchParams(location.search).get('view')==='projects';
+$('galleryView').hidden=true;$('projectsView').hidden=!projectMode;$('studioView').hidden=projectMode;
+if(projectMode){app.renderProjects();return;}
 document.querySelector('.identity small').textContent='PROSPECÇÃO · STUDIO';
 const client={name:lead?.name||'',category:lead?.category||lead?.categories?.[0]||localStorage.getItem('prospect_last_segment')||'',city:lead?.address||'Mauá, SP',phone:lead?.phone||''};
 $('studioCompany').value=client.name;$('studioSegment').value=client.category;$('studioCity').value=client.city;$('studioPhone').value=client.phone;
