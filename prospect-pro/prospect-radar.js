@@ -127,6 +127,25 @@ async function search(){
  const term=byId('term').value.trim(),city=byId('city').value.trim();
  if(!term||!city){alert('Informe o ramo de atividade e a cidade.');return}
  const mode=byId('mode').value;
+ let auth;try{auth=JSON.parse(sessionStorage.getItem('prospect_publisher_session_v1')||'null')}catch{}
+ if(mode==='api'){
+  let q;
+  try{
+   const checkHeaders={};if(auth?.access_token)checkHeaders.Authorization='Bearer '+auth.access_token;
+   const qr=await fetch('/api/quota',{headers:checkHeaders,cache:'no-store'});q=await qr.json();
+  }catch{q={enabled:false,reason:'Não foi possível verificar a configuração do Google.'}}
+  if(!q.enabled){
+   setStage('error',0,q.reason||'A integração Google Places ainda não foi habilitada.');
+   byId('searchResults').innerHTML='<div class="radar-empty">'+escR(q.reason||'Configure a API Google Places para consultar empresas automaticamente.')+'</div>';
+   return;
+  }
+  if(q.loginRequired&&!auth?.access_token){
+   byId('prospectAuthPanel').hidden=false;
+   setStage('idle',0,'Entre com a sua conta autorizada para iniciar a busca segura.');
+   byId('searchResults').innerHTML='<div class="radar-empty">A busca automática exige login para proteger sua cota Google. Entre acima e clique em Buscar.</div>';
+   return;
+  }
+ }
  if(mode==='free'){
   const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(term+' em '+city);
   window.open(url,'_blank','noopener');
@@ -146,9 +165,7 @@ async function search(){
  const progress=()=>setStage('working',1,'Consultando os perfis públicos por meio do Google Places…');
  requestAnimationFrame(progress);
  try{
-  const headers={};let auth;
-  try{auth=JSON.parse(sessionStorage.getItem('prospect_publisher_session_v1')||'null')}catch{}
-  if(auth?.access_token)headers.Authorization='Bearer '+auth.access_token;
+  const headers={};if(auth?.access_token)headers.Authorization='Bearer '+auth.access_token;
   const r=await fetch('/api/search?term='+encodeURIComponent(term)+'&city='+encodeURIComponent(city),{headers,cache:'no-store'});
   const j=await r.json();
   if(!r.ok)throw Error(j.error||'Não foi possível buscar os estabelecimentos.');
