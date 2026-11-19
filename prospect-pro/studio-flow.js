@@ -27,6 +27,39 @@ function colorScheme(base,index){
  {layout:['corporate','technical','kinetic'].includes(base.layout)?'serene':'corporate',bg:'#f5f7f8',ink:'#253749',accent:base.accent,title:'Premium Contemporâneo',summary:'Composição elegante, comunicação objetiva e design sofisticado.'}
  ];return schemes[index];
 }
+// Three licensed-demo style image references per segment; replace with the client's own media before delivery.
+const photoBuckets={
+ hamburgueria:['photo-1550547660-d9450f859349','photo-1571091718767-18b5b1457add'],
+ restaurante:['photo-1517248135467-4c7edcad34c4','photo-1552566626-52f8b828add9'],
+ pizzaria:['photo-1513104890138-7c749659a591','photo-1574071318508-1cdbab80d002'],
+ cafeteria:['photo-1442512595331-e89e73853f31','photo-1501339847302-ac426a4a7cbb'],
+ barbearia:['photo-1599351431202-1e0f0137899a','photo-1621605815971-fbc98d665033'],
+ salao:['photo-1522335789203-aabd1fc54bc9','photo-1512290923902-8a9f81dc236c'],
+ spa:['photo-1512290923902-8a9f81dc236c','photo-1540555700478-4be289fbecef'],
+ estetica:['photo-1512290923902-8a9f81dc236c','photo-1522335789203-aabd1fc54bc9'],
+ clinica:['photo-1576091160399-112ba8d25d1d','photo-1551076805-e1869033e561'],
+ odontologia:['photo-1606811971618-4486d14f3f99','photo-1551076805-e1869033e561'],
+ imobiliaria:['photo-1600566753086-00f18fb6b3ea','photo-1600585154340-be6161a56a0c'],
+ arquitetura:['photo-1600607687920-4e2a09cf159d','photo-1600566753086-00f18fb6b3ea'],
+ oficina:['photo-1485291571150-772bcfc10da5','photo-1517524206127-48bbd363f3d7'],
+ esteticaauto:['photo-1517524206127-48bbd363f3d7','photo-1486496572940-2bb2341fdbdf'],
+ advocacia:['photo-1589829545856-d10d557cf95f','photo-1497366811353-6870744d04b2'],
+ contabilidade:['photo-1497366754035-f200968a6e72','photo-1497366811353-6870744d04b2'],
+ academia:['photo-1517836357463-d25dfeac3438','photo-1571019614242-c5c5dee9f50b'],
+ educacao:['photo-1427504494785-3a9ca7044f45','photo-1523240795612-9a054b0db644'],
+ veterinaria:['photo-1583337130417-3346a1be7dee','photo-1517849845537-4d257902454b'],
+ petshop:['photo-1548199973-03cce0bbc87b','photo-1583337130417-3346a1be7dee'],
+ hotelaria:['photo-1566073771259-6a8506099945','photo-1571896349842-33c89424de2d'],
+ fotografia:['photo-1542038784456-1ea8e935640e','photo-1497366754035-f200968a6e72'],
+ generic:['photo-1497366811353-6870744d04b2','photo-1600585154340-be6161a56a0c']
+};
+function differentPhoto(base,index){
+ if(index===0)return base.photo;
+ const bucket=photoBuckets[base.id]||photoBuckets.generic;
+ const id=bucket[index-1];
+ const url='https://images.unsplash.com/'+id+'?auto=format&fit=crop&w=1600&q=80';
+ return url!==base.photo?url:('https://images.unsplash.com/'+photoBuckets.generic[index-1]+'?auto=format&fit=crop&w=1600&q=80');
+}
 function proposalData(t){
  const name=$('studioCompany').value.trim()||'Empresa demonstrativa';
  const category=$('studioSegment').value.trim()||t.label;
@@ -41,7 +74,7 @@ function previewThree(){
  const base=chooseBase(category,name);
  const metas=[0,1,2].map(i=>{
   const style=colorScheme(base,i);
-  const t={...base,id:base.id+'-studio-'+i,layout:style.layout,bg:style.bg,ink:style.ink,accent:style.accent,photo:base.photo,label:category};
+  const t={...base,id:base.id+'-studio-'+i,layout:style.layout,bg:style.bg,ink:style.ink,accent:style.accent,photo:differentPhoto(base,i),label:category,headline:i===0?base.headline:i===1?'Uma experiência que merece ser descoberta.':'Conheça uma nova forma de viver nossos serviços.'};
   return {template:t,info:proposalData(t),style};
  });
  window.__generatedTemplates=metas.map(x=>x.template);
