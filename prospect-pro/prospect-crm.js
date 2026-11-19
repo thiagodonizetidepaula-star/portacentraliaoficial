@@ -166,15 +166,16 @@ function confirmGoogleLead(x,category,callback,existing=false){
   '<label>Nome confirmado da empresa<input id="crm-name" maxlength="190" value="'+escape(name)+'"></label>'+
   '<label>Telefone comercial confirmado<input id="crm-phone" maxlength="40" value="'+escape(phone)+'"></label>'+
   '<label>Endereço confirmado<input id="crm-address" maxlength="300" value="'+escape(address)+'"></label>'+
+  '<label>Site identificado fora do perfil (opcional)<input id="crm-site" maxlength="350" value="'+escape(plain(source.website))+'"></label>'+
   '<label><input id="crm-verified" type="checkbox" style="width:auto"> Conferi essas informações e quero manter este cadastro comercial</label>',()=>{
   if(!el('crm-verified')?.checked)return alert('Confirme a verificação dos dados.');
-  const name=plain(el('crm-name').value),phone=plain(el('crm-phone').value),address=plain(el('crm-address').value);
+  const name=plain(el('crm-name').value),phone=plain(el('crm-phone').value),address=plain(el('crm-address').value),website=plain(el('crm-site').value);
   if(name.length<2)return alert('Informe o nome do estabelecimento.');
   const lead=existing?source:leads.find(l=>source.googleId&&l.googleId===source.googleId);
-  if(lead){lead.name=name;lead.phone=phone;lead.address=address;lead.category=category||lead.category;lead.operatorConfirmed=true;lead.origin='google-places';save()}
+  if(lead){lead.name=name;lead.phone=phone;lead.address=address;lead.website=website;lead.category=category||lead.category;lead.operatorConfirmed=true;lead.origin='google-places';save()}
   else{
    const leadNew={id:uid(),googleId:source.googleId||'',name,phone,address,website:'',category:category||'',city:plain(el('city')?.value),origin:'google-places',operatorConfirmed:true,stage:'Novo',previewSlug:'',proposalSentAt:null};
-   leads.unshift(leadNew);save();
+   leadNew.website=website;leads.unshift(leadNew);save();
   }
   el('modal').classList.add('hidden');
   const out=existing?source:leads.find(l=>l.googleId&&l.googleId===source.googleId);
@@ -222,7 +223,9 @@ async function sync(){
 }
 async function recordSearch(term,city,rows){
  const ids=[...new Set((rows||[]).map(x=>plain(x.googleId)).filter(Boolean))].slice(0,20);
- if(!account||!ids.length)return;
+ if(!ids.length)return;
+ if(!account){try{account=await authorize()}catch{}}
+ if(!account)return;
  try{
   await request('/rest/v1/prospect_search_bookmarks','POST',{owner_id:account.id,search_term:term,search_city:city,place_ids:ids},'return=minimal');
   await loadHistory();
@@ -247,6 +250,6 @@ function renderHistory(){
  });
 }
 window.PortalCRM={sync,recordSearch,composeMessage,confirmGoogleLead,confirmSent,renderHistory,archive,restore,publishedLink,hasSent:id=>!!find(id)?.proposalSentAt};
-document.addEventListener('DOMContentLoaded',()=>{render();if(token())sync();});
-if(document.readyState!=='loading'){render();if(token())sync()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{render();if(token())sync()});
+else{render();if(token())sync()}
 })();
