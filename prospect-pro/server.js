@@ -39,7 +39,7 @@ const publicKey=process.env.SUPABASE_PUBLISHABLE_KEY||'';
 async function publicPreview(slug){
  if(!endpoint||!publicKey)throw new Error('Banco de dados não configurado');
  const url=endpoint+'/rest/v1/prospect_site_previews?slug=eq.'+encodeURIComponent(slug)+'&status=eq.published&select=business_name,business_category,city,description,cover_image,html,slug&limit=1';
- const response=await fetch(url,{headers:{apikey:publicKey,Authorization:'Bearer '+publicKey},signal:AbortSignal.timeout(9000)});
+ const response=await fetch(url,{headers:{apikey:publicKey},signal:AbortSignal.timeout(9000)});
  if(!response.ok)throw Error('Falha no banco: '+response.status);
  const rows=await response.json();
  return rows[0]||null;
