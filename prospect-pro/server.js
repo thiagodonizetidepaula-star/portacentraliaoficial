@@ -88,7 +88,9 @@ http.createServer(async(req,res)=>{
   '/biblioteca.js':['./biblioteca.js','text/javascript; charset=utf-8'],
   '/biblioteca-data.js':['./biblioteca-data.js','text/javascript; charset=utf-8'],
   '/studio-flow.js':['./studio-flow.js','text/javascript; charset=utf-8'],
-  '/studio-publish.js':['./studio-publish.js','text/javascript; charset=utf-8']
+  '/studio-publish.js':['./studio-publish.js','text/javascript; charset=utf-8'],
+  '/prospect-radar.css':['./prospect-radar.css','text/css; charset=utf-8'],
+  '/prospect-radar.js':['./prospect-radar.js','text/javascript; charset=utf-8']
  };
  if(Object.prototype.hasOwnProperty.call(libraryFiles,u.pathname)){
   const [file,kind]=libraryFiles[u.pathname];
