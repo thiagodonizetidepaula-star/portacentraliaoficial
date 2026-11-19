@@ -1,10 +1,10 @@
 import http from 'node:http';
 import {readFile} from 'node:fs/promises';
 const port=process.env.PORT||3000;
-const LIMIT=30;
+const LIMIT=50;
 // Cota persistente e atômica no Supabase, só para o operador autorizado.
 // Sem Supabase, login ou chave Google: nenhuma consulta pagável será executada.
-const month=()=>new Date().toISOString().slice(0,7);
+const month=()=>{const parts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Sao_Paulo',year:'numeric',month:'2-digit'}).formatToParts(new Date());const year=parts.find(p=>p.type==='year').value,mo=parts.find(p=>p.type==='month').value;return year+'-'+mo};
 async function usageBudget(bearer,reserve=false){
  if(!endpoint||!publicKey)throw Error('Banco de dados do controle de buscas não configurado');
  if(!bearer||!/^[a-zA-Z0-9_.-]{40,}$/.test(bearer))throw Error('Entre com sua conta do Portal Central IA para usar a busca automática');
@@ -105,7 +105,7 @@ http.createServer(async(req,res)=>{
   const token=getToken(req);
   if(!token)return json(res,401,{error:'Faça login na sua conta do Portal Central IA para usar a busca automática.'});
   let slot;try{slot=await usageBudget(token,true)}catch(e){return json(res,403,{error:e.message})}
-  if(slot.blocked)return json(res,429,{error:'Limite de segurança de 30 consultas atingido neste mês.',used:slot.used,limit:LIMIT});
+  if(slot.blocked)return json(res,429,{error:'Limite de segurança de 50 buscas atingido neste mês. O acesso será liberado no próximo mês.',used:slot.used,limit:LIMIT});
   try{
    const upstream=await fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':process.env.GOOGLE_PLACES_API_KEY,'X-Goog-FieldMask':'places.id,places.displayName,places.formattedAddress,places.websiteUri,places.internationalPhoneNumber,places.googleMapsUri'},body:JSON.stringify({textQuery:term+' em '+city,languageCode:'pt-BR',regionCode:'BR',pageSize:20}),signal:AbortSignal.timeout(12000)});
    const j=await upstream.json();
