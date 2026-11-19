@@ -24,6 +24,19 @@
   <button id="tabGallery" class="workspace-tab selected" data-view="gallery" role="tab" aria-selected="true">Explorar modelos</button>
   <button id="tabProjects" class="workspace-tab" data-view="projects" role="tab" aria-selected="false">Meus projetos <span id="savedCount">0</span></button>
  </div>
+ <section id="studioView" hidden>
+  <div class="studio-heading"><div class="kicker">SITE STUDIO / PROPOSTAS AUTOMÁTICAS</div><h2>Três direções criativas para a sua próxima venda.</h2><p>Selecione uma empresa da prospecção, ou digite os dados de uma empresa aqui. O Portal Prospect PRO prepara três composições diferentes para você analisar e editar.</p></div>
+  <div class="studio-client">
+   <label>Empresa<input id="studioCompany" maxlength="100" placeholder="Nome da empresa"></label>
+   <label>Segmento<input id="studioSegment" maxlength="80" placeholder="Ex.: hamburgueria, barbearia, clínica"></label>
+   <label>Cidade<input id="studioCity" maxlength="90" placeholder="Ex.: Mauá, SP"></label>
+   <label>WhatsApp<input id="studioPhone" maxlength="23" placeholder="11 99999-9999"></label>
+   <button id="generateThree" type="button" class="button accent">Gerar 3 propostas</button>
+  </div>
+  <div id="studioStep" class="studio-status" aria-live="polite">Pronto para criar propostas.</div>
+  <div id="threeProposals" class="three-proposals"></div>
+  <p class="studio-note">A IA não é cobrada por geração: três propostas são montadas por um motor de design. Fotos demonstrativas devem ser substituídas por imagens autorizadas da empresa.</p>
+ </section>
  <section id="galleryView">
    <div class="catalog-tools">
     <label class="searchbox"><span aria-hidden="true">⌕</span><input id="filter" type="search" placeholder="Buscar segmento: clínica, imobiliária, pet shop..." autocomplete="off" aria-label="Buscar modelos"></label>
@@ -38,8 +51,8 @@
 </main>
 <div id="editorOverlay" class="editor-overlay" hidden>
  <div class="editor-shell" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
-  <div class="editor-bar"><div class="editor-brand"><button id="closeEditor" class="plain-btn" type="button" aria-label="Fechar editor">← Voltar</button><span class="vertical-rule"></span><div><div class="editor-eyebrow">ESTÚDIO DE CRIAÇÃO</div><strong id="editorTitle">Personalizar site</strong></div></div>
-   <div class="editor-tools"><div class="device-toggle" aria-label="Dispositivo"><button type="button" data-device="desktop" class="active">Desktop</button><button type="button" data-device="mobile">Celular</button></div><button id="saveProject" class="button secondary" type="button">Salvar projeto</button><button id="downloadSite" class="button accent" type="button">Baixar site HTML</button></div>
+  <div class="editor-bar"><div class="editor-brand"><button id="closeEditor" class="plain-btn" type="button" aria-label="Fechar editor">← Voltar</button><span class="vertical-rule"></span><div><div class="editor-eyebrow">EDITOR PREMIUM / DEMONSTRAÇÃO</div><strong id="editorTitle">Personalizar site</strong></div></div>
+   <div class="editor-tools"><div class="device-toggle" aria-label="Dispositivo"><button type="button" data-device="desktop" class="active">Desktop</button><button type="button" data-device="mobile">Celular</button></div><button id="saveProject" class="button secondary" type="button">Salvar projeto</button><button id="publishPreview" class="button accent" type="button">Publicar prévia</button><button id="downloadSite" class="button accent" type="button">Baixar site HTML</button></div>
   </div>
   <div class="editor-content">
    <aside class="editor-form">
@@ -63,6 +76,20 @@
   </div>
  </div>
 </div>
+<div id="publishOverlay" class="publish-overlay" hidden><div class="publish-dialog" role="dialog" aria-modal="true" aria-labelledby="publishTitle">
+  <div class="publish-head"><h2 id="publishTitle">Publicar demonstração</h2><button id="closePublish" type="button" class="plain-btn">Fechar</button></div>
+  <div id="publishAuth">
+   <p class="muted-copy">Entre com o seu acesso do Portal Central IA para criar links públicos permanentes. As demonstrações são salvas no Supabase; não é necessário criar um Render para cada cliente.</p>
+   <label>E-mail de acesso<input type="email" id="pubEmail" placeholder="Seu e-mail cadastrado" autocomplete="username"></label>
+   <label>Senha<input type="password" id="pubPass" placeholder="Senha do aplicativo" autocomplete="current-password"></label>
+   <div class="publish-buttons"><button class="button accent" id="pubLogin">Entrar e publicar</button><button class="button secondary" id="pubEmailLink">Enviar link por e-mail</button></div>
+   <div id="otpGroup" hidden><label>Código recebido por e-mail (se disponível)<input id="pubOtp" inputmode="numeric" maxlength="8" placeholder="Código de 6 dígitos"></label><button class="button secondary" id="verifyOtp">Verificar código</button></div>
+   <p class="muted-copy">Acesso restrito ao responsável pelo Portal Central IA. Se ainda não tiver senha de usuário do aplicativo, use o link por e-mail ou configure a autenticação no Supabase.</p>
+  </div>
+  <div id="publishReady" hidden><p id="publishAccount" class="muted-copy"></p><p class="muted-copy">Esta é uma demonstração, não um site contratado. Revise os textos, a imagem e o telefone antes de publicar.</p><button class="button accent" id="confirmPublish" type="button">Publicar link individual</button><button class="button secondary" id="pubLogout" type="button">Sair da conta</button></div>
+  <div id="publishResult" hidden><p class="muted-copy">Demonstração publicada. Abra o link e confira o cartão antes de compartilhar.</p><label>Link público<input id="publicLink" readonly></label><div class="publish-buttons"><button id="copyPublicLink" class="button secondary">Copiar link</button><button id="openPublicLink" class="button secondary">Abrir site</button></div><label>Mensagem para a empresa<textarea id="publicMessage" rows="5"></textarea></label><div class="publish-buttons"><button id="copyPublicMessage" class="button secondary">Copiar mensagem</button><button id="openBusinessWhatsapp" class="button accent">Preparar WhatsApp</button></div><p class="muted-copy">O WhatsApp abre a mensagem para revisão; nenhuma mensagem é enviada automaticamente.</p></div>
+  <p id="publishStatus" role="status" class="muted-copy"></p>
+ </div></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 <footer class="site-foot container"><span>Portal Prospect PRO · Portal Central IA</span><span>Modelos comerciais personalizáveis · Sem IA por geração</span></footer>
 </body></html>
