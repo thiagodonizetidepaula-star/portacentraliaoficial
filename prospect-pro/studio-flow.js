@@ -4,7 +4,8 @@ if(!location.pathname.startsWith('/studio'))return;
 const $=id=>document.getElementById(id);
 const app=window.PortalSiteStudio;
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
-const lead=app.pendingLead;
+let lead=app.pendingLead;
+const leadKey=new URLSearchParams(location.search).get('lead');
 document.title='Criar sites premium | Portal Prospect PRO';
 document.querySelector('.intro').hidden=true;
 document.querySelector('.workspace-nav').hidden=true;
@@ -65,7 +66,7 @@ function proposalData(t){
  const category=$('studioSegment').value.trim()||t.label;
  const city=$('studioCity').value.trim()||'Mauá, SP';
  const phone=$('studioPhone').value.trim();
- return {...app.getDefault(t),templateId:t.id,name,industry:category,city,phone,headline:t.headline,summary:t.summary,color:t.accent,photo:t.photo};
+ return {...app.getDefault(t),leadId:lead?.id||leadKey||null,templateId:t.id,name,industry:category,city,phone,headline:t.headline,summary:t.summary,color:t.accent,photo:t.photo};
 }
 function previewThree(){
  const name=$('studioCompany').value.trim(),category=$('studioSegment').value.trim();
@@ -101,5 +102,22 @@ function previewThree(){
 }
 $('generateThree').onclick=previewThree;
 if(lead){if(!$('studioSegment').value)$('studioSegment').value='Serviços profissionais';previewThree()}
+else if(leadKey){
+ $('studioStep').textContent='Recuperando empresa salva no CRM…';
+ (async()=>{
+  try{
+   let session;try{session=JSON.parse(sessionStorage.getItem('prospect_publisher_session_v1')||'null')}catch{}
+   if(!session?.access_token)throw Error('Entre no Prospect PRO para recuperar esta empresa da nuvem.');
+   const response=await fetch('/api/public-config',{cache:'no-store'}),c=await response.json();
+   if(!c.configured)throw Error('Armazenamento não configurado.');
+   const r=await fetch(c.supabaseUrl+'/rest/v1/prospect_crm_leads?id=eq.'+encodeURIComponent(leadKey)+'&select=id,business_name,business_category,city,address,phone&limit=1',{headers:{apikey:c.publishableKey,Authorization:'Bearer '+session.access_token}});
+   if(!r.ok)throw Error('Não foi possível recuperar o cadastro.');
+   const rows=await r.json();if(!rows.length)throw Error('Empresa não encontrada. Abra Oportunidades e confirme seu cadastro.');
+   const d=rows[0];lead={id:d.id,name:d.business_name,category:d.business_category,city:d.city,address:d.address,phone:d.phone};
+   $('studioCompany').value=lead.name;$('studioSegment').value=lead.category||'Serviços profissionais';$('studioCity').value=lead.city||'Mauá, SP';$('studioPhone').value=lead.phone;
+   previewThree();
+  }catch(e){$('studioStep').textContent=e.message||'Informe a empresa manualmente para gerar propostas.'}
+ })();
+}
 else $('studioStep').textContent='Informe a empresa acima para gerar automaticamente três propostas de site.';
 })();
