@@ -67,3 +67,11 @@
 .prospect-auth-fields input{flex:1 1 180px;min-width:0;min-height:42px;border:1px solid #44466e;background:#111a30;border-radius:9px;padding:10px 11px;color:#fff;font-size:12px}
 .prospect-auth-fields .btn{min-height:42px}
 .prospect-auth[hidden]{display:none!important}
+
+.quota-visual{border:1px solid #363b5b;background:linear-gradient(110deg,#171e35,#202142);border-radius:14px;padding:15px 18px;margin:-12px 0 21px;box-shadow:0 10px 25px #0509181f}
+.quota-heading,.quota-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.quota-heading strong{color:#e8ebff;font-size:12px}.quota-heading span{font-size:14px;color:#e8ddff;font-weight:800;font-variant-numeric:tabular-nums}
+.quota-progress{height:9px;border-radius:99px;background:#363453;overflow:hidden;margin:11px 0 9px}
+.quota-progress span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#5b8df6,#a27cff);transition:width .3s ease}
+.quota-progress span.quota-warning{background:linear-gradient(90deg,#dea94e,#e47f6a)}
+.quota-foot{color:#a9b2d1;font-size:10px;line-height:1.6}
