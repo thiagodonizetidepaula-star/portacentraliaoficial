@@ -66,29 +66,26 @@ function renderLive(){
   };
  });
 }
-function saveFromResult(i){
- const x=currentResults[i];
- if(!x)return null;
- let lead=leads.find(l=>(x.googleId&&l.googleId===x.googleId)||(l.name===x.name&&l.address===x.address));
- if(lead)return lead;
- // Salvamento solicitado pelo operador: dados precisam ser confirmados antes de uso comercial.
- lead={id:uid(),googleId:x.googleId||'',name:x.name,address:x.address||'',phone:x.phone||'',website:x.website||'',maps:x.maps||'',category:lastTerm,stage:'Novo',origin:'google-places',reviewedAt:null};
- leads.unshift(lead);
- try{save()}catch(e){alert('Não foi possível salvar esta oportunidade no navegador. Libere espaço ou tente novamente.');return null}
- renderLive();
- return lead;
+function saveFromResult(i,after){
+ const x=currentResults[i];if(!x)return null;
+ const existing=leads.find(l=>(x.googleId&&l.googleId===x.googleId)||(l.name===x.name&&l.address===x.address));
+ if(existing&&existing.operatorConfirmed){if(after)after(existing);return existing}
+ if(window.PortalCRM?.confirmGoogleLead){
+  window.PortalCRM.confirmGoogleLead(existing||x,lastTerm,lead=>{renderLive();if(after)after(lead)});
+  return null;
+ }
+ // If offline or the CRM module has not loaded, don't silently copy Maps content into permanent storage.
+ alert('Confirme as informações comerciais antes de salvar esta empresa. Tente atualizar a página.');
+ return null;
 }
-function createFromResult(i){const x=saveFromResult(i);if(x)location.href='/studio?lead='+encodeURIComponent(x.id)}
+function createFromResult(i){saveFromResult(i,lead=>{if(lead)location.href='/studio?lead='+encodeURIComponent(lead.id)})}
 function publishedForLead(id){
  let ps=[];try{ps=JSON.parse(localStorage.getItem('prospect_library_projects')||'[]')}catch{}
  if(!Array.isArray(ps))return null;
  return ps.find(p=>p&&p.leadId===id&&p.publicSlug)||null;
 }
 function proposalLink(id){const p=publishedForLead(id);return p?location.origin+'/mvp/'+encodeURIComponent(p.publicSlug):''}
-function messageFromResult(i){
- const l=saveFromResult(i);if(!l)return;
- offerWithPublishedLink(l.id);
-}
+function messageFromResult(i){saveFromResult(i,l=>{if(!l)return;const send=window.PortalCRM?.composeMessage||offerWithPublishedLink;send(l.id)})}
 const previousContact=contact;
 function offerWithPublishedLink(id){
  const l=leads.find(x=>x.id===id);if(!l)return;
@@ -109,7 +106,7 @@ function offerWithPublishedLink(id){
   l.stage='Contatado';save();byId('modal').classList.add('hidden');
  });
 }
-contact=offerWithPublishedLink;
+contact=window.PortalCRM?.composeMessage||offerWithPublishedLink;
 function attachCurrentHandlers(){
  $$r('#autoOppCards [data-radar-create],#autoOppCards [data-radar-save],#autoOppCards [data-radar-message]').forEach(b=>{
   b.onclick=()=>{
@@ -173,6 +170,7 @@ async function search(){
   if(!Array.isArray(j.data))throw Error('O serviço não retornou empresas.');
   currentResults=j.data.map(x=>({...x,name:String(x.name||'Empresa'),website:String(x.website||'')}));
   lastTerm=term;filterMode='no';
+  if(window.PortalCRM?.recordSearch)window.PortalCRM.recordSearch(term,city,currentResults);
   localStorage.setItem('prospect_last_segment',term);
   const missing=currentResults.filter(x=>!x.website).length;
   setStage('done',3,'Busca concluída: '+currentResults.length+' empresas encontradas, '+missing+' sem site informado.');
