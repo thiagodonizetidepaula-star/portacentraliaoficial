@@ -36,7 +36,7 @@ document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>switchView(b.d
 $('filter').addEventListener('input',renderCatalog);
 $('category').addEventListener('change',renderCatalog);
 function getDefault(t){
- return {id:null,templateId:t.id,name:pendingLead?.name||t.example,industry:t.label,city:(pendingLead?.address||'Mauá, SP').slice(0,90),phone:pendingLead?.phone||'',headline:t.headline,summary:t.summary,services:t.services.join('\n'),photo:t.photo,color:t.accent,variant:'0',headingFont:'auto',headingSize:'1',buttonStyle:'auto',motionStyle:'soft'};
+ return {id:null,leadId:pendingLead?.id||null,templateId:t.id,name:pendingLead?.name||t.example,industry:t.label,city:(pendingLead?.address||'Mauá, SP').slice(0,90),phone:pendingLead?.phone||'',headline:t.headline,summary:t.summary,services:t.services.join('\n'),photo:t.photo,color:t.accent,variant:'0',headingFont:'auto',headingSize:'1',buttonStyle:'auto',motionStyle:'soft'};
 }
 function start(id,project){
  template=(project&&project.templateSnapshot)||((window.__generatedTemplates||[]).find(t=>t.id===id))||templates.find(t=>t.id===id)||templates[0];if(!template)return notify('Nenhum modelo disponível');
