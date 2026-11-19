@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f4f6fb"><title>Biblioteca de Sites | Portal Prospect PRO</title>
+<meta name="description" content="Biblioteca profissional de modelos de sites por segmento. Crie prévias personalizadas no Portal Prospect PRO.">
+<link rel="stylesheet" href="/biblioteca.css"><script src="/biblioteca.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+ <div class="topbar-inner">
+  <a class="back" href="/" aria-label="Voltar ao painel">← <span>Painel</span></a>
+  <a class="identity" href="/biblioteca"><span class="symbol">P</span><span>PORTAL <b>PROSPECT</b><small>FÁBRICA DE SITES</small></span></a>
+  <div class="top-actions"><span class="top-status"><i></i> Biblioteca profissional</span><button id="help" class="plain-btn" type="button">Como funciona</button></div>
+ </div>
+</header>
+<main>
+<section class="intro container">
+ <div><div class="kicker"><span class="line"></span> PORTAL CENTRAL IA / DESIGN STUDIO</div><h1>Uma biblioteca. <em>Infinitas possibilidades.</em></h1><p>Escolha o segmento, personalize a identidade e crie uma demonstração real de site. Cada modelo tem direção de arte, estrutura e linguagem próprias.</p></div>
+ <div class="intro-stats"><span><strong id="templatesCount">—</strong> segmentos</span><span><strong>8</strong> direções de arte</span><span><strong>0</strong> créditos de IA por geração</span></div>
+</section>
+<section class="container app-area">
+ <div class="workspace-nav" role="tablist" aria-label="Áreas da biblioteca">
+  <button id="tabGallery" class="workspace-tab selected" data-view="gallery" role="tab" aria-selected="true">Explorar modelos</button>
+  <button id="tabProjects" class="workspace-tab" data-view="projects" role="tab" aria-selected="false">Meus projetos <span id="savedCount">0</span></button>
+ </div>
+ <section id="galleryView">
+   <div class="catalog-tools">
+    <label class="searchbox"><span aria-hidden="true">⌕</span><input id="filter" type="search" placeholder="Buscar segmento: clínica, imobiliária, pet shop..." autocomplete="off" aria-label="Buscar modelos"></label>
+    <select id="category" aria-label="Filtrar categoria"><option value="all">Todos os segmentos</option></select>
+   </div>
+   <div id="catalogInfo" class="catalog-info" aria-live="polite"></div>
+   <div id="catalog" class="catalog"></div>
+   <div class="custom-strip"><div><strong>Não encontrou seu segmento?</strong><p>Escolha a base visual mais próxima e personalize o nome, o texto e os serviços. Novos modelos entram na biblioteca continuamente.</p></div><button id="customStart" class="button secondary" type="button">Criar modelo personalizado</button></div>
+ </section>
+ <section id="projectsView" hidden><div class="projects-header"><h2>Projetos salvos neste aparelho</h2><p>Rascunhos locais para retomar a personalização depois. Para acesso em vários dispositivos, será necessária uma base de dados com login.</p></div><div id="projectsList" class="projects-list"></div></section>
+</section>
+</main>
+<div id="editorOverlay" class="editor-overlay" hidden>
+ <div class="editor-shell" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+  <div class="editor-bar"><div class="editor-brand"><button id="closeEditor" class="plain-btn" type="button" aria-label="Fechar editor">← Voltar</button><span class="vertical-rule"></span><div><div class="editor-eyebrow">ESTÚDIO DE CRIAÇÃO</div><strong id="editorTitle">Personalizar site</strong></div></div>
+   <div class="editor-tools"><div class="device-toggle" aria-label="Dispositivo"><button type="button" data-device="desktop" class="active">Desktop</button><button type="button" data-device="mobile">Celular</button></div><button id="saveProject" class="button secondary" type="button">Salvar projeto</button><button id="downloadSite" class="button accent" type="button">Baixar site HTML</button></div>
+  </div>
+  <div class="editor-content">
+   <aside class="editor-form">
+    <div class="form-title"><div class="kicker">PERSONALIZAÇÃO</div><h2 id="modelName">Modelo</h2><p>Os campos alteram a prévia em tempo real.</p></div>
+    <div class="form-grid">
+     <label>Nome da empresa<input id="companyName" maxlength="80" placeholder="Ex.: Studio Aurora"></label>
+     <label>Segmento<input id="industryName" maxlength="70" placeholder="Ex.: Salão de beleza"></label>
+     <label>Cidade / região<input id="cityName" maxlength="90" placeholder="Ex.: Mauá, SP"></label>
+     <label>WhatsApp (com DDD)<input id="phoneNumber" inputmode="tel" maxlength="23" placeholder="Ex.: 11 99999-9999"></label>
+     <label>Título principal<input id="headline" maxlength="120"></label>
+     <label>Subtítulo / proposta de valor<textarea id="summary" rows="3" maxlength="320"></textarea></label>
+     <label>Serviços (um por linha)<textarea id="services" rows="4" maxlength="500"></textarea></label>
+     <label>Imagem principal (URL de imagem permitida)<input id="photoUrl" type="url" placeholder="https://images.unsplash.com/..."></label>
+     <label>Layout alternativo<select id="layoutVariant"><option value="0">Editorial original</option><option value="1">Composição alternativa</option><option value="2">Composição expressiva</option></select></label>
+     <label>Cor de destaque<input id="brandColor" type="color" value="#305a80"></label>
+    </div>
+    <p class="form-hint">As imagens dos modelos são demonstrativas. Substitua por fotografias autorizadas antes de entregar ao cliente. O WhatsApp só aparece no site quando for informado um número.</p>
+    <div class="form-actions"><button id="resetModel" class="button secondary" type="button">Restaurar modelo</button><button id="copyHtml" class="button secondary" type="button">Copiar HTML</button></div>
+   </aside>
+   <div class="preview-area"><div class="preview-meta"><span><span class="live-dot"></span> PRÉVIA AO VIVO</span><span id="previewLabel">Desktop · site completo</span></div><div class="preview-frame-box"><iframe id="websitePreview" title="Prévia do site da empresa" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" loading="eager"></iframe></div><p class="preview-caveat">Prévia demonstrativa, não publicada. O arquivo HTML gerado pode ser hospedado após revisão das informações, imagens e contatos.</p></div>
+  </div>
+ </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<footer class="site-foot container"><span>Portal Prospect PRO · Portal Central IA</span><span>Modelos comerciais personalizáveis · Sem IA por geração</span></footer>
+</body></html>
