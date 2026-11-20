@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Instrument+Serif&family=Manrope:wght@400;500;600;700;800&display=swap');
 :root{color-scheme:light;--navy:#152039;--muted:#6c7890;--border:#e3e8f2;--bg:#f4f6fa;--violet:#6848d9;font-family:'DM Sans',system-ui,sans-serif}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--navy)}button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:default}a{text-decoration:none;color:inherit}img{display:block;max-width:100%}[hidden]{display:none!important}
 .topbar{height:73px;background:#fff;border-bottom:1px solid #e5e9f1;position:sticky;top:0;z-index:10}.topbar-inner{width:min(1470px,calc(100% - 64px));height:100%;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:20px}
@@ -57,6 +57,10 @@
  font: 800 clamp(30px, 4.5vw, 49px)/1.1 Manrope, system-ui, sans-serif;
  letter-spacing: -.045em;
 }
+.studio-heading h1 {
+ font: 400 clamp(42px, 6vw, 77px)/.99 "Instrument Serif", Georgia, serif;
+ letter-spacing: -.04em;
+}
 .studio-heading p, .projects-header p {
  margin: 12px 0 0;
  max-width: 65ch;
@@ -73,11 +77,25 @@
  border-radius: 16px;
  box-shadow: 0 8px 28px #27345b08;
 }
-.studio-client-fields, .studio-brief-fields {
+.studio-client-fields, .studio-contact-fields, .studio-brief-fields {
  display: grid;
  gap: 14px;
 }
-.studio-client-fields { grid-template-columns: 1.25fr 1.1fr 1fr 1fr }
+.studio-client-fields, .studio-contact-fields { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+.studio-address { grid-column: 1 / -1 }
+.studio-contact {
+ min-width: 0;
+ margin: 0;
+ padding: 8px 0 0;
+ border: 0;
+ border-top: 1px solid var(--border);
+}
+.studio-contact legend {
+ padding: 0 9px 0 0;
+ color: #354161;
+ font-size: 13px;
+ font-weight: 800;
+}
 .studio-brief-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 14px }
 .studio-client label, .field-group label, .project-search, .publish-overlay label {
  display: grid;
@@ -88,7 +106,7 @@
  font-size: 13px;
 }
 .studio-client input, .studio-client textarea, .form-grid input, .form-grid textarea, .form-grid select,
-.project-search input, .publish-overlay input, .publish-overlay textarea {
+.project-search input, .publish-overlay input, .publish-overlay textarea, .assistant-panel textarea {
  width: 100%;
  min-width: 0;
  padding: 10px 12px;
@@ -99,7 +117,7 @@
  font-size: 14px;
  line-height: 1.5;
 }
-.studio-client textarea, .form-grid textarea, .publish-overlay textarea { resize: vertical }
+.studio-client textarea, .form-grid textarea, .publish-overlay textarea, .assistant-panel textarea { resize: vertical }
 .studio-brief {
  padding-top: 13px;
  border-top: 1px solid var(--border);
@@ -114,6 +132,10 @@
  font-weight: 800;
 }
 .studio-submit { display: flex; align-items: center; gap: 15px; flex-wrap: wrap }
+.studio-image-options { max-width: 36ch }
+.studio-contact .control-check { margin-top: 13px }
+.studio-contact .field-hint { margin-top: 5px }
+.studio-contact .field-hint:empty { display: none }
 .studio-submit p, .studio-status, .project-cloud-status { margin: 0; color: #57647c; font-size: 13px; line-height: 1.5 }
 .studio-status { padding: 18px 0 }
 .studio-status:empty, .project-cloud-status:empty { display: none }
@@ -238,17 +260,59 @@
  border-right: 1px solid #dfe5f1;
  padding: 24px;
 }
+.editor-workflow, .assistant-modes {
+ display: flex;
+ gap: 3px;
+ margin-bottom: 19px;
+ padding: 3px;
+ background: #e8edf7;
+ border-radius: 9px;
+}
+.editor-workflow button, .assistant-modes button { flex: 1; padding: 8px 6px; font-size: 13px }
+.editor-workflow button.active, .assistant-modes button.active {
+ color: #4536a5;
+ background: #fff;
+ box-shadow: 0 1px 3px #2422541a;
+}
+.assistant-panel > label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 750 }
+.assistant-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 11px }
+.assistant-status { margin-top: 12px }
+.assistant-status:empty { display: none }
+.assistant-result { margin-top: 21px; padding-top: 16px; border-top: 1px solid #d8e0ee }
+.assistant-result h3 { margin: 0 0 8px; font-size: 16px }
+.assistant-change {
+ display: grid;
+ grid-template-columns: 18px minmax(0, 1fr);
+ align-items: start;
+ gap: 5px 8px;
+ padding: 11px 0;
+ border-bottom: 1px solid #e4e9f3;
+ color: #334362;
+ font-size: 13px;
+}
+.assistant-change input { margin: 2px 0 0; width: 15px; height: 15px; accent-color: #5c4cbe }
+.assistant-change span { grid-column: 2; overflow-wrap: anywhere; white-space: pre-line; line-height: 1.45 }
+.assistant-result figure { margin: 12px 0 0 }
+.assistant-result img {
+ width: 100%;
+ aspect-ratio: 3 / 2;
+ object-fit: contain;
+ background: #eef1f8;
+ border-radius: 7px;
+}
+.assistant-result figcaption { margin-top: 6px; color: #57647c; font-size: 12px }
+#aiPreviewBadge { color: #4830a5; font-weight: 750 }
 .form-title h2 { margin: 0; font-size: 20px; letter-spacing: -.02em }
 .form-grid { margin: 17px 0 }
 .form-grid details { border-top: 1px solid #e5e9f3; padding: 9px 0 }
 .form-grid details:last-child { border-bottom: 1px solid #e5e9f3 }
 .field-group { display: grid; gap: 13px; margin: 9px 0 6px }
-.field-group .control-check, .publish-overlay .publish-check {
+.field-group .control-check, .studio-client .control-check, .publish-overlay .publish-check {
  display: flex;
  gap: 9px;
  align-items: center;
 }
-.field-group .control-check input, .publish-overlay .publish-check input { width: 1.15rem; height: 1.15rem; accent-color: #5c4cbe; margin: 0; flex: none }
+.field-group .control-check input, .studio-client .control-check input, .publish-overlay .publish-check input { width: 1.15rem; height: 1.15rem; accent-color: #5c4cbe; margin: 0; flex: none }
 .form-grid input[type="color"] { height: 43px; padding: 4px }
 .field-hint { margin: 0; font-size: 12px; line-height: 1.5; color: #57647c }
 .form-actions { display: flex; gap: 7px; flex-wrap: wrap }
@@ -333,7 +397,7 @@
 
 @media (max-width: 1050px) {
  .catalog, .projects-list { grid-template-columns: repeat(2, minmax(0, 1fr)) }
- .studio-client-fields { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+ .studio-client-fields, .studio-contact-fields { grid-template-columns: repeat(2, minmax(0, 1fr)) }
  .editor-content { grid-template-columns: 300px minmax(0, 1fr) }
  .editor-form { padding: 19px }
  .proposal-preview { --preview-scale: .28 }
@@ -363,13 +427,13 @@
  .editor-overlay.show-preview .preview-area { display: flex }
 }
 @media (max-width: 530px) {
- .catalog, .projects-list, .studio-client-fields, .studio-brief-fields { grid-template-columns: minmax(0, 1fr) }
+ .catalog, .projects-list, .studio-client-fields, .studio-contact-fields, .studio-brief-fields { grid-template-columns: minmax(0, 1fr) }
  .catalog-tools { flex-direction: column }
  .catalog-tools select { min-height: 42px }
  .custom-strip { flex-direction: column; align-items: flex-start }
  .proposal-preview { --preview-scale: .32 }
  .studio-client input, .studio-client textarea, .form-grid input, .form-grid textarea, .form-grid select,
- .project-search input, .publish-overlay input, .publish-overlay textarea { font-size: 16px }
+ .project-search input, .publish-overlay input, .publish-overlay textarea, .assistant-panel textarea { font-size: 16px }
 }
 @media (prefers-reduced-motion: reduce) {
  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important }

@@ -176,13 +176,121 @@ const segmentCopy = {
  farmacia:{experience:'Apoio para seus cuidados do dia a dia.', practical:'Consulte produtos e atendimento.', action:'Consultar disponibilidade'}
 };
 
+const sectorEditorial = {
+ 'Beleza e bem-estar': {
+  art:'salon',contact:'Combine seu atendimento',
+  planning:'Antes de agendar',ask:'Quero saber quais opções de atendimento e horários estão disponíveis.'
+ },
+ Saúde: {
+  art:'care',contact:'Informações de atendimento',
+  planning:'Antes da primeira visita',ask:'Gostaria de saber como funciona o atendimento e quais são os horários disponíveis.'
+ },
+ Pets: {
+  art:'pet',contact:'Fale sobre o seu pet',
+  planning:'Prepare o atendimento do seu pet',ask:'Gostaria de informações sobre os serviços e a disponibilidade para o meu pet.'
+ },
+ Gastronomia: {
+  art:'food',contact:'Consulte a casa',
+  planning:'Planeje seu pedido ou visita',ask:'Gostaria de consultar o cardápio e saber como fazer um pedido ou planejar uma visita.'
+ },
+ 'Hospitalidade e turismo': {
+  art:'editorial',contact:'Consulte as opções para sua viagem',
+  planning:'Planeje sua viagem',ask:'Gostaria de saber quais opções estão disponíveis para as minhas datas.'
+ },
+ 'Casa e imóveis': {
+  art:'architect',contact:'Conte o que você procura',
+  planning:'Prepare a conversa sobre seu espaço',ask:'Gostaria de explicar o que estou buscando e saber como funciona o atendimento.'
+ },
+ Automotivo: {
+  art:'workshop',contact:'Fale sobre seu veículo',
+  planning:'Antes de levar o veículo',ask:'Gostaria de conversar sobre o serviço que meu veículo precisa e consultar horários.'
+ },
+ 'Serviços profissionais': {
+  art:'practice',contact:'Converse sobre o atendimento',
+  planning:'Prepare o primeiro contato',ask:'Gostaria de explicar o que preciso e entender como funciona o atendimento.'
+ },
+ 'Tecnologia e comércio': {
+  art:'modern',contact:'Peça informações',
+  planning:'Esclareça suas dúvidas',ask:'Gostaria de saber mais sobre as opções disponíveis e como funciona o atendimento.'
+ },
+ 'Moda e criatividade': {
+  art:'creative',contact:'Conte o que você tem em mente',
+  planning:'Planeje o que está procurando',ask:'Gostaria de falar sobre o que estou procurando e saber quais opções estão disponíveis.'
+ },
+ 'Educação e esportes': {
+  art:'academy',contact:'Consulte atividades e horários',
+  planning:'Prepare seu primeiro encontro',ask:'Gostaria de informações sobre atividades, horários e como começar.'
+ }
+};
+
+const segmentEditorial = {
+ barbearia:{art:'barber',contact:'Combine seu próximo corte',planning:'Antes de sentar na cadeira',ask:'Quero saber quais opções de corte ou barba estão disponíveis e consultar horários.'},
+ salao:{contact:'Planeje seu próximo atendimento',planning:'Antes de ir ao salão'},
+ odontologia:{contact:'Informações para sua consulta',planning:'Prepare sua consulta odontológica'},
+ veterinaria:{contact:'Informações para seu pet',planning:'Antes da consulta veterinária'},
+ hamburgueria:{art:'counter',contact:'Confira os burgers disponíveis',planning:'Antes de pedir',ask:'Gostaria de consultar os burgers disponíveis e as condições para pedir.'},
+ pizzaria:{art:'oven',contact:'Consulte sabores e pedidos',planning:'Antes de escolher a pizza',ask:'Gostaria de consultar os sabores disponíveis e saber como fazer meu pedido.'},
+ cafeteria:{art:'coffee',contact:'Planeje sua próxima visita',planning:'Antes de passar para um café',ask:'Gostaria de saber sobre as opções da cafeteria e os horários para visitar.'},
+ padaria:{art:'coffee',contact:'Consulte as opções da padaria',planning:'Antes de passar na padaria'},
+ hotelaria:{contact:'Consulte vagas para sua estadia',planning:'Antes de reservar',ask:'Gostaria de consultar acomodações e valores para as datas da minha estadia.'},
+ imobiliaria:{contact:'Fale sobre o imóvel que procura',planning:'Prepare sua busca por imóveis',ask:'Gostaria de conversar sobre o imóvel que procuro e saber quais opções estão disponíveis.'},
+ academia:{art:'training',contact:'Consulte modalidades e horários',planning:'Antes do primeiro treino'},
+ fotografia:{art:'editorial',contact:'Planeje seu próximo ensaio',planning:'Antes de marcar a sessão',ask:'Gostaria de conversar sobre uma sessão de fotos e consultar possibilidades.'},
+ farmacia:{contact:'Consulte produtos e atendimento',planning:'Antes de visitar a farmácia'}
+};
+
+const serviceGuidance = {
+ salao:['Pergunte pelas opções para seu tipo de cabelo e a duração prevista do atendimento.','Consulte a técnica indicada, o tempo de atendimento e os cuidados depois da coloração.','Conte o que você busca para avaliar as opções de tratamento e manutenção.'],
+ barbearia:['Leve uma referência do estilo ou peça orientação sobre o comprimento e a finalização.','Pergunte sobre alinhamento, contorno e tempo de atendimento para a barba.','Consulte quais cuidados complementares estão disponíveis na barbearia.'],
+ spa:['Consulte tipos de massagem, duração e orientações antes de agendar.','Pergunte sobre as etapas de cada opção e o tempo reservado para a sessão.','Confirme os cuidados indicados para o que você está procurando.'],
+ estetica:['Converse sobre seu objetivo e confirme como funciona a avaliação inicial.','Peça informações sobre indicações, preparo prévio e cuidados posteriores.','Pergunte quais procedimentos são avaliados para o seu caso.'],
+ odontologia:['Confirme as informações para agendar e o que levar à consulta.','Pergunte como funciona a avaliação preventiva e os cuidados de rotina.','Converse sobre dúvidas, etapas e opções a avaliar com o profissional.'],
+ clinica:['Confirme especialidades, horários e informações para agendar.','Pergunte sobre orientações de retorno e documentos úteis para a consulta.','Converse com o atendimento sobre orientações e encaminhamentos disponíveis.'],
+ fisioterapia:['Informe sua necessidade para saber como funciona a avaliação.','Converse sobre o objetivo do atendimento e a disponibilidade para sessões.','Pergunte como são orientados movimentos e cuidados entre sessões.'],
+ psicologia:['Confirme disponibilidade e modalidade para a primeira conversa.','Pergunte sobre horários e como combinar a continuidade do atendimento.','Consulte as informações práticas para marcar uma sessão.'],
+ nutricao:['Pergunte o que levar e como se preparar para a primeira consulta.','Conte sobre seus hábitos e objetivos para conversar sobre o planejamento.','Converse sobre disponibilidade para retorno e acompanhamento.'],
+ veterinaria:['Informe a espécie, idade e motivo do atendimento ao consultar horários.','Pergunte quais cuidados de rotina podem ser discutidos na avaliação.','Consulte o que levar e como preparar seu pet para a visita.'],
+ petshop:['Informe o porte e o tipo de pelagem ao consultar opções de banho e tosa.','Pergunte pela disponibilidade dos produtos de rotina do seu pet.','Confirme medidas e opções de acessórios para o porte do animal.'],
+ hamburgueria:['Consulte os hambúrgueres disponíveis, ingredientes e opções adicionais.','Confira como montar o pedido com bebidas e acompanhamentos.','Pergunte sobre horários, áreas de entrega e condições de retirada.'],
+ restaurante:['Consulte os pratos, ingredientes e eventuais opções do dia.','Confirme os horários e a disponibilidade para o período desejado.','Pergunte com antecedência sobre datas, número de pessoas e condições.'],
+ pizzaria:['Confira sabores, tamanhos e ingredientes das opções tradicionais.','Pergunte quais combinações e sabores especiais estão disponíveis.','Consulte o horário e as condições de entrega ou retirada antes de pedir.'],
+ cafeteria:['Pergunte pelos cafés e preparos disponíveis no dia.','Consulte as opções de vitrine e informe possíveis restrições alimentares.','Confira o que está disponível para acompanhar o seu café.'],
+ padaria:['Consulte os tipos de pão e horários em que costumam ficar prontos.','Pergunte pelos itens da vitrine e pelas condições para encomendar.','Confira o horário e as opções para o café da manhã.'],
+ hotelaria:['Consulte datas, quantidade de hóspedes e condições da hospedagem.','Pergunte pelas categorias, configurações de quarto e itens incluídos.','Confirme horários de entrada e saída e as condições de reserva.'],
+ turismo:['Compartilhe destino, datas e perfil da viagem para conversar sobre o roteiro.','Consulte o que está incluído e a disponibilidade para as datas desejadas.','Confirme documentos, prazos e informações práticas para embarcar.'],
+ imobiliaria:['Informe região, faixa de preço e os critérios mais importantes para sua procura.','Converse sobre prazo para mudança, tipo de imóvel e condições de locação.','Pergunte quais dados são necessários para conversar sobre a avaliação.'],
+ arquitetura:['Converse sobre o terreno ou espaço, uso do projeto e próximos passos.','Compartilhe a situação atual e o que quer transformar no imóvel.','Apresente a atividade do negócio, o local e as necessidades do espaço.'],
+ interiores:['Compartilhe medidas, referências e o uso da área que deseja transformar.','Conte quais decisões de ambiente precisam de orientação.','Informe o estilo desejado e os itens que pretende manter.'],
+ construcao:['Descreva o imóvel e as mudanças desejadas para conversar sobre escopo.','Informe onde será a obra, em que etapa está e qual o objetivo.','Descreva os pontos que precisam de manutenção e confirme a disponibilidade.'],
+ moveis:['Informe medidas e o uso do ambiente ao consultar opções de móveis.','Compartilhe referências de estilo e o que precisa para o espaço.','Converse sobre medidas, materiais e prazo antes de decidir.'],
+ oficina:['Informe modelo, ano e quilometragem do veículo antes de consultar a revisão.','Descreva o problema percebido e desde quando ele acontece.','Informe sintomas, avisos do painel e situações em que o problema aparece.'],
+ esteticaauto:['Consulte o processo indicado conforme o estado dos tecidos e superfícies.','Informe o estado da pintura e o acabamento que você procura.','Converse sobre as áreas do veículo que precisam de cuidado.'],
+ contabilidade:['Informe tipo de atividade, porte da empresa e necessidades da rotina contábil.','Converse sobre regime e prazos que precisam de atenção.','Descreva os controles e relatórios que precisa organizar.'],
+ advocacia:['Explique o assunto e confirme a área e a forma de atendimento.','Informe o tipo de documento e se há prazo relacionado.','Pergunte quais informações são necessárias para a primeira conversa.'],
+ consultoria:['Conte sobre o desafio atual e os processos que deseja entender melhor.','Indique objetivos, prioridades e prazos para conversar sobre o planejamento.','Compartilhe as áreas da operação que precisam de revisão.'],
+ logistica:['Informe origem, destino, volume e prazo antes de solicitar condições.','Conte a frequência e os locais das entregas que precisam de organização.','Apresente as etapas da operação que precisam de suporte.'],
+ tecnologia:['Descreva a finalidade do site, o público e as funcionalidades necessárias.','Explique o processo atual e o que pretende resolver com o sistema.','Liste as ferramentas e as informações que precisam trocar dados.'],
+ ecommerce:['Consulte categorias, disponibilidade e condições de compra.','Pergunte pelos produtos ou coleções com novidades.','Confirme dúvidas sobre compra, formas de entrega e troca.'],
+ moda:['Pergunte pelas peças e pelos tamanhos disponíveis.','Informe a ocasião ou o estilo da peça que procura.','Consulte disponibilidade, condições de troca e horários para visitar.'],
+ fotografia:['Informe a finalidade do ensaio, local e possíveis datas.','Conte o tipo de evento, data, duração e local.','Compartilhe o produto, a campanha e os formatos de imagem que precisa.'],
+ eventos:['Informe data, local e número estimado de convidados.','Converse sobre as etapas e o tipo de acompanhamento desejado.','Compartilhe fornecedores e pontos do cronograma que precisam de coordenação.'],
+ floricultura:['Informe a ocasião, as cores escolhidas e a data de entrega desejada.','Pergunte pelas flores disponíveis e pelas possibilidades de composição.','Consulte valores, mensagem para o cartão e condições de retirada ou entrega.'],
+ educacao:['Consulte nível, conteúdo e disponibilidade de turmas.','Pergunte sobre faixa etária, duração e materiais necessários.','Confirme documentação, datas e condições para matrícula.'],
+ academia:['Consulte horários, estrutura e orientações para iniciar a musculação.','Pergunte por horários de treino e como funciona a orientação inicial.','Consulte grade, duração e disponibilidade das aulas.'],
+ farmacia:['Consulte disponibilidade, apresentação e condições para compra.','Pergunte pelas categorias e pelos produtos de higiene disponíveis.','Confirme horários, canais de atendimento e informações para sua visita.']
+};
+
 window.SITE_TEMPLATES = source.map(([id,label,category,layout,example,headline,summary,serviceList,mainPhoto,accent,bg,ink])=>{
  const related=source.filter(row=>row[2]===category&&row[0]!==id).map(row=>row[8]);
+ const services=serviceList.split('|');
  const photos=[...new Set([mainPhoto,...(referencePhotos[id]||[]),...related])]
   .slice(0,3).map(photo=>`https://images.unsplash.com/${photo}?auto=format&fit=crop&w=1600&q=82`);
  return {
-  id,label,category,layout,example,headline,summary,services:serviceList.split('|'),
+  id,label,category,layout,example,headline,summary,services,
   photo:photos[0],photos,accent,bg,ink,aliases:segmentAliases[id]||[],
-  profile:{...sectorCopy[category],...segmentCopy[id]}
+  profile:{
+   ...sectorCopy[category],...sectorEditorial[category],...segmentCopy[id],...segmentEditorial[id],
+   serviceDescriptions:Object.fromEntries(services.map((service,index)=>[service,serviceGuidance[id]?.[index]||'']))
+  }
  };
 });

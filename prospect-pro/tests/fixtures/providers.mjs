@@ -4,7 +4,10 @@ import {once} from 'node:events';
 import {createServer} from 'node:http';
 
 export const token = 'only_local_fixture_bearer_not_usable_as_a_real_token';
+export const viewOnlyToken = 'only_local_fixture_viewer_not_usable_as_a_real_token';
 export const publishableKey = 'only_local_fixture_publishable_key';
+export const openaiKey = 'only_local_fixture_openai_key';
+const imageBytes = Buffer.from('UklGRjQAAABXRUJQVlA4ICgAAABwAQCdASoFAAUAAUAmJaACdAFAAAD+9SddWWohyP/8bx/ru/yi3oAA', 'base64');
 export const operator = {
   id: '8b2f438c-6a5f-4f91-952d-0f1163be9787',
   email: 'operador@example.test',
@@ -23,10 +26,15 @@ const withWebsite = {
   websiteUri: 'https://horizonte.example.test',
 };
 
-async function jsonBody(request) {
+async function requestBytes(request) {
   const chunks = [];
   for await (const chunk of request) chunks.push(chunk);
-  return chunks.length ? JSON.parse(Buffer.concat(chunks).toString()) : undefined;
+  return Buffer.concat(chunks);
+}
+
+async function jsonBody(request) {
+  const body = await requestBytes(request);
+  return body.length ? JSON.parse(body.toString()) : undefined;
 }
 
 function respond(response, status, body) {
@@ -48,9 +56,13 @@ export async function startProviders() {
     projectVersions: new Map(),
     bookmarks: [],
     messages: [],
+    aiTexts: [],
+    aiImages: [],
+    uploadedImages: new Map(),
     failures: [],
   };
   let googleHandler = () => [200, {places: [business, withWebsite]}];
+  let textHandler = () => [500, {error: {message: 'Resposta de texto não configurada no teste'}}];
 
   function hasAuth(request) {
     assert.equal(request.headers.apikey, publishableKey);
@@ -77,6 +89,10 @@ export async function startProviders() {
     }
     if (pathname === '/auth/v1/user' && method === 'GET') {
       const authorized = hasAuth(request);
+      if (request.headers.authorization === 'Bearer ' + viewOnlyToken) {
+        respond(response, 200, {id: '1c92dd2b-5513-4925-8b13-f98677bebe21', app_metadata: {}, user_metadata: {prospect_operator: true}});
+        return;
+      }
       respond(response, authorized ? 200 : 401, authorized ? operator : {message: 'Sessão inválida'});
       return;
     }
@@ -185,6 +201,43 @@ export async function startProviders() {
       respond(response, 201, [row]);
       return;
     }
+    if (pathname === '/v1/responses' && method === 'POST') {
+      assert.equal(request.headers.authorization, 'Bearer ' + openaiKey);
+      const payload = await jsonBody(request);
+      state.aiTexts.push(payload);
+      const [status, output] = await textHandler(payload);
+      respond(response, status, output);
+      return;
+    }
+    if (pathname === '/v1/images/generations' && method === 'POST') {
+      assert.equal(request.headers.authorization, 'Bearer ' + openaiKey);
+      state.aiImages.push(await jsonBody(request));
+      respond(response, 200, {data: [{b64_json: imageBytes.toString('base64')}]});
+      return;
+    }
+    const bucket = 'prospect-site-images';
+    const storagePath = '/storage/v1/object/';
+    if (method === 'POST' && pathname.startsWith(storagePath + bucket + '/')) {
+      assert.ok(hasAuth(request));
+      assert.match(pathname.slice((storagePath + bucket + '/').length), new RegExp('^' + operator.id + '/[0-9a-f-]{36}\\.webp$'));
+      assert.equal(request.headers['content-type'], 'image/webp');
+      const bytes = await requestBytes(request);
+      assert.deepEqual(bytes, imageBytes);
+      const key = pathname.slice(storagePath.length);
+      state.uploadedImages.set(key, bytes);
+      respond(response, 200, {Key: key});
+      return;
+    }
+    if (method === 'GET' && pathname.startsWith(storagePath + 'public/' + bucket + '/')) {
+      const image = state.uploadedImages.get(pathname.slice((storagePath + 'public/').length));
+      if (!image) {
+        respond(response, 404, {message: 'Imagem não encontrada na simulação'});
+        return;
+      }
+      response.writeHead(200, {'Content-Type': 'image/webp'});
+      response.end(image);
+      return;
+    }
     throw new Error('Rota inesperada na simulação: ' + method + ' ' + url.pathname);
   }
 
@@ -201,9 +254,13 @@ export async function startProviders() {
   await once(server, 'listening');
   return {
     origin: 'http://127.0.0.1:' + server.address().port,
+    publicOrigin: 'https://prospect-storage.example.test',
     state,
     controlGoogle(handler) {
       googleHandler = handler;
+    },
+    controlAiText(handler) {
+      textHandler = handler;
     },
     close: () => new Promise(resolve => {
       server.close(resolve);

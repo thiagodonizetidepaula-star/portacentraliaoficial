@@ -118,7 +118,8 @@ function findLead(business) {
 }
 
 function renderCard(business, index) {
- const saved = findLead(business)?.operatorConfirmed;
+ const existing = findLead(business);
+ const saved = existing?.operatorConfirmed && (!business.googleId || existing.googleId === business.googleId);
  const placeName = escapeHtml(business.name);
  const street = escapeHtml(business.address || 'Endereço não informado');
  const phone = escapeHtml(business.phone || 'Telefone não informado');
@@ -191,7 +192,7 @@ function withConfirmedLead(index, callback) {
  const business = completedSearch?.results[index];
  if (!business) return;
  const existing = findLead(business);
- if (existing?.operatorConfirmed) {
+ if (existing?.operatorConfirmed && (!business.googleId || existing.googleId === business.googleId)) {
   callback?.(existing);
   return;
  }
@@ -204,7 +205,7 @@ function withConfirmedLead(index, callback) {
   renderSearchResults();
   renderSessionOpportunities();
   callback?.(lead);
- }, Boolean(existing), completedSearch.city);
+ }, Boolean(existing), completedSearch.city, business.googleId);
 }
 
 function handleResultAction(event) {
