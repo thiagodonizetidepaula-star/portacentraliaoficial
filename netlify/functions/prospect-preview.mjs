@@ -1,4 +1,4 @@
-import { publicationHtml, readPublication, validSlug, previewPolicy } from '../lib/prospect-page.mjs';
+import { publicationHtml, readPublication, validSlug, previewPolicy } from '../../prospect-pro/public-page.mjs';
 
 // This is the same public project configuration provided to visitors by the studio.
 // Anonymous database access is restricted by its published-only row policy.
@@ -18,12 +18,17 @@ export default async function handler(request) {
   const message = (status, body) => new Response(request.method === 'HEAD' ? null : body, {
     status, headers: {...commonHeaders, 'Content-Type':'text/plain; charset=utf-8'}
   });
+  if (request.method === 'OPTIONS') return new Response(null, {status: 204, headers: {
+    ...commonHeaders, 'Access-Control-Allow-Methods': 'GET, HEAD, OPTIONS', 'Access-Control-Allow-Headers': 'cache-control, pragma'
+  }});
   if (!['GET','HEAD'].includes(request.method)) return message(405, 'Método não permitido.');
   if (!validSlug(slug)) return message(404, 'Prévia não encontrada.');
   try {
-    const row = await readPublication(project, publishableKey, slug);
+    const row = await readPublication(project, publishableKey, slug, 'share_slug');
     if (!row) return message(404, 'Esta prévia não está publicada.');
-    const html = publicationHtml(row, url.origin + '/p/' + slug);
+    const canonical = url.origin + '/p/' + row.share_slug;
+    if (row.share_slug !== slug) return new Response(null, {status: 302, headers: {...commonHeaders, Location: canonical}});
+    const html = publicationHtml(row, canonical);
     return new Response(request.method === 'HEAD' ? null : html, {headers: {
       ...commonHeaders, 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': previewPolicy,
       'X-Frame-Options': 'SAMEORIGIN', 'X-Prospect-Updated': String(Date.parse(row.updated_at)),

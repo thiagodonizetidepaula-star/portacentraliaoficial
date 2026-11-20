@@ -7,17 +7,17 @@ const escape = value => String(value).replace(/[&<>"']/g, char => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 })[char]);
 
-export async function readPublication(endpoint, key, slug, fetcher = fetch) {
+export async function readPublication(endpoint, key, slug, prefer = 'slug', fetcher = fetch) {
   const url = new URL('/rest/v1/prospect_site_previews', endpoint);
   url.search = new URLSearchParams({
-    slug: 'eq.' + slug, status: 'eq.published', limit: '1',
-    select: 'business_name,description,cover_image,html,updated_at'
+    or: '(slug.eq.' + slug + ',share_slug.eq.' + slug + ')', status: 'eq.published', limit: '2',
+    select: 'slug,share_slug,business_name,description,cover_image,html,updated_at'
   });
   const response = await fetcher(url, {headers: {apikey: key}, signal: AbortSignal.timeout(8000)});
   if (!response.ok) throw new Error('Leitura da publicação indisponível');
   const rows = await response.json();
   if (!Array.isArray(rows)) throw new Error('Resposta de publicação inválida');
-  return rows[0] || null;
+  return rows.find(row => row[prefer] === slug) || rows[0] || null;
 }
 
 export function publicationHtml(row, canonical) {
