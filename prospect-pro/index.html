@@ -1,54 +1,207 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Portal Prospect PRO | Portal Central IA</title><style>
-:root{font-family:Inter,Arial,sans-serif;color:#e9ecff;background:#080d1b}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top right,#24254b 0,#090e1c 60%)}aside{position:fixed;inset:0 auto 0 0;width:240px;background:#0b1122;border-right:1px solid #30364b;padding:23px 14px;display:flex;flex-direction:column}aside h2{font-size:18px;color:#fff;margin:3px 10px 0}aside small{font-size:10px;color:#ae9dff;letter-spacing:2px;margin:4px 10px 26px}.nav{display:block;text-align:left;width:100%;background:none;border:0;color:#9da8c5;padding:14px;border-radius:10px;font-weight:600;cursor:pointer;margin:3px 0}.nav:hover,.nav.active{color:white;background:#262348}.foot{margin-top:auto;font-size:11px;line-height:1.7;color:#8d98b5}main{margin-left:240px;padding:30px;max-width:1600px}header{display:flex;align-items:center;justify-content:space-between;margin-bottom:27px}h1{font-size:30px;margin:6px 0}h2{font-size:16px;margin:0 0 18px}p{color:#9caac5}.eyebrow{color:#a692ff;letter-spacing:2px;font-size:10px;font-weight:800}.pill,.tag{display:inline-block;border-radius:20px;padding:7px 11px;background:#242b42;color:#c4ceeb;font-size:11px}.tag.no{color:#ffbc80;background:#55362155}.tag.yes{color:#8edcc8;background:#1c534855}.notice{background:#302c4a;border:1px solid #5c4d81;padding:14px;border-radius:12px;color:#dcd3ff;font-size:12px;margin-bottom:20px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.card,.panel{background:#111b30;border:1px solid #293451;border-radius:18px;padding:21px;box-shadow:0 10px 30px #0002}.stat{font-size:34px;font-weight:800;margin:13px 0}.muted{color:#9ca9c2;font-size:12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.hidden{display:none!important}button{cursor:pointer}.btn{border:1px solid #475475;border-radius:10px;background:#1b2943;color:#fff;padding:11px 15px;font-weight:700}.btn:hover{border-color:#a89aff}.primary{background:linear-gradient(110deg,#7454f5,#5a6be9);border:0}.danger{color:#ff9aa4}.toolbar{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:17px}.toolbar label{font-size:11px;color:#adb8d1;display:block;margin-bottom:7px}.toolbar>div{flex:1;min-width:140px}input,textarea,select{background:#0a1326;border:1px solid #374565;color:#f7f7ff;border-radius:10px;padding:12px;width:100%;font:inherit}textarea{min-height:110px}table{border-collapse:collapse;width:100%;font-size:13px;text-align:left}th{color:#8497b8;font-size:11px;text-transform:uppercase;letter-spacing:.08em}td,th{padding:14px 9px;border-bottom:1px solid #2b3550}td{color:#d7e0fb}.table-scroll{overflow-x:auto}.actions{display:flex;gap:7px}.mini{background:#273453;color:#e0e7ff;border:0;border-radius:8px;padding:8px;font-size:11px}.empty{padding:34px;text-align:center;color:#a0adcb}.funnel{display:grid;gap:13px}.track{background:#27334c;height:9px;border-radius:9px;overflow:hidden;margin-top:7px}.fill{height:100%;background:linear-gradient(90deg,#7156f0,#38c8cd)}.flex{display:flex;justify-content:space-between;gap:10px;align-items:center}.modalbg{position:fixed;inset:0;background:#03050bdc;display:grid;place-items:center;padding:18px}.modal{width:min(540px,100%);background:#131d34;padding:25px;border-radius:19px;border:1px solid #45516d}.modal label{display:block;font-size:12px;margin-top:12px;margin-bottom:5px;color:#b2bfd4}.modalbuttons{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}@media(max-width:960px){aside{position:static;width:auto;display:block;padding:12px}.nav{display:inline-block;width:auto;margin:4px;font-size:12px;padding:10px}aside small,.foot{display:none}main{margin:0;padding:16px}.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}}@media(max-width:450px){.stats{gap:8px}.card,.panel{padding:14px}.stat{font-size:27px}header{align-items:start}header .pill{display:none}h1{font-size:24px}}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#11182c">
+  <title>Portal Prospect PRO | Portal Central IA</title>
+  <link rel="stylesheet" href="/prospect-dashboard.css">
+  <link rel="stylesheet" href="/prospect-radar.css">
+  <script src="/prospect-dashboard.js" defer></script>
+  <script src="/prospect-crm.js" defer></script>
+  <script src="/prospect-radar.js" defer></script>
+  <script src="/prospect-auth.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#mainContent">Ir para o conteúdo</a>
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <a class="brand" href="/">
+        <svg class="logo-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="brandA" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#3bd0e5"/><stop offset="1" stop-color="#6f61f2"/></linearGradient><linearGradient id="brandB" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#587efa"/><stop offset="1" stop-color="#ab4df1"/></linearGradient></defs><circle cx="32" cy="32" r="29" fill="#12234a"/><circle cx="32" cy="32" r="24" fill="none" stroke="url(#brandA)" stroke-width="4"/><path d="M32 1 36 15 32 19 28 15ZM63 32 49 36 45 32 49 28ZM32 63 28 49 32 45 36 49ZM1 32 15 28 19 32 15 36Z" fill="#6b67de"/><rect x="17" y="39" width="7" height="10" rx="2" fill="#3dd5e4"/><rect x="28" y="32" width="7" height="17" rx="2" fill="#4e9ff5"/><rect x="39" y="25" width="7" height="24" rx="2" fill="url(#brandB)"/><path d="M17 34Q35 29 45 16l-1 9M45 16l-9 2" fill="none" stroke="#38dcf4" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5"/></svg>
+        <span>Portal Prospect <strong>PRO</strong><small>Portal Central IA</small></span>
+      </a>
+      <button class="menu-toggle" id="menuToggle" type="button" aria-controls="workspaceMenu" aria-expanded="false">
+        <span aria-hidden="true">☰</span> Menu
+      </button>
+    </div>
+    <nav id="workspaceMenu" class="sidebar-nav" aria-label="Menu principal">
+      <div class="nav-group">
+        <a class="nav active" href="/" data-page="dashboard" aria-current="page"><span aria-hidden="true">◫</span> Visão geral</a>
+        <a class="nav" href="/?view=search" data-page="search"><span aria-hidden="true">⌖</span> Prospecção</a>
+        <a class="nav" href="/?view=leads" data-page="leads"><span aria-hidden="true">◇</span> Oportunidades</a>
+        <a class="nav" href="/?view=sent" data-page="sent"><span aria-hidden="true">✓</span> Propostas enviadas</a>
+        <a class="nav" href="/?view=pipeline" data-page="pipeline"><span aria-hidden="true">≡</span> Funil comercial</a>
+      </div>
+      <div class="nav-group">
+        <a class="nav" href="/studio"><span aria-hidden="true">▤</span> Criar sites</a>
+        <a class="nav" href="/studio?view=projects"><span aria-hidden="true">▱</span> Meus projetos</a>
+      </div>
+      <div class="nav-group nav-settings">
+        <a class="nav" href="/?view=search" id="accountLogin" data-go="search" hidden><span aria-hidden="true">●</span> Entrar</a>
+        <a class="nav" href="/?view=settings" data-page="settings"><span aria-hidden="true">⚙︎</span> Configurações</a>
+      </div>
+    </nav>
+  </aside>
 
-/* Portal Prospect PRO — Claro Premium Luxuoso */
-:root{color-scheme:light;color:#18243d;background:#f4f7fd}
-body{color:#18243d;background:radial-gradient(circle at 91% 0%,#e7e7ff 0%,transparent 36%),linear-gradient(145deg,#f5f8ff,#ecf3ff 75%,#f8faff);min-height:100vh}
-aside{background:linear-gradient(175deg,#fff 0%,#f5f7ff 75%,#eef4ff 100%);border-right:1px solid #dae3f5;box-shadow:8px 0 36px #17245208}
-aside h2{color:#17253f}aside small{color:#7155d7}aside .foot{color:#65738e}
-.nav{color:#53627f;transition:background .2s,color .2s,transform .2s}.nav:hover{background:#ecebff;color:#5642ad;transform:translateX(2px)}.nav.active{color:#523ec6;background:linear-gradient(115deg,#eeeaff,#e9f1ff);box-shadow:inset 3px 0 #7356ee}
-h1,h2,strong{color:#192541}h1{letter-spacing:-.035em}p{color:#62718c}.eyebrow{color:#6855cd}
-.pill,.tag{background:#edf3ff;color:#566888;border:1px solid #e1e8f7}.tag.no{color:#a45a1f;background:#fff4e9;border-color:#ffe4c6}.tag.yes{color:#137c66;background:#eafaf4;border-color:#c7edde}
-.notice{background:#f1edff;border:1px solid #ded5ff;color:#514b79;box-shadow:0 4px 18px #6655aa08}
-.card,.panel{background:#fff;border:1px solid #e1e8f4;box-shadow:0 10px 30px #2743720d,0 2px 6px #27437208}
-.stat{color:#1d2e55;letter-spacing:-.05em}.muted,.empty{color:#73819b}
-.btn{background:#fff;border:1px solid #cfdaf0;color:#33456d;box-shadow:0 2px 7px #3553a30a}.btn:hover{border-color:#7768e8;background:#f8f7ff}.btn.primary,.primary{background:linear-gradient(120deg,#7853ec,#467bfa);border:0;color:#fff;box-shadow:0 6px 15px #6658e52b}
-.btn.danger{color:#bb3c57;border-color:#f5dce3;background:#fff8fa}
-.toolbar label,.modal label{color:#596a87}
-input,textarea,select{background:#f8faff;border:1px solid #d7e1f2;color:#1d2b46;outline:none}input:focus,textarea:focus,select:focus{border-color:#816cfa;box-shadow:0 0 0 3px #795eea1d}
-th{color:#647491}td,th{border-bottom:1px solid #e9eef7}td{color:#2b3853}tbody tr:hover{background:#f8faff}
-.mini{background:#eef2ff;color:#5349a8}.mini:hover{background:#e3e7ff}
-.track{background:#e7ecf9}.fill{background:linear-gradient(90deg,#7458f1,#3bb9d7)}
-.modalbg{background:#0c173999;backdrop-filter:blur(7px)}.modal{background:#fff;border:1px solid #e2e7f6;box-shadow:0 25px 65px #121e3940}.modal label{color:#55647f}
-.logo-head{display:flex;align-items:center;gap:11px;padding:3px 9px 2px;margin-bottom:5px}.logo-mark{width:45px;height:45px;flex-shrink:0;filter:drop-shadow(0 3px 5px #6064bd33)}.logo-head h2{font-size:16px;margin:0;line-height:1.12;letter-spacing:-.04em;color:#1a2850}.logo-head h2 span{color:#6952dc}.brand-sub{display:block;color:#60718e;font-size:10px;letter-spacing:1.5px;margin-top:5px;font-weight:700}
-@media(max-width:960px){aside{border-right:0;border-bottom:1px solid #dce6f5}.logo-head{display:inline-flex;vertical-align:middle;margin-right:7px}.nav{font-size:11px}.nav:hover{transform:none}}
-@keyframes spinsearch{to{transform:rotate(360deg)}}.loading-search{display:inline-block;width:23px;height:23px;border:2px solid #dfe4f5;border-top-color:#7456de;border-radius:50%;animation:spinsearch .6s linear infinite}@media(prefers-reduced-motion:reduce){.loading-search{animation:none}} </style><link rel="stylesheet" href="/prospect-radar.css"></head><body><aside><div class="logo-head"><svg class="logo-mark" viewBox="0 0 64 64" aria-label="Portal Prospect PRO" role="img"><defs><linearGradient id="brandA" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#3bd0e5"/><stop offset="1" stop-color="#6f61f2"/></linearGradient><linearGradient id="brandB" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#587efa"/><stop offset="1" stop-color="#ab4df1"/></linearGradient></defs><circle cx="32" cy="32" r="29" fill="#12234a"/><circle cx="32" cy="32" r="24" fill="none" stroke="url(#brandA)" stroke-width="4"/><path d="M32 1 36 15 32 19 28 15ZM63 32 49 36 45 32 49 28ZM32 63 28 49 32 45 36 49ZM1 32 15 28 19 32 15 36Z" fill="#6b67de"/><rect x="17" y="39" width="7" height="10" rx="2" fill="#3dd5e4"/><rect x="28" y="32" width="7" height="17" rx="2" fill="#4e9ff5"/><rect x="39" y="25" width="7" height="24" rx="2" fill="url(#brandB)"/><path d="M17 34Q35 29 45 16l-1 9M45 16l-9 2" fill="none" stroke="#38dcf4" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5"/></svg><div><h2>Portal Prospect <span>PRO</span></h2><span class="brand-sub">INTELLIGENCE CRM</span></div></div><button class="nav active" data-page="dashboard">◫ Visão geral</button><button class="nav" data-page="search">⌕ Prospecção</button><button class="nav" data-page="leads">▤ Oportunidades</button><button class="nav" data-page="sent">✓ Propostas enviadas</button><a class="nav" href="/studio" style="text-decoration:none;display:block">▦ Criar sites</a><a class="nav" href="/studio?view=projects" style="text-decoration:none;display:block">▤ Meus projetos</a><button class="nav" data-page="pipeline">◇ Funil comercial</button><button class="nav" data-page="settings">⚙ Configurações</button><div class="foot">PORTAL CENTRAL IA<br>Ambiente demonstrativo • CRM local</div></aside><main><header><div><div class="eyebrow">PORTAL CENTRAL IA · GESTÃO COMERCIAL</div><h1 id="title">Visão geral</h1><p id="subtitle">Sua central inteligente de prospecção digital</p></div><span class="pill">● Sistema online</span></header><div class="notice">Os leads salvos ficam neste navegador. A busca oficial exige chave Google e controle de consumo; resultados não são simulados. Não ter site informado no perfil não comprova ausência de site próprio. Nenhuma mensagem é enviada automaticamente. <span id="quotaStatus">Verificando consumo…</span></div><div class="quota-visual"><div class="quota-heading"><strong>Controle mensal de buscas Google Places</strong><span id="quotaCount">— / 50</span></div><div class="quota-progress" role="progressbar" aria-label="Buscas Google Places utilizadas" aria-valuemin="0" aria-valuemax="50" aria-valuenow="0" id="quotaProgress"><span id="quotaFill" style="width:0%"></span></div><div class="quota-foot"><span id="quotaRemaining">Faça login para consultar a sua cota.</span><span>Reinicia no dia 1º de cada mês (São Paulo)</span></div></div><section id="dashboard"><div class="stats" id="stats"></div><div class="grid"><div class="panel"><h2>Radar de oportunidades</h2><div id="radar" class="funnel"></div></div><div class="panel"><h2>Pipeline comercial</h2><div id="overview" class="funnel"></div></div></div><div class="panel" style="margin-top:17px"><div class="flex"><h2>Oportunidades recentes</h2><button class="btn" data-go="leads">Ver todas</button></div><div class="table-scroll"><table><thead><tr><th>Empresa</th><th>Presença digital</th><th>Etapa</th></tr></thead><tbody id="recent"></tbody></table></div></div></section><section id="search" class="hidden"><div class="panel"><div class="prospection-intro"><div><h2>Radar de oportunidades</h2><p>Localize empresas por ramo e cidade. A pesquisa automática separa perfis sem site informado no Google Maps e envia as oportunidades para sua lista de trabalho.</p></div><span class="radar-live">PROSPECÇÃO INTELIGENTE</span></div><div class="toolbar"><div><label>MODALIDADE DE BUSCA</label><select id="mode"><option value="free">Gratuita • abrir Google Maps</option><option value="api">Automática • Google Places API</option></select></div><div><label>RAMO DE ATIVIDADE</label><input id="term" value="salões de beleza" placeholder="Ex.: restaurantes"></div><div><label>CIDADE / REGIÃO</label><input id="city" value="Mauá, SP"></div><button class="btn primary" id="searchBtn">⌕ Abrir Google Maps</button></div><p id="modeHelp">Grátis e sem chave de API: você pesquisa diretamente no Google Maps e depois cadastra a empresa no CRM. Os dados não são extraídos automaticamente.</p><div id="prospectAuthPanel" class="prospect-auth" hidden>
- <div><strong>🔐 Acesso de prospecção</strong><p>Entre com sua conta autorizada para pesquisar empresas pelo Google. A chave da API permanece protegida no servidor e as pesquisas têm limite mensal.</p></div>
- <div class="prospect-auth-fields"><input id="radarEmail" type="email" placeholder="E-mail cadastrado" autocomplete="username"><input id="radarPassword" type="password" placeholder="Sua senha" autocomplete="current-password"><button class="btn primary" type="button" id="radarLogin">Entrar</button><button class="btn" type="button" id="radarMagic">Receber código</button></div>
- <div class="prospect-auth-fields" id="radarOtpRow" hidden><input id="radarOtp" type="text" maxlength="8" inputmode="numeric" placeholder="Código recebido"><button class="btn" type="button" id="radarVerifyOtp">Validar código</button></div>
- <p id="radarAuthStatus" role="status" class="muted"></p>
-</div>
-<div id="radarStage" class="radar-stage" data-state="idle" aria-live="polite"></div>
-<div class="radar-result-bar"><div><h3>Empresas encontradas</h3><p id="radarCardsCount">Faça uma busca para localizar estabelecimentos.</p></div><span class="radar-status-pill">Fonte: Google Maps Platform</span></div>
-<div id="searchResults" class="radar-results"><div class="radar-empty">As empresas consultadas aparecerão aqui quando a busca automática estiver disponível.</div></div></div></section><section id="leads" class="hidden"><div class="panel" id="autoOpportunitySection" style="margin-bottom:18px">
-<div class="radar-result-bar"><div><h3>Oportunidades da pesquisa</h3><p id="radarFoundCaption">Empresas sem site informado no Google que apareceram na busca atual.</p></div><span class="radar-status-pill" id="radarFoundCount">Nenhuma busca realizada</span></div>
-<div class="opp-toolbar"><label>Resultados encontrados nesta sessão e separados por oportunidade.</label><button class="mini" type="button" data-go="search">↩ Fazer outra busca</button></div>
-<div id="autoOppCards"></div><details class="crm-search-history"><summary>Histórico de buscas anteriores</summary><div id="storedSearches"></div></details>
-</div><div class="panel"><div class="flex" style="margin-bottom:15px"><h2>Gestão de oportunidades</h2><button class="btn primary" id="addBtn">+ Novo lead</button></div><p id="crmSyncStatus" class="crm-lead-note">Carregando estado de sincronização…</p><div class="toolbar"><div><label>FILTRAR RESULTADOS</label><select id="filter"><option value="pending" selected>Pendentes / não enviadas</option><option value="sent">Propostas enviadas</option><option value="archived">Arquivadas</option><option value="all">Todas</option><option value="no">Sem site informado</option><option value="yes">Com site informado</option></select></div></div><div class="table-scroll"><table><thead><tr><th>Empresa</th><th>Telefone</th><th>Site</th><th>Etapa</th><th>Ações</th></tr></thead><tbody id="leadRows"></tbody></table></div></div></section><section id="sent" class="hidden"><div class="panel"><div class="flex"><h2>Propostas enviadas</h2><span class="pill" id="sentCounter">0 propostas</span></div><p class="muted">Aqui entram somente empresas cujo envio foi confirmado por você, depois de enviar a mensagem no WhatsApp. Evite propostas duplicadas.</p><div id="sentProposalRows"></div></div></section><section id="pipeline" class="hidden"><div class="panel"><h2>Funil de vendas</h2><div id="fullFunnel" class="funnel"></div></div></section><section id="settings" class="hidden"><div class="grid"><div class="panel"><h2>Integração Google</h2><p>Para ativar a pesquisa oficial, configure a variável GOOGLE_PLACES_API_KEY no Render. A chave permanece no servidor e nunca no navegador.</p><p>Não ter site informado no Google não significa necessariamente que a empresa não possui um.</p></div><div class="panel"><h2>Mensagem comercial</h2><textarea id="tpl">Olá! Tudo bem? Sou da Portal Central IA. Desenvolvemos sites profissionais para empresas. Se tiver interesse, posso apresentar modelos sem compromisso. Se não desejar contatos, é só informar.</textarea><button class="btn primary" id="saveTpl">Salvar modelo</button></div><div class="panel"><h2>Exportação e dados</h2><button class="btn" id="csv">↓ Exportar CSV</button> <button class="btn danger" id="clear">Limpar leads</button><p>Dados locais. Não recomendado para informações sensíveis ou uso por múltiplos operadores sem login.</p></div></div></section></main><div id="modal" class="modalbg hidden"><div class="modal"><h2 id="modalTitle">Novo lead</h2><div id="modalBody"></div><div class="modalbuttons"><button class="btn" id="cancel">Cancelar</button><button class="btn primary" id="confirm">Confirmar</button></div></div></div><script>
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));let leads=[];try{leads=JSON.parse(localStorage.getItem('prospect_pro_leads')||'[]')}catch{}let tpl=localStorage.getItem('prospect_pro_template')||$('#tpl').value;$('#tpl').value=tpl;const stages=['Novo','Em análise','Site criado','Proposta pronta','Proposta enviada','Respondeu','Contatado','Em negociação','Fechado','Arquivado','Não contatar'],uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);let onConfirm=()=>{};function save(){localStorage.setItem('prospect_pro_leads',JSON.stringify(leads));render()}function page(p){$$('main section').forEach(s=>s.classList.toggle('hidden',s.id!==p));$$('.nav').forEach(s=>s.classList.toggle('active',s.dataset.page===p));let names={dashboard:['Dashboard comercial','Resultados e atividades do Portal Central IA'],search:['Prospecção','Encontre empresas com potencial para criação de site'],leads:['Oportunidades','Gerencie seus contatos comerciais'],sent:['Propostas enviadas','Histórico de empresas que receberam propostas confirmadas'],pipeline:['Funil comercial','Acompanhe as negociações'],settings:['Configurações','Controle suas mensagens e integrações']};$('#title').textContent=names[p][0];$('#subtitle').textContent=names[p][1];render()}$$('[data-page]').forEach(b=>b.onclick=()=>page(b.dataset.page));$$('[data-go]').forEach(b=>b.onclick=()=>page(b.dataset.go));
-function stageMarkup(){let max=Math.max(1,leads.length);return stages.map(s=>{let n=leads.filter(l=>l.stage===s).length;return '<div><div class="flex"><span>'+esc(s)+'</span><strong>'+n+'</strong></div><div class="track"><div class="fill" style="width:'+(n/max*100)+'%"></div></div></div>'}).join('')}
-function render(){let publishedByLead={};try{for(const x of JSON.parse(localStorage.getItem('prospect_library_projects')||'[]')){if(x.leadId&&x.publicSlug)publishedByLead[x.leadId]=x.publicSlug}}catch{}let no=leads.filter(l=>!l.website).length,c=leads.filter(l=>['Contatado','Em negociação','Fechado'].includes(l.stage)).length,won=leads.filter(l=>l.stage==='Fechado').length;$('#stats').innerHTML=[[leads.length,'Empresas cadastradas'],[no,'Sem site informado'],[c,'Contatos registrados'],[won,'Negócios fechados']].map(([n,t])=>'<div class="card"><div class="muted">'+t+'</div><div class="stat">'+n+'</div><div class="muted">Portal Prospect PRO</div></div>').join('');$('#radar').innerHTML='<div class="flex"><span>Sem site informado</span><strong>'+no+'</strong></div><div class="track"><div class="fill" style="width:'+(no/Math.max(leads.length,1)*100)+'%"></div></div><div class="flex"><span>Com site informado</span><strong>'+(leads.length-no)+'</strong></div><div class="track"><div class="fill" style="width:'+((leads.length-no)/Math.max(leads.length,1)*100)+'%"></div></div>';$('#overview').innerHTML=stageMarkup();$('#fullFunnel').innerHTML=stageMarkup();$('#recent').innerHTML=leads.slice(0,5).map(l=>'<tr><td>'+esc(l.name)+'</td><td><span class="tag '+(l.website?'yes':'no')+'">'+(l.website?'Com site':'Não informado')+'</span></td><td>'+esc(l.stage)+'</td></tr>').join('')||'<tr><td colspan="3" class="empty">Nenhuma empresa cadastrada</td></tr>';let f=$('#filter').value,list=leads.filter(l=>f==='all'||f==='pending'&&!l.proposalSentAt&&l.stage!=='Arquivado'&&l.stage!=='Não contatar'||f==='sent'&&!!l.proposalSentAt||f==='archived'&&l.stage==='Arquivado'||f==='no'&&!l.website&&l.stage!=='Arquivado'||f==='yes'&&l.website&&l.stage!=='Arquivado');$('#leadRows').innerHTML=list.map(l=>'<tr><td><strong>'+esc(l.name)+'</strong><div class="muted">'+esc(l.address||'')+'</div></td><td>'+esc(l.phone||'—')+'</td><td><span class="tag '+(l.website?'yes':'no')+'">'+(l.website?'Com site':'Não informado')+'</span></td><td><select data-stage="'+esc(l.id)+'">'+stages.map(s=>'<option '+(l.stage===s?'selected':'')+'>'+s+'</option>').join('')+'</select></td><td><div class="actions"><button class="mini" data-wa="'+esc(l.id)+'">'+(publishedByLead[l.id]?'Mensagem + link':'Preparar mensagem')+'</button><button class="mini" data-site="'+esc(l.id)+'" style="background:#ebf5ff;color:#334ba1">Criar 3 sites</button>'+(publishedByLead[l.id]?'<a class="mini" target="_blank" rel="noopener noreferrer" href="/mvp/'+encodeURIComponent(publishedByLead[l.id])+'">Ver site</a>':'')+'<button class="mini" data-del="'+esc(l.id)+'">Arquivar</button></div></td></tr>').join('')||'<tr><td colspan="5" class="empty">Sem registros nesta categoria.</td></tr>';$$('[data-stage]').forEach(e=>e.onchange=()=>{const l=leads.find(x=>x.id===e.dataset.stage);if(l){l.stage=e.value;save()}});$('[data-del]').forEach(e=>e.onclick=()=>{if(confirm('Arquivar esta oportunidade? Ela continuará salva para consulta.')){const l=leads.find(x=>x.id===e.dataset.del);if(l){l.stage='Arquivado';l.archivedAt=new Date().toISOString();save()}}});$('[data-wa]').forEach(e=>e.onclick=()=>contact(e.dataset.wa));$('[data-site]').forEach(e=>e.onclick=()=>{window.location.href='/studio?lead='+encodeURIComponent(e.dataset.site)})}
-$('#filter').onchange=render;function modal(title,body,fn){$('#modalTitle').textContent=title;$('#modalBody').innerHTML=body;onConfirm=fn;$('#modal').classList.remove('hidden')}$('#cancel').onclick=()=>$('#modal').classList.add('hidden');$('#confirm').onclick=()=>onConfirm();$('#addBtn').onclick=()=>modal('Nova oportunidade','<label>EMPRESA</label><input id="newName"><label>TELEFONE COM DDD</label><input id="newPhone"><label>SITE (OPCIONAL)</label><input id="newSite">',()=>{let name=$('#newName').value.trim();if(!name)return alert('Informe a empresa');leads.unshift({id:uid(),name,phone:$('#newPhone').value.trim(),website:$('#newSite').value.trim(),stage:'Novo'});save();$('#modal').classList.add('hidden')});
-function contact(id){let l=leads.find(x=>x.id===id),phone=(l.phone||'').replace(/\D/g,'');if(phone.length===10||phone.length===11)phone='55'+phone;if(phone.length<12)return alert('Informe um telefone com DDD válido');modal('Contato com '+l.name,'<p>Revise o texto. O botão abre o WhatsApp, mas não envia automaticamente.</p><textarea id="message">'+esc(tpl.replaceAll('{empresa}',l.name))+'</textarea><label><input type="checkbox" id="permit" style="width:auto"> Confirmo que o contato comercial é apropriado e permitido.</label>',()=>{if(!$('#permit').checked)return alert('Confirme antes de continuar');window.open('https://wa.me/'+phone+'?text='+encodeURIComponent($('#message').value),'_blank','noopener');l.stage='Contatado';save();$('#modal').classList.add('hidden')})}
-const mapsLink=(x)=>x.maps||('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([x.name,x.address||'Mauá SP'].join(' ')));
-$('#mode').onchange=()=>{const free=$('#mode').value==='free';$('#searchBtn').textContent=free?'⌕ Abrir Google Maps':'⌕ Buscar automaticamente';$('#modeHelp').textContent=free?'Busca gratuita: abre a pesquisa no Google Maps, sem coleta automática nem uso de API. Cadastre manualmente as empresas que encontrar.':'Busca automática: consulta a Places API, exige chave e contador persistente; usa a cota mensal limitada.';$('#searchResults').className='empty';$('#searchResults').textContent=free?'O Google Maps será aberto em nova aba.':'Os resultados aparecerão aqui quando a API estiver configurada.'};
-$('#searchBtn').onclick=async()=>{const term=$('#term').value.trim(),city=$('#city').value.trim();if(!term||!city)return alert('Preencha os campos');if($('#mode').value==='free'){const link='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(term+' em '+city);window.open(link,'_blank','noopener');$('#searchResults').className='empty';$('#searchResults').innerHTML='Pesquisa aberta no Google Maps. Identifique uma empresa, confira se há site cadastrado e use <strong>Oportunidades → Novo lead</strong> para salvá-la. <a href="'+link+'" target="_blank" rel="noopener noreferrer" style="color:#a999ff">Abrir novamente</a>';return}$('#searchBtn').disabled=true;localStorage.setItem('prospect_last_segment',term);$('#searchResults').innerHTML='<div style="display:flex;align-items:center;gap:12px;justify-content:center;padding:22px"><span class="loading-search" aria-hidden="true"></span><span>Consultando empresas em '+esc(city)+' com Google Places…</span></div>';try{const r=await fetch('/api/search?term='+encodeURIComponent(term)+'&city='+encodeURIComponent(city)),j=await r.json();if(!r.ok)throw Error(j.error);$('#searchResults').className='table-scroll';$('#searchResults').innerHTML='<table><thead><tr><th>Empresa</th><th>Site</th><th>Telefone</th><th>Google Maps</th><th>Ação</th></tr></thead><tbody>'+j.data.map((x,i)=>'<tr><td>'+esc(x.name)+'<div class="muted">'+esc(x.address)+'</div></td><td>'+(x.website?'Informado':'Não informado')+'</td><td>'+esc(x.phone||'—')+'</td><td><a href="'+esc(mapsLink(x))+'" target="_blank" rel="noopener noreferrer" style="color:#b2a5ff">Abrir perfil</a></td><td><button class="mini" data-add="'+i+'">Adicionar</button></td></tr>').join('')+'</tbody></table>';$$('[data-add]').forEach(b=>b.onclick=()=>{const x={...j.data[+b.dataset.add],category:term};if(leads.some(l=>l.googleId&&l.googleId===x.googleId))return alert('Empresa já cadastrada');leads.unshift({...x,id:uid(),stage:'Novo'});save();b.disabled=true;b.textContent='Adicionado'})}catch(e){$('#searchResults').className='empty';$('#searchResults').textContent=e.message}finally{$('#searchBtn').disabled=false;refreshQuota()}};
-$('#saveTpl').onclick=()=>{tpl=$('#tpl').value;localStorage.setItem('prospect_pro_template',tpl);alert('Modelo salvo neste navegador')};$('#clear').onclick=()=>{alert('Para evitar a perda dos seus clientes, a exclusão em massa foi desativada. Arquive cada oportunidade que não deseja mais trabalhar.');};$('#csv').onclick=()=>{let csv='\ufeffEmpresa;Telefone;Site;Etapa\r\n'+leads.map(l=>[l.name,l.phone,l.website,l.stage].map(s=>'"'+String(s||'').replaceAll('"','""')+'"').join(';')).join('\r\n');let url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='oportunidades.csv';a.click();URL.revokeObjectURL(url)};async function refreshQuota(){try{let session=null;try{session=JSON.parse(sessionStorage.getItem('prospect_publisher_session_v1')||'null')}catch{}const headers={};if(session?.access_token)headers.Authorization='Bearer '+session.access_token;const r=await fetch('/api/quota',{headers,cache:'no-store'});const q=await r.json();$('#quotaStatus').textContent=q.reason||(q.enabled?'Consultas usadas: '+q.used+' de '+q.limit+' em '+q.month:'Integração ainda não configurada');
-const used=Number.isFinite(q.used)?Math.min(50,Math.max(0,q.used)):null;
-$('#quotaCount').textContent=used===null?'— / 50':used+' / 50';
-$('#quotaFill').style.width=used===null?'0%':(used/50*100)+'%';
-$('#quotaFill').classList.toggle('quota-warning',used!==null&&used>=40);
-$('#quotaProgress').setAttribute('aria-valuenow',String(used??0));
-$('#quotaRemaining').textContent=used===null?(q.reason||'Faça login para consultar a sua cota.'):(used>=50?'Limite atingido — novas buscas bloqueadas.':(50-used)+' buscas restantes neste mês'+(used>=40?' · Atenção ao limite':''));
-}catch{$('#quotaStatus').textContent='Consumo indisponível — pesquisa protegida.'}}refreshQuota();render();
-</script><script src="/prospect-crm.js"></script><script src="/prospect-radar.js"></script><script src="/prospect-auth.js"></script></body></html>
+  <main id="mainContent" tabindex="-1">
+    <header class="page-heading">
+      <div>
+        <h1 id="title" tabindex="-1">Visão geral</h1>
+        <p id="subtitle">Acompanhe suas oportunidades e prepare a próxima proposta.</p>
+      </div>
+      <a id="headerAction" href="/?view=search" class="btn primary" data-go="search">Nova prospecção</a>
+    </header>
+
+    <section id="dashboard" data-screen aria-labelledby="title">
+      <div class="stats" id="stats"></div>
+      <div class="dashboard-grid">
+        <article class="panel">
+          <h2>Presença digital</h2>
+          <div id="radar" class="funnel"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-heading"><h2>Funil comercial</h2><a class="btn subtle" data-go="pipeline" href="/?view=pipeline">Ver etapas</a></div>
+          <div id="overview" class="funnel"></div>
+        </article>
+      </div>
+      <article class="panel">
+        <div class="panel-heading"><h2>Oportunidades recentes</h2><a class="btn subtle" data-go="leads" href="/?view=leads">Ver todas</a></div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th scope="col">Empresa</th><th scope="col">Presença digital</th><th scope="col">Etapa</th></tr></thead>
+            <tbody id="recent"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <section id="search" data-screen aria-labelledby="title" class="hidden">
+      <div class="panel">
+        <div class="prospection-intro">
+          <div><h2>Radar de oportunidades</h2><p>Pesquise por segmento e cidade. Veja quais perfis do Google têm um site informado.</p></div>
+        </div>
+        <form class="toolbar search-form" id="radarForm">
+          <label>Modalidade
+            <select id="mode">
+              <option value="api">Automática · Google Places</option>
+              <option value="free">Manual · Google Maps</option>
+            </select>
+          </label>
+          <label for="term">Segmento<input id="term" maxlength="100" required placeholder="Ex.: barbearias"></label>
+          <label for="city">Cidade ou região<input id="city" maxlength="100" required placeholder="Ex.: Mauá, SP"></label>
+          <button class="btn primary" id="searchBtn" type="submit">Buscar empresas</button>
+        </form>
+        <p id="modeHelp" class="muted"></p>
+        <div class="quota-visual">
+          <div class="quota-heading"><strong id="quotaLabel">Cota mensal de buscas</strong><span id="quotaCount">— / 50</span></div>
+          <div class="quota-progress" role="progressbar" aria-labelledby="quotaLabel" aria-valuemin="0" aria-valuemax="50" id="quotaProgress"><span id="quotaFill"></span></div>
+          <div class="quota-foot"><span id="quotaRemaining">Consultando disponibilidade…</span><span>Renova no dia 1º, no horário de São Paulo</span></div>
+          <p id="quotaStatus" class="sr-only" role="status"></p>
+        </div>
+        <div id="prospectAuthPanel" class="prospect-auth" hidden>
+          <div><strong>Acesso do operador</strong><p>Entre com sua conta para usar a busca automática e recuperar suas oportunidades.</p></div>
+          <div class="prospect-auth-fields">
+            <input id="radarEmail" type="email" aria-label="E-mail cadastrado" placeholder="E-mail cadastrado" autocomplete="username">
+            <input id="radarPassword" type="password" aria-label="Senha" placeholder="Sua senha" autocomplete="current-password">
+            <button class="btn primary" type="button" id="radarLogin">Entrar</button>
+            <button class="btn" type="button" id="radarMagic">Receber código</button>
+          </div>
+          <div class="prospect-auth-fields" id="radarOtpRow" hidden>
+            <input id="radarOtp" type="text" maxlength="8" inputmode="numeric" aria-label="Código recebido" placeholder="Código recebido" autocomplete="one-time-code">
+            <button class="btn" type="button" id="radarVerifyOtp">Validar código</button>
+          </div>
+          <p id="radarAuthStatus" role="status" class="muted"></p>
+        </div>
+        <div id="radarStage" class="radar-stage" data-state="idle"></div>
+        <div class="radar-result-bar">
+          <div><h3>Empresas encontradas</h3><p id="radarCardsCount">Faça uma busca para localizar estabelecimentos.</p></div>
+        </div>
+        <div id="searchResults" class="radar-results"></div>
+      </div>
+    </section>
+
+    <section id="leads" data-screen aria-labelledby="title" class="hidden">
+      <article class="panel">
+        <div class="panel-heading"><h2>Empresas salvas</h2><button class="btn primary" id="addBtn" type="button">Nova oportunidade</button></div>
+        <p id="crmSyncStatus" class="crm-lead-note" role="status">Carregando oportunidades…</p>
+        <div class="toolbar">
+          <label for="filter">Exibir
+            <select id="filter">
+              <option value="pending" selected>Pendentes</option>
+              <option value="sent">Propostas enviadas</option>
+              <option value="archived">Arquivadas</option>
+              <option value="all">Todas</option>
+              <option value="no">Sem site informado</option>
+              <option value="yes">Com site informado</option>
+            </select>
+          </label>
+        </div>
+        <div class="table-scroll">
+          <table class="lead-table">
+            <thead><tr><th scope="col">Empresa</th><th scope="col">Telefone</th><th scope="col">Site</th><th scope="col">Etapa</th><th scope="col">Ações</th></tr></thead>
+            <tbody id="leadRows"></tbody>
+          </table>
+        </div>
+      </article>
+      <article class="panel" id="autoOpportunitySection">
+        <div class="radar-result-bar">
+          <div><h3>Resultados da prospecção</h3><p id="radarFoundCaption">As empresas da busca atual aparecem aqui.</p></div>
+          <span class="radar-status-pill" id="radarFoundCount">Nenhuma busca realizada</span>
+        </div>
+        <div class="opp-toolbar"><a class="btn subtle" href="/?view=search" data-go="search">Ir para a prospecção</a></div>
+        <div id="autoOppCards"></div>
+        <details class="crm-search-history"><summary>Histórico de buscas</summary><div id="storedSearches"></div></details>
+      </article>
+    </section>
+
+    <section id="sent" data-screen aria-labelledby="title" class="hidden">
+      <article class="panel">
+        <div class="panel-heading"><h2>Histórico de propostas</h2><span class="pill" id="sentCounter"></span></div>
+        <div id="sentProposalRows"></div>
+      </article>
+    </section>
+
+    <section id="pipeline" data-screen aria-labelledby="title" class="hidden">
+      <article class="panel"><h2>Empresas por etapa</h2><div id="fullFunnel" class="funnel"></div></article>
+    </section>
+
+    <section id="settings" data-screen aria-labelledby="title" class="hidden">
+      <div class="dashboard-grid">
+        <article class="panel">
+          <h2>Integração Google</h2>
+          <p>A busca automática usa Google Places e tem limite de 50 consultas por mês. A busca manual abre o Google Maps e funciona sem usar a cota.</p>
+          <a class="btn subtle" href="/?view=search" data-go="search">Abrir prospecção</a>
+        </article>
+        <article class="panel">
+          <h2>Mensagem comercial</h2>
+          <label for="tpl">Modelo para propostas</label>
+          <p id="templateHelp">Use <code>{empresa}</code> e <code>{link}</code> para inserir o nome e a prévia.</p>
+          <textarea id="tpl" rows="6" aria-describedby="templateHelp">Olá! Tudo bem? Sou do Portal Central IA. Preparei uma demonstração de site para {empresa}.
+
+Confira a prévia: {link}
+
+Posso explicar a ideia? Se preferir não receber outras mensagens, é só avisar.</textarea>
+          <div class="panel-heading"><button class="btn primary" id="saveTpl" type="button">Salvar neste navegador</button><span id="templateStatus" role="status" class="muted"></span></div>
+        </article>
+        <article class="panel">
+          <h2>Exportação de dados</h2>
+          <p>Baixe as oportunidades disponíveis neste navegador em formato CSV.</p>
+          <button class="btn subtle" id="csv" type="button">Exportar CSV</button>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modalbg hidden">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle"></h2>
+      <div id="modalBody"></div>
+      <p id="modalStatus" role="status" class="form-error" hidden></p>
+      <div class="modalbuttons">
+        <button class="btn" id="cancel" type="button">Cancelar</button>
+        <button class="btn primary" id="confirm" type="button">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

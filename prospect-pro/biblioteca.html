@@ -1,99 +1,212 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#f4f6fb"><title>Biblioteca de Sites | Portal Prospect PRO</title>
-<meta name="description" content="Biblioteca profissional de modelos de sites por segmento. Crie prévias personalizadas no Portal Prospect PRO.">
-<link rel="stylesheet" href="/biblioteca.css"><script src="/biblioteca-data.js" defer></script><script src="/biblioteca.js" defer></script><script src="/studio-flow.js" defer></script><script src="/studio-publish.js" defer></script>
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <meta name="theme-color" content="#f4f6fb">
+ <title>Biblioteca de Sites | Portal Prospect PRO</title>
+ <meta name="description" content="Crie, edite e publique demonstrações de sites para empresas no Portal Prospect PRO.">
+ <link rel="stylesheet" href="/biblioteca.css">
+ <script src="/biblioteca-data.js" defer></script>
+ <script src="/biblioteca.js" defer></script>
+ <script src="/studio-projects.js" defer></script>
+ <script src="/studio-flow.js" defer></script>
+ <script src="/studio-publish.js" defer></script>
 </head>
 <body>
 <header class="topbar">
  <div class="topbar-inner">
-  <a class="back" href="/" aria-label="Voltar ao painel">← <span>Painel</span></a>
-  <a class="identity" href="/biblioteca"><span class="symbol">P</span><span>PORTAL <b>PROSPECT</b><small>FÁBRICA DE SITES</small></span></a>
-  <div class="top-actions"><span class="top-status"><i></i> Biblioteca profissional</span><button id="help" class="plain-btn" type="button">Como funciona</button></div>
+  <a class="identity" href="/"><span class="symbol" aria-hidden="true">P</span><span>Portal <b>Prospect PRO</b><small>Estúdio de sites</small></span></a>
+  <nav class="studio-nav" aria-label="Navegação do estúdio">
+   <a class="studio-nav-link" href="/?view=leads">Oportunidades</a>
+   <a class="studio-nav-link" href="/studio" id="studioNavCreate">Criar sites</a>
+   <a class="studio-nav-link" href="/studio?view=projects" id="studioNavProjects">Meus projetos <span id="savedCount">0</span></a>
+  </nav>
  </div>
 </header>
 <main>
-<section class="intro container">
- <div><div class="kicker"><span class="line"></span> PORTAL CENTRAL IA / DESIGN STUDIO</div><h1>Uma biblioteca. <em>Infinitas possibilidades.</em></h1><p>Escolha o segmento, personalize a identidade e crie uma demonstração real de site. Cada modelo tem direção de arte, estrutura e linguagem próprias.</p></div>
- <div class="intro-stats"><span><strong id="templatesCount">—</strong> segmentos</span><span><strong>8</strong> direções de arte</span><span><strong>0</strong> créditos de IA por geração</span></div>
-</section>
-<section class="container app-area">
- <div class="workspace-nav" role="tablist" aria-label="Áreas da biblioteca">
-  <button id="tabGallery" class="workspace-tab selected" data-view="gallery" role="tab" aria-selected="true">Explorar modelos</button>
-  <button id="tabProjects" class="workspace-tab" data-view="projects" role="tab" aria-selected="false">Meus projetos <span id="savedCount">0</span></button>
- </div>
- <section id="studioView" hidden>
-  <div class="studio-heading"><div class="kicker">SITE STUDIO / PROPOSTAS AUTOMÁTICAS</div><h2>Três direções criativas para a sua próxima venda.</h2><p>Selecione uma empresa da prospecção, ou digite os dados de uma empresa aqui. O Portal Prospect PRO prepara três composições diferentes para você analisar e editar.</p></div>
-  <div class="studio-client">
-   <label>Empresa<input id="studioCompany" maxlength="100" placeholder="Nome da empresa"></label>
-   <label>Segmento<input id="studioSegment" maxlength="80" placeholder="Ex.: hamburgueria, barbearia, clínica"></label>
-   <label>Cidade<input id="studioCity" maxlength="90" placeholder="Ex.: Mauá, SP"></label>
-   <label>WhatsApp<input id="studioPhone" maxlength="23" placeholder="11 99999-9999"></label>
-   <button id="generateThree" type="button" class="button accent">Gerar 3 propostas</button>
+ <section class="intro container">
+  <div>
+   <h1>Modelos de sites</h1>
+   <p>Encontre um modelo para o seu segmento e adapte o conteúdo à empresa.</p>
   </div>
-  <div id="studioStep" class="studio-status" aria-live="polite">Pronto para criar propostas.</div>
-  <div id="threeProposals" class="three-proposals"></div>
-  <p class="studio-note">A IA não é cobrada por geração: três propostas são montadas por um motor de design. Fotos demonstrativas devem ser substituídas por imagens autorizadas da empresa.</p>
+  <div class="intro-stats"><span><strong id="templatesCount">—</strong> modelos</span></div>
  </section>
- <section id="galleryView">
+ <section class="container app-area">
+  <div class="workspace-nav" aria-label="Áreas da biblioteca">
+   <button id="tabGallery" class="workspace-tab selected" data-view="gallery" type="button" aria-pressed="true">Explorar modelos</button>
+   <button id="tabProjects" class="workspace-tab" data-view="projects" type="button" aria-pressed="false">Meus projetos</button>
+  </div>
+  <section id="studioView" hidden>
+   <div class="studio-heading">
+    <h1>Crie um site para uma empresa</h1>
+    <p>Use o cadastro de uma oportunidade ou preencha os dados abaixo. Você poderá comparar três propostas e editar a que preferir.</p>
+   </div>
+   <form class="studio-client" id="studioClientForm">
+    <div class="studio-client-fields">
+     <label>Empresa<input id="studioCompany" maxlength="100" placeholder="Nome da empresa" required></label>
+     <label>Segmento<input id="studioSegment" maxlength="80" placeholder="Ex.: hamburgueria, barbearia, clínica" required></label>
+     <label>Cidade<input id="studioCity" maxlength="90" placeholder="Ex.: Mauá, SP"></label>
+     <label>WhatsApp<input id="studioPhone" inputmode="tel" autocomplete="off" maxlength="23" placeholder="(11) 99999-9999"></label>
+    </div>
+    <details class="studio-brief">
+     <summary>Adicionar descrição e serviços</summary>
+     <div class="studio-brief-fields">
+      <label>Descrição da empresa<textarea id="studioSummary" rows="3" maxlength="320" placeholder="Conte o que diferencia a empresa no atendimento."></textarea></label>
+      <label>Serviços, um por linha<textarea id="studioServices" rows="3" maxlength="600" placeholder="Ex.: Corte masculino&#10;Barba e acabamento"></textarea></label>
+     </div>
+    </details>
+    <div class="studio-submit">
+     <button id="generateThree" type="submit" class="button accent">Gerar 3 propostas</button>
+     <p>As fotos são ilustrativas. Você pode substituí-las no editor.</p>
+    </div>
+   </form>
+   <div id="studioStep" class="studio-status" role="status"></div>
+   <div id="threeProposals" class="three-proposals"></div>
+  </section>
+  <section id="galleryView">
    <div class="catalog-tools">
     <label class="searchbox"><span aria-hidden="true">⌕</span><input id="filter" type="search" placeholder="Buscar segmento: clínica, imobiliária, pet shop..." autocomplete="off" aria-label="Buscar modelos"></label>
     <select id="category" aria-label="Filtrar categoria"><option value="all">Todos os segmentos</option></select>
    </div>
-   <div id="catalogInfo" class="catalog-info" aria-live="polite"></div>
+   <div id="catalogInfo" class="catalog-info" role="status"></div>
    <div id="catalog" class="catalog"></div>
-   <div class="custom-strip"><div><strong>Não encontrou seu segmento?</strong><p>Escolha a base visual mais próxima e personalize o nome, o texto e os serviços. Novos modelos entram na biblioteca continuamente.</p></div><button id="customStart" class="button secondary" type="button">Criar modelo personalizado</button></div>
+   <div class="custom-strip"><div><strong>Seu segmento é outro?</strong><p>Comece com um modelo de serviços e personalize o conteúdo.</p></div><button id="customStart" class="button secondary" type="button">Criar modelo personalizado</button></div>
+  </section>
+  <section id="projectsView" hidden>
+   <div class="projects-header">
+    <div><h1>Meus projetos</h1><p>Retome um rascunho ou abra o link de uma demonstração publicada.</p></div>
+    <div class="project-header-actions">
+     <button id="manageProjectAccount" class="button secondary" type="button">Entrar na conta</button>
+     <a class="button accent" href="/studio">Criar site</a>
+    </div>
+   </div>
+   <p id="projectCloudStatus" class="project-cloud-status" role="status"></p>
+   <label class="project-search">Buscar projeto<input id="projectSearch" type="search" placeholder="Empresa, segmento ou cidade" autocomplete="off"></label>
+   <div id="projectsList" class="projects-list"></div>
+  </section>
  </section>
- <section id="projectsView" hidden><div class="projects-header"><h2>Projetos salvos neste aparelho</h2><p>Rascunhos locais para retomar a personalização depois. Para acesso em vários dispositivos, será necessária uma base de dados com login.</p></div><div id="projectsList" class="projects-list"></div></section>
-</section>
 </main>
-<div id="editorOverlay" class="editor-overlay" hidden>
- <div class="editor-shell" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
-  <div class="editor-bar"><div class="editor-brand"><button id="closeEditor" class="plain-btn" type="button" aria-label="Fechar editor">← Voltar</button><span class="vertical-rule"></span><div><div class="editor-eyebrow">EDITOR PREMIUM / DEMONSTRAÇÃO</div><strong id="editorTitle">Personalizar site</strong></div></div>
-   <div class="editor-tools"><div class="device-toggle" aria-label="Dispositivo"><button type="button" data-device="desktop" class="active">Desktop</button><button type="button" data-device="mobile">Celular</button></div><button id="saveProject" class="button secondary" type="button">Salvar projeto</button><button id="publishPreview" class="button accent" type="button">Publicar prévia</button><button id="downloadSite" class="button accent" type="button">Baixar site HTML</button></div>
+<dialog id="editorOverlay" class="editor-overlay" aria-labelledby="editorTitle">
+ <div class="editor-shell">
+  <div class="editor-bar">
+   <div class="editor-brand">
+    <button id="closeEditor" class="plain-btn" type="button" aria-label="Fechar editor">← Voltar</button>
+    <span class="vertical-rule" aria-hidden="true"></span>
+    <div><strong id="editorTitle">Personalizar site</strong><p id="editStatus" role="status"></p></div>
+   </div>
+   <div class="editor-tools">
+    <div class="edit-history" aria-label="Histórico de edição">
+     <button id="undoEdit" type="button" class="plain-btn" aria-label="Desfazer" title="Desfazer" disabled>↶</button>
+     <button id="redoEdit" type="button" class="plain-btn" aria-label="Refazer" title="Refazer" disabled>↷</button>
+    </div>
+    <button id="saveProject" class="button secondary" type="button">Salvar projeto</button>
+    <button id="publishPreview" class="button accent" type="button">Publicar prévia</button>
+   </div>
+  </div>
+  <div class="mobile-editor-tabs" aria-label="Área do editor">
+   <button id="editMobileView" class="plain-btn active" type="button" aria-pressed="true">Editar</button>
+   <button id="previewMobileView" class="plain-btn" type="button" aria-pressed="false">Ver prévia</button>
   </div>
   <div class="editor-content">
-   <aside class="editor-form">
-    <div class="form-title"><div class="kicker">PERSONALIZAÇÃO</div><h2 id="modelName">Modelo</h2><p>Os campos alteram a prévia em tempo real.</p></div>
+   <aside class="editor-form" aria-label="Personalização">
+    <div class="form-title"><h2 id="modelName">Dados do site</h2></div>
     <div class="form-grid">
-     <label>Nome da empresa<input id="companyName" maxlength="80" placeholder="Ex.: Studio Aurora"></label>
-     <label>Segmento<input id="industryName" maxlength="70" placeholder="Ex.: Salão de beleza"></label>
-     <label>Cidade / região<input id="cityName" maxlength="90" placeholder="Ex.: Mauá, SP"></label>
-     <label>WhatsApp (com DDD)<input id="phoneNumber" inputmode="tel" maxlength="23" placeholder="Ex.: 11 99999-9999"></label>
-     <label>Título principal<input id="headline" maxlength="120"></label>
-     <label>Subtítulo / proposta de valor<textarea id="summary" rows="3" maxlength="320"></textarea></label>
-     <label>Serviços (um por linha)<textarea id="services" rows="4" maxlength="500"></textarea></label>
-     <label>Imagem principal (URL de imagem permitida)<input id="photoUrl" type="url" placeholder="https://images.unsplash.com/..."></label>
-     <label>Fonte dos títulos<select id="headingFont"><option value="auto">Estilo original</option><option value="editorial">Editorial clássica</option><option value="modern">Moderna</option><option value="luxury">Elegante</option><option value="impact">Impacto</option></select></label>
-<label>Tamanho do título<select id="headingSize"><option value="1">Original</option><option value="0.85">Discreto</option><option value="1.15">Grande</option><option value="1.3">Extra grande</option></select></label>
-<label>Estilo dos botões<select id="buttonStyle"><option value="auto">Original</option><option value="pill">Arredondados</option><option value="square">Retos e minimalistas</option></select></label>
-<label>Animação<select id="motionStyle"><option value="soft">Elegante</option><option value="strong">Marcante</option><option value="none">Sem animação</option></select></label>
-<label>Layout alternativo<select id="layoutVariant"><option value="0">Editorial original</option><option value="1">Composição alternativa</option><option value="2">Composição expressiva</option></select></label>
-     <label>Cor de destaque<input id="brandColor" type="color" value="#305a80"></label>
+     <details open>
+      <summary>Conteúdo</summary>
+      <div class="field-group">
+       <label>Nome da empresa<input id="companyName" maxlength="100"></label>
+       <label>Segmento<input id="industryName" maxlength="80"></label>
+       <label>Cidade / região<input id="cityName" maxlength="90"></label>
+       <label>WhatsApp (com DDD)<input id="phoneNumber" inputmode="tel" maxlength="23" placeholder="(11) 99999-9999"></label>
+       <label>Título principal<input id="headline" maxlength="120"></label>
+       <label>Descrição da empresa<textarea id="summary" rows="3" maxlength="320"></textarea></label>
+       <label>Serviços, um por linha<textarea id="services" rows="4" maxlength="600"></textarea></label>
+      </div>
+     </details>
+     <details>
+      <summary>Identidade visual</summary>
+      <div class="field-group">
+       <label>Logotipo (URL HTTPS)<input id="logoUrl" type="url" maxlength="1000" placeholder="https://"></label>
+       <label>Imagem principal (URL HTTPS)<input id="photoUrl" type="url" maxlength="1000" placeholder="https://"></label>
+       <p class="field-hint">Use fotos autorizadas da empresa. As imagens iniciais são ilustrativas.</p>
+       <label>Cor de destaque<input id="brandColor" type="color" value="#305a80"></label>
+       <label>Fonte dos títulos<select id="headingFont"><option value="auto">Estilo original</option><option value="editorial">Editorial clássica</option><option value="modern">Moderna</option><option value="luxury">Elegante</option><option value="impact">Impacto</option></select></label>
+       <label>Tamanho do título<select id="headingSize"><option value="1">Original</option><option value="0.85">Discreto</option><option value="1.15">Grande</option><option value="1.3">Extra grande</option></select></label>
+       <label>Estilo dos botões<select id="buttonStyle"><option value="auto">Original</option><option value="pill">Arredondados</option><option value="square">Retos</option></select></label>
+       <label>Animação<select id="motionStyle"><option value="soft">Suave</option><option value="strong">Marcante</option><option value="none">Sem animação</option></select></label>
+      </div>
+     </details>
+     <details>
+      <summary>Layout e seções</summary>
+      <div class="field-group">
+       <label>Composição<select id="layoutVariant"><option value="0">Original da proposta</option><option value="1">Alternativa</option><option value="2">Expressiva</option></select></label>
+       <label>Espaçamento<select id="sectionSpacing"><option value="compact">Compacto</option><option value="balanced">Equilibrado</option><option value="spacious">Amplo</option></select></label>
+       <label class="control-check"><input id="showServices" type="checkbox" checked> Exibir serviços</label>
+       <label class="control-check"><input id="showLocation" type="checkbox" checked> Exibir localização</label>
+      </div>
+     </details>
     </div>
-    <p class="form-hint">As imagens dos modelos são demonstrativas. Substitua por fotografias autorizadas antes de entregar ao cliente. O WhatsApp só aparece no site quando for informado um número.</p>
-    <div class="form-actions"><button id="resetModel" class="button secondary" type="button">Restaurar modelo</button><button id="copyHtml" class="button secondary" type="button">Copiar HTML</button></div>
+    <div class="form-actions">
+     <button id="resetModel" class="button secondary" type="button">Restaurar estilo</button>
+     <button id="downloadSite" class="button secondary" type="button">Baixar HTML</button>
+     <button id="copyHtml" class="button secondary" type="button">Copiar HTML</button>
+    </div>
    </aside>
-   <div class="preview-area"><div class="preview-meta"><span><span class="live-dot"></span> PRÉVIA AO VIVO</span><span id="previewLabel">Desktop · site completo</span></div><div class="preview-frame-box"><iframe id="websitePreview" title="Prévia do site da empresa" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" loading="eager"></iframe></div><p class="preview-caveat">Prévia demonstrativa, não publicada. O arquivo HTML gerado pode ser hospedado após revisão das informações, imagens e contatos.</p></div>
+   <div class="preview-area">
+    <div class="preview-meta">
+     <div><strong>Prévia ao vivo</strong><span id="previewLabel">Computador</span></div>
+     <div class="device-toggle" aria-label="Largura da prévia">
+      <button type="button" data-device="desktop" class="active" aria-pressed="true">Desktop</button>
+      <button type="button" data-device="mobile" aria-pressed="false">Celular</button>
+     </div>
+    </div>
+    <div class="preview-frame-box"><iframe id="websitePreview" title="Prévia do site da empresa" sandbox referrerpolicy="no-referrer"></iframe></div>
+   </div>
   </div>
  </div>
-</div>
-<div id="publishOverlay" class="publish-overlay" hidden><div class="publish-dialog" role="dialog" aria-modal="true" aria-labelledby="publishTitle">
-  <div class="publish-head"><h2 id="publishTitle">Publicar demonstração</h2><button id="closePublish" type="button" class="plain-btn">Fechar</button></div>
-  <div id="publishAuth">
-   <p class="muted-copy">Entre com o seu acesso do Portal Central IA para criar links públicos permanentes. As demonstrações são salvas no Supabase; não é necessário criar um Render para cada cliente.</p>
-   <label>E-mail de acesso<input type="email" id="pubEmail" placeholder="Seu e-mail cadastrado" autocomplete="username"></label>
-   <label>Senha<input type="password" id="pubPass" placeholder="Senha do aplicativo" autocomplete="current-password"></label>
-   <div class="publish-buttons"><button class="button accent" id="pubLogin">Entrar e publicar</button><button class="button secondary" id="pubEmailLink">Enviar link por e-mail</button></div>
-   <div id="otpGroup" hidden><label>Código recebido por e-mail (se disponível)<input id="pubOtp" inputmode="numeric" maxlength="8" placeholder="Código de 6 dígitos"></label><button class="button secondary" id="verifyOtp">Verificar código</button></div>
-   <p class="muted-copy">Acesso restrito ao responsável pelo Portal Central IA. Se ainda não tiver senha de usuário do aplicativo, use o link por e-mail ou configure a autenticação no Supabase.</p>
+ <div id="editorToast" class="toast" role="status" hidden></div>
+</dialog>
+<dialog id="publishOverlay" class="publish-overlay" aria-labelledby="publishTitle">
+ <div class="publish-head"><h2 id="publishTitle">Publicar demonstração</h2><button id="closePublish" type="button" class="plain-btn">Fechar</button></div>
+ <div id="publishAuth" hidden>
+  <p id="publishAuthCopy" class="muted-copy">Entre com sua conta do Portal Central IA para criar um link público para esta demonstração.</p>
+  <form id="publishLoginForm">
+   <label>E-mail<input type="email" id="pubEmail" autocomplete="username" required></label>
+   <label>Senha<input type="password" id="pubPass" autocomplete="current-password" required></label>
+   <div class="publish-buttons"><button class="button accent" id="pubLogin" type="submit">Entrar</button><button class="button secondary" id="pubEmailLink" type="button">Receber link por e-mail</button></div>
+  </form>
+  <div id="otpGroup" hidden>
+   <label>Código recebido por e-mail<input id="pubOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="8"></label>
+   <button class="button secondary" id="verifyOtp" type="button">Verificar código</button>
   </div>
-  <div id="publishReady" hidden><p id="publishAccount" class="muted-copy"></p><p class="muted-copy">Esta é uma demonstração, não um site contratado. Revise os textos, a imagem e o telefone antes de publicar.</p><button class="button accent" id="confirmPublish" type="button">Publicar link individual</button><button class="button secondary" id="pubLogout" type="button">Sair da conta</button></div>
-  <div id="publishResult" hidden><p class="muted-copy">Demonstração publicada. Abra o link e confira o cartão antes de compartilhar.</p><label>Link público<input id="publicLink" readonly></label><div class="publish-buttons"><button id="copyPublicLink" class="button secondary">Copiar link</button><button id="openPublicLink" class="button secondary">Abrir site</button></div><label>Mensagem para a empresa<textarea id="publicMessage" rows="5"></textarea></label><div class="publish-buttons"><button id="copyPublicMessage" class="button secondary">Copiar mensagem</button><button id="openBusinessWhatsapp" class="button accent">Preparar WhatsApp</button></div><p class="muted-copy">O WhatsApp abre a mensagem para revisão; nenhuma mensagem é enviada automaticamente.</p></div>
-  <p id="publishStatus" role="status" class="muted-copy"></p>
- </div></div>
-<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-<footer class="site-foot container"><span>Portal Prospect PRO · Portal Central IA</span><span>Modelos comerciais personalizáveis · Sem IA por geração</span></footer>
-</body></html>
+ </div>
+ <div id="publishReady" hidden>
+  <p id="publishAccount" class="muted-copy"></p>
+  <p id="publishReviewCopy" class="muted-copy">Revise o conteúdo, a imagem e o telefone. Qualquer pessoa com o link poderá ver a demonstração.</p>
+  <div class="publish-buttons"><button class="button accent" id="confirmPublish" type="button">Publicar link</button><button class="button secondary" id="pubLogout" type="button">Sair da conta</button></div>
+ </div>
+ <div id="publishResult" hidden>
+  <p class="publish-success">Demonstração publicada</p>
+  <label>Link público<input id="publicLink" readonly></label>
+  <div class="publish-buttons"><button id="copyPublicLink" class="button secondary" type="button">Copiar link</button><button id="openPublicLink" class="button secondary" type="button">Abrir site</button></div>
+  <label>Mensagem para a empresa<textarea id="publicMessage" rows="6"></textarea></label>
+  <p id="publishContactStatus" class="muted-copy">Revise a mensagem antes de abrir o WhatsApp.</p>
+  <label id="publishDuplicate" class="publish-check" hidden><input id="publishRepeat" type="checkbox"> Quero preparar outra mensagem para esta empresa.</label>
+  <div class="publish-buttons">
+   <button id="openBusinessWhatsapp" class="button accent" type="button">Preparar WhatsApp</button>
+   <button id="copyPublicMessage" class="button secondary" type="button">Copiar mensagem</button>
+   <a id="reviewOpportunity" class="button secondary" href="/?view=leads" hidden>Ver oportunidade</a>
+  </div>
+ </div>
+ <p id="publishStatus" role="status" class="publish-status"></p>
+</dialog>
+<dialog id="versionsOverlay" class="version-dialog" aria-labelledby="versionsTitle">
+ <div class="publish-head"><h2 id="versionsTitle">Versões do projeto</h2><button id="closeVersions" type="button" class="plain-btn">Fechar</button></div>
+ <p id="versionsStatus" class="muted-copy" role="status"></p>
+ <div id="versionsList" class="version-list"></div>
+</dialog>
+<div id="toast" class="toast" role="status" hidden></div>
+<footer class="site-foot container"><span>Portal Prospect PRO · Portal Central IA</span></footer>
+</body>
+</html>
