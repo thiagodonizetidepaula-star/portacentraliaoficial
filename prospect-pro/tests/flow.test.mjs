@@ -9,6 +9,7 @@ import {test} from 'node:test';
 import {setTimeout as delay} from 'node:timers/promises';
 import {fileURLToPath} from 'node:url';
 import {business, openaiKey, operator, publishableKey, startProviders, token, viewOnlyToken} from './fixtures/providers.mjs';
+import { websiteMetadata, instagramProfile } from '../brand-sources.js';
 
 const playwrightModule = process.env.PROSPECT_PLAYWRIGHT_MODULE || 'playwright-core';
 const {chromium} = await import(playwrightModule);
@@ -25,7 +26,7 @@ async function availablePort() {
   return port;
 }
 
-async function startApp(t, providers, googleEnabled, {aiEnabled = false} = {}) {
+async function startApp(t, providers, googleEnabled, {aiEnabled = false, metaEnabled = false} = {}) {
   const port = await availablePort();
   const origin = 'http://127.0.0.1:' + port;
   const child = spawn(process.execPath, ['--import', guardPath, serverPath], {
@@ -35,11 +36,13 @@ async function startApp(t, providers, googleEnabled, {aiEnabled = false} = {}) {
       PREVIEW_PUBLIC_ORIGIN: origin,
       PROSPECT_PROVIDER_FIXTURE_ORIGIN: providers.origin,
       PROSPECT_PROVIDER_PUBLIC_ORIGIN: providers.publicOrigin,
-      SUPABASE_URL: aiEnabled ? providers.publicOrigin : providers.origin,
+      SUPABASE_URL: aiEnabled || metaEnabled ? providers.publicOrigin : providers.origin,
       SUPABASE_PUBLISHABLE_KEY: publishableKey,
       GOOGLE_PLACES_API_KEY: googleEnabled ? 'only_local_fixture_google_key' : '',
       OPENAI_API_KEY: aiEnabled ? openaiKey : '',
       OPENAI_BASE_URL: providers.origin + '/v1',
+      INSTAGRAM_BUSINESS_ACCOUNT_ID: metaEnabled ? '123456' : '',
+      INSTAGRAM_GRAPH_ACCESS_TOKEN: metaEnabled ? 'only_local_fixture_meta' : '',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -171,6 +174,7 @@ test('IA valida o operador, preserva os contatos e gera três propostas no servi
   const payload = providers.state.aiTexts[0];
   assert.equal(payload.store, false);
   assert.equal(payload.text.format.name, 'site_proposals');
+  assert.match(payload.instructions,/prospect-premium/);
   const context = JSON.parse(payload.input).company;
   assert.equal(context.name, company.name);
   assert.deepEqual(context.services, company.services);
@@ -624,4 +628,162 @@ test('No celular, respeita movimento reduzido e separa busca vazia de erro', {ti
   assert.equal(providers.state.googleQueries.length, 2);
   assert.equal(await page.locator('#searchResults [data-radar-save]').count(), 0);
   assert.deepEqual(providers.state.failures, []);
+});
+
+test('Identifica marca e perfis na página da empresa', () => {
+  const result = websiteMetadata('<html><head><meta name="theme-color" content="#bc6022">' +
+    '<meta property="og:image" content="/capa.webp"><meta property="og:description" content="Cerâmica &amp; arte">' +
+    '<script type="application/ld+json">'+JSON.stringify({'@graph':[
+      {'@type':'LocalBusiness',logo:{url:'/logo.svg'},image:['/capa.webp','/loja.jpg'],sameAs:'https://instagram.com/atelieroficial/?hl=pt'},
+      {'@type':'Person',image:'/autor.jpg'}]})+'</script></head>' +
+    '<body><img class="logo" src="/outro.png"><a href="https://www.instagram.com/p/post/">Post</a></body></html>', 'https://atelier.example.com/');
+  assert.equal(result.logo,'https://atelier.example.com/logo.svg');
+  assert.equal(result.color,'#bc6022');
+  assert.deepEqual(result.photos,['https://atelier.example.com/capa.webp','https://atelier.example.com/loja.jpg']);
+  assert.equal(result.description,'Cerâmica & arte');
+  assert.deepEqual(result.profiles,['https://www.instagram.com/atelieroficial/']);
+  assert.equal(instagramProfile('https://www.instagram.com/reels/'),'');
+});
+
+test('Consulta a unidade por ID, conta uma busca e exige operador para importar mídia', async t => {
+  const providers=await startProviders();
+  t.after(providers.close);
+  const origin=await startApp(t,providers,true,{metaEnabled:true,aiEnabled:true});
+  const place='/api/studio/place?id='+business.id;
+  assert.equal((await fetch(origin+place)).status,401);
+  const found=await fetch(origin+place,{headers:authorization}).then(r=>r.json());
+  assert.equal(found.data[0].googleId,business.id);
+  assert.ok(found.data[0].photosUrl);
+  assert.equal(providers.state.used,1);
+  const post=(path,body,auth=token)=>fetch(origin+path,{method:'POST',
+    headers:{'Content-Type':'application/json',Authorization:'Bearer '+auth},body:JSON.stringify(body)});
+  const social={url:'https://www.instagram.com/salaoaurora/'};
+  assert.equal((await post('/api/studio/brand/instagram',social,viewOnlyToken)).status,403);
+  const data=await post('/api/studio/brand/instagram',social).then(r=>r.json());
+  assert.equal(data.profiles[0],social.url);
+  assert.equal(data.photos.length,2);
+  assert.equal((await post('/api/studio/brand/media',{ticket:data.photos[0].ticket})).headers.get('content-type'),'image/webp');
+  providers.controlAiText(()=>[200,{output:[
+    {type:'web_search_call',action:{sources:[{url:social.url},{url:'https://instagram.com/p/abc/'}]}},
+    {type:'message',content:[{type:'output_text',text:'https://www.instagram.com/naoverificado/'}]}]}]);
+  const profiles=await post('/api/studio/ai/instagram',{company:{name:'Salão Aurora',city:'Mauá'}}).then(r=>r.json());
+  assert.deepEqual(profiles.profiles,[social.url]);
+  assert.deepEqual(providers.state.failures,[]);
+});
+
+test('No celular, confirma a unidade e aplica a marca nas prévias, no rascunho e no HTML', {timeout:45000}, async t => {
+  const providers=await startProviders(); t.after(providers.close);
+  providers.controlGoogle(()=>[200,{places:[{...business, websiteUri:'https://www.instagram.com/salaoaurora/'},
+    {...business,id:'outra-unidade-aurora',formattedAddress:'Outra cidade'}]}]);
+  const origin=await startApp(t,providers,true,{metaEnabled:true});
+  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});
+  t.after(()=>browser.close());
+  const {context}=await browserContext(browser,origin,providers,{viewport:{width:375,height:812},reducedMotion:'reduce'});
+  await context.addInitScript(token=>{if (window.top===window && location.protocol.startsWith('http')) sessionStorage.setItem('prospect_publisher_session_v1',JSON.stringify({access_token:token}));},token);
+  const page=await context.newPage();
+  const errors=[]; page.on('pageerror',e=>errors.push(e.message));
+  await page.goto(origin+'/studio');
+  await page.locator('#studioCompany').fill('Salão Aurora');
+  await page.locator('#studioSegment').fill('Salão de beleza');
+  await page.locator('#studioCity').fill('Mauá');
+  await page.locator('#brandGoogleAtGenerate').check();
+  await page.locator('#generateThree').click();
+  const units=page.getByRole('button',{name:'Usar esta unidade'});
+  await units.first().waitFor(); assert.equal(await units.count(),2);
+  assert.equal(await page.locator('.proposal-card').count(),0);
+  assert.equal(await page.locator('#studioAddress').inputValue(),'');
+  await units.first().click();
+  await page.getByRole('button',{name:'Aplicar seleção autorizada'}).click();
+  await eventually(()=>providers.state.uploadedImages.size===3,'As fotos selecionadas não foram armazenadas.');
+  const choices=page.locator('[data-choose]');
+  await choices.nth(2).waitFor();
+  const mark=await page.locator('#brandLogo').inputValue();
+  const photos=(await page.locator('#brandPhotos').inputValue()).split('\n');
+  assert.equal(photos.length,2); assert.ok(photos.every(link=>link.startsWith(providers.publicOrigin)));
+  for(let i=0;i<3;i++){
+    const frame=page.locator('.proposal-card').nth(i).frameLocator('iframe');
+    assert.equal(await frame.locator('.brand-logo').getAttribute('src'),mark);
+    assert.equal(await frame.locator('.hero img').first().getAttribute('src'),photos[i%2]);
+    assert.equal(await frame.locator('[data-contact=instagram]').getAttribute('href'),'https://www.instagram.com/salaoaurora/');
+    assert.ok(!(await frame.locator('body').textContent()).includes('Outra cidade'));
+  }
+  assert.equal(providers.state.used,1);
+  await choices.first().click();
+  const snapshot=await page.evaluate(()=>window.PortalSiteStudio.getCurrent().data);
+  assert.equal(snapshot.googlePlaceId,business.id); assert.equal(snapshot.logo,mark);
+  assert.ok(snapshot.brandSources.includes('https://www.instagram.com/p/example1/'));
+  const html=await page.evaluate(()=>{const {data,template}=window.PortalSiteStudio.getCurrent();return window.PortalSiteStudio.buildSite(data,template);});
+  assert.ok(html.includes(mark)); assert.ok(html.includes('Ver galeria'));
+  assert.ok(!html.includes('cdninstagram.com')); assert.ok(!html.includes('/p/example1/'));
+  await page.locator('#saveProject').click();
+  await eventually(()=>providers.state.projectVersions.size===1,'O rascunho da marca não foi salvo.');
+  const [versions]=providers.state.projectVersions.values();
+  assert.equal(versions[0].snapshot.brandGallery,photos.join('\n'));
+  await page.locator('#closeEditor').click();
+  await page.locator('#studioCompany').fill('Outro negócio');
+  assert.equal(await page.locator('#brandLogo').inputValue(),'');
+  assert.equal(await page.locator('#studioInstagram').inputValue(),'');
+  assert.equal(await page.locator('#studioSummary').inputValue(),'');
+  await page.goto(origin+'/studio?view=projects');
+  await page.locator('#projectsView [data-load]').click();
+  assert.equal(await page.locator('#logoUrl').inputValue(),mark);
+  assert.equal(await page.locator('#brandGallery').inputValue(),photos.join('\n'));
+  assert.ok(await page.locator('#brandEvidence a').count()>=1);
+  await page.locator('#closeEditor').click();
+  await page.goto(origin+'/?view=search');
+  await searchInputs(page);
+  await page.locator('#searchBtn').click();
+  await visibleText(page.locator('#searchResults .opp-tag'),'Apenas Instagram');
+  assert.equal(await page.locator('#searchResults [data-radar-filter=no]').getAttribute('aria-pressed'),'true');
+  assert.equal(providers.state.messages.length,0);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth <= innerWidth),true);
+  assert.deepEqual(errors,[]); assert.deepEqual(providers.state.failures,[]);
+});
+
+test('Página oficial, arquivos próprios e cor do logo funcionam sem geração por IA', {timeout:30000}, async t=>{
+  const providers=await startProviders(); t.after(providers.close);
+  const origin=await startApp(t,providers,false,{metaEnabled:true});
+  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});
+  t.after(()=>browser.close());
+  const {context}=await browserContext(browser,origin,providers,{viewport:{width:1440,height:960}});
+  const page=await context.newPage();
+  await page.goto(origin+'/studio');
+  await page.evaluate(token=>sessionStorage.setItem('prospect_publisher_session_v1',JSON.stringify({access_token:token})),token);
+  const source='https://atelier.example.com/';
+  const sourceData=websiteMetadata('<meta property="og:image" content="/colecao.jpg"><img src="/logo.png" alt="Logo">'+
+    '<a href="https://www.instagram.com/atelieroficial/">Instagram</a>',source);
+  let reads=0;
+  await page.route('**/api/studio/brand/website',async route=>{
+    assert.equal(route.request().postDataJSON().url,source); reads++;
+    await route.fulfill({json:sourceData});
+  });
+  await page.locator('#studioCompany').fill('Ateliê Amora');
+  await page.locator('#studioSegment').fill('Fotografia');
+  await page.locator('#studioCity').fill('Santo André');
+  await page.locator('#studioWebsite').fill(source);
+  await page.locator('#generateThree').click();
+  await page.getByRole('button',{name:'Aplicar seleção autorizada'}).click();
+  await page.locator('[data-choose="2"]').waitFor();
+  assert.equal(reads,1); assert.equal(await page.locator('#brandLogo').inputValue(),sourceData.logo);
+  const png=await page.evaluate(()=>{
+    const canvas=document.createElement('canvas'); canvas.width=canvas.height=20;
+    const ctx=canvas.getContext('2d');ctx.fillStyle='#347a55';ctx.fillRect(0,0,20,20);
+    return canvas.toDataURL('image/png').split(',')[1];
+  });
+  await page.locator('.brand-materials summary').click();
+  const file={name:'marca.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')};
+  await page.locator('#brandLogoFile').setInputFiles(file);
+  await page.locator('#brandPhotoFiles').setInputFiles(file);
+  await page.locator('#brandUpload').click();
+  await visibleText(page.locator('#brandStatus'),'Arquivos da empresa prontos');
+  assert.equal(await page.locator('#brandColorHex').inputValue(),'#347a55');
+  await page.locator('#generateThree').click();
+  await page.locator('[data-choose="0"]').click();
+  assert.equal(await page.locator('#brandColor').inputValue(),'#347a55');
+  assert.equal(await page.locator('#photoOrigin').inputValue(),'business');
+  assert.equal(await page.locator('#brandEvidence a').count(),1);
+  assert.ok((await page.locator('#logoUrl').inputValue()).startsWith(providers.publicOrigin));
+  assert.equal(reads,1); assert.equal(providers.state.used,0);
+  assert.deepEqual(providers.state.aiTexts,[]); assert.deepEqual(providers.state.aiImages,[]);
+  assert.deepEqual(providers.state.failures,[]);
 });

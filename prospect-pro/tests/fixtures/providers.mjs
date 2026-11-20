@@ -80,12 +80,31 @@ export async function startProviders() {
     }
     if (pathname === '/fixtures/google' && method === 'POST') {
       assert.equal(request.headers['x-goog-api-key'], 'only_local_fixture_google_key');
-      assert.equal(request.headers['x-goog-fieldmask'], 'places.id,places.displayName,places.formattedAddress,places.websiteUri,places.internationalPhoneNumber,places.googleMapsUri');
+      const fields='places.id,places.displayName,places.formattedAddress,places.websiteUri,places.internationalPhoneNumber,places.googleMapsUri';
+      assert.ok([fields,fields+',places.googleMapsLinks.photosUri,places.attributions'].includes(request.headers['x-goog-fieldmask']));
       const payload = await jsonBody(request);
       state.googleQueries.push(payload);
       const [status, body] = await googleHandler(payload);
       respond(response, status, body);
       return;
+    }
+    if (pathname === '/fixtures/place/' + business.id) {
+      assert.equal(request.headers['x-goog-api-key'], 'only_local_fixture_google_key');
+      assert.ok(request.headers['x-goog-fieldmask'].includes('googleMapsLinks.photosUri'));
+      respond(response,200,{...business,googleMapsLinks:{photosUri:'https://maps.google.com/maps/photos'}});
+      return;
+    }
+    if (pathname === '/fixtures/instagram') {
+      assert.equal(request.headers.authorization,'Bearer only_local_fixture_meta');
+      assert.match(url.searchParams.get('fields'),/^business_discovery\.username\(salaoaurora\)/);
+      respond(response,200,{business_discovery:{username:'salaoaurora',name:'Salão Aurora',
+        biography:'Cortes com hora marcada.',profile_picture_url:'https://scontent.cdninstagram.com/mark.webp',
+        media:{data:[1,2].map(i=>({media_type:'IMAGE',media_url:'https://scontent.cdninstagram.com/'+i+'.webp',permalink:'https://www.instagram.com/p/example'+i+'/'}))}}});
+      return;
+    }
+    if (pathname === '/fixtures/insta-image') {
+      assert.equal(request.headers.authorization,undefined);
+      response.writeHead(200,{'Content-Type':'image/webp'}); response.end(imageBytes); return;
     }
     if (pathname === '/auth/v1/user' && method === 'GET') {
       const authorized = hasAuth(request);
@@ -222,7 +241,9 @@ export async function startProviders() {
       assert.match(pathname.slice((storagePath + bucket + '/').length), new RegExp('^' + operator.id + '/[0-9a-f-]{36}\\.webp$'));
       assert.equal(request.headers['content-type'], 'image/webp');
       const bytes = await requestBytes(request);
-      assert.deepEqual(bytes, imageBytes);
+      assert.equal(bytes.toString('ascii',0,4),'RIFF');
+      assert.equal(bytes.toString('ascii',8,12),'WEBP');
+      if (state.aiImages.length) assert.deepEqual(bytes, imageBytes);
       const key = pathname.slice(storagePath.length);
       state.uploadedImages.set(key, bytes);
       respond(response, 200, {Key: key});
@@ -243,7 +264,7 @@ export async function startProviders() {
 
   const server = createServer((request, response) => {
     response.setHeader('Access-Control-Allow-Origin', '*');
-    response.setHeader('Access-Control-Allow-Headers', 'apikey,authorization,content-type,prefer');
+    response.setHeader('Access-Control-Allow-Headers', 'apikey,authorization,content-type,prefer,x-upsert');
     response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,OPTIONS');
     handle(request, response).catch(error => {
       state.failures.push(error);

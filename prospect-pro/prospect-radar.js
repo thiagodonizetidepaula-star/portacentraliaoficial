@@ -1,6 +1,7 @@
 (() => {
 'use strict';
 
+const hasWebsite = window.ProspectLinks.hasWebsite;
 const byId = id => document.getElementById(id);
 const stage = byId('radarStage');
 const mode = byId('mode');
@@ -123,8 +124,8 @@ function renderCard(business, index) {
  const placeName = escapeHtml(business.name);
  const street = escapeHtml(business.address || 'Endereço não informado');
  const phone = escapeHtml(business.phone || 'Telefone não informado');
- const site = Boolean(business.website);
- const status = site ? 'Site informado' : 'Sem site informado';
+ const site = hasWebsite(business);
+ const status = site ? 'Site informado' : window.ProspectLinks.instagram(business.website) ? 'Apenas Instagram' : 'Sem site informado';
  return `<article class="opportunity-card">
   <div class="opp-head"><h4>${placeName}</h4><span class="opp-tag${site ? ' site' : ''}">${status}</span></div>
   <div class="opp-meta"><div>${street}</div><div>${phone}</div>
@@ -159,9 +160,9 @@ function renderSessionOpportunities() {
   return;
  }
  const { term, city, results } = completedSearch;
- countLabel.textContent = noSiteCount(results.filter(business => !business.website).length);
+ countLabel.textContent = noSiteCount(results.filter(business => !hasWebsite(business)).length);
  caption.textContent = `${term} · ${city}`;
- const cards = renderCards(business => !business.website);
+ const cards = renderCards(business => !hasWebsite(business));
  opportunityResults.innerHTML = cards ? attribution + cards : emptyPanel('Nenhum perfil sem site informado nesta pesquisa.');
 }
 
@@ -169,7 +170,7 @@ function renderSearchResults() {
  if (searchView !== 'completed') return;
  const { results, city } = completedSearch;
  const total = results.length;
- const noSite = results.filter(business => !business.website).length;
+ const noSite = results.filter(business => !hasWebsite(business)).length;
  const caption = byId('radarCardsCount');
  if (!total) {
   caption.textContent = `Nenhuma empresa encontrada em ${city}.`;
@@ -183,7 +184,7 @@ function renderSearchResults() {
   { id: 'yes', label: 'Com site informado', count: total - noSite }
  ];
  const controls = filters.map(({ id, label, count }) => `<button type="button" class="radar-filter${id === filterMode ? ' active' : ''}" data-radar-filter="${id}" aria-pressed="${id === filterMode}">${label} (${count})</button>`);
- const cards = renderCards(business => filterMode === 'all' || (filterMode === 'no' ? !business.website : Boolean(business.website)));
+ const cards = renderCards(business => filterMode === 'all' || (filterMode === 'no' ? !hasWebsite(business) : hasWebsite(business)));
  searchResults.innerHTML = `<div class="radar-controls" role="group" aria-label="Filtrar empresas">${controls.join('')}</div>` +
   attribution + (cards || emptyPanel('Nenhuma empresa neste filtro.'));
 }
@@ -322,7 +323,7 @@ async function search(event) {
   filterMode = 'no';
   renderSearchResults();
   renderSessionOpportunities();
-  const missing = results.filter(business => !business.website).length;
+  const missing = results.filter(business => !hasWebsite(business)).length;
   const summary = results.length ? `${businessCount(results.length)} no resultado · ${noSiteCount(missing)}.` : `Nenhuma empresa encontrada em ${city}.`;
   setStage('done', '', summary);
   try { localStorage.setItem('prospect_last_segment', term); } catch { /* Search remains available without storage. */ }

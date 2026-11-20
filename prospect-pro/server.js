@@ -1,6 +1,7 @@
 import http from 'node:http';
 import {readFile} from 'node:fs/promises';
-import {createStudioAi} from './studio-ai.js';
+import {createStudioAi, studioOperator} from './studio-ai.js';
+import {createStudioBrand} from './studio-brand-api.js';
 const port=process.env.PORT||3000;
 const LIMIT=50;
 // Cota persistente e atômica no Supabase, só para o operador autorizado.
@@ -29,7 +30,23 @@ const safeSlug=x=>typeof x==='string'&&/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(x)&&x.l
 const escapeHtml=x=>String(x||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const endpoint=process.env.SUPABASE_URL||'';
 const publicKey=process.env.SUPABASE_PUBLISHABLE_KEY||'';
-const studioAi=createStudioAi({endpoint,publicKey,json,getToken});
+const authorizedOperator=studioOperator(endpoint,publicKey);
+const studioAi=createStudioAi({endpoint,publicKey,json,getToken,authorizedOperator});
+const studioBrand=createStudioBrand({json,getToken,authorizedOperator});
+function queryPlaces({placeId,term,city,identity}) {
+ const fields=['id','displayName','formattedAddress','websiteUri','internationalPhoneNumber','googleMapsUri'];
+ if(identity)fields.push('googleMapsLinks.photosUri','attributions');
+ const headers={
+  'X-Goog-Api-Key':process.env.GOOGLE_PLACES_API_KEY,
+  'X-Goog-FieldMask':fields.map(field=>placeId?field:'places.'+field).join(',')
+ };
+ const signal=AbortSignal.timeout(12000);
+ if(placeId)return fetch('https://places.googleapis.com/v1/places/'+encodeURIComponent(placeId)+'?languageCode=pt-BR',{headers,signal});
+ return fetch('https://places.googleapis.com/v1/places:searchText',{
+  method:'POST',headers:{...headers,'Content-Type':'application/json'},signal,
+  body:JSON.stringify({textQuery:term+' em '+city,languageCode:'pt-BR',regionCode:'BR',pageSize:20})
+ });
+}
 async function publicPreview(slug){
  if(!endpoint||!publicKey)throw new Error('Banco de dados não configurado');
  const url=endpoint+'/rest/v1/prospect_site_previews?slug=eq.'+encodeURIComponent(slug)+'&status=eq.published&select=business_name,business_category,city,description,cover_image,html,slug&limit=1';
@@ -41,6 +58,7 @@ async function publicPreview(slug){
 
 http.createServer(async(req,res)=>{
  const u=new URL(req.url,'http://localhost');
+ if(u.pathname.startsWith('/api/studio/brand/'))return studioBrand(req,res,u.pathname);
  if(u.pathname.startsWith('/api/studio/ai/'))return studioAi(req,res,u.pathname);
  if(req.method!=='GET')return json(res,405,{error:'Método não permitido'});
  if(u.pathname==='/health')return json(res,200,{ok:true});
@@ -83,9 +101,11 @@ http.createServer(async(req,res)=>{
   '/biblioteca.js':['./biblioteca.js','text/javascript; charset=utf-8'],
   '/biblioteca-data.js':['./biblioteca-data.js','text/javascript; charset=utf-8'],
   '/studio-flow.js':['./studio-flow.js','text/javascript; charset=utf-8'],
+  '/studio-brand.js':['./studio-brand.js','text/javascript; charset=utf-8'],
   '/studio-publish.js':['./studio-publish.js','text/javascript; charset=utf-8'],
   '/studio-projects.js':['./studio-projects.js','text/javascript; charset=utf-8'],
   '/prospect-dashboard.css':['./prospect-dashboard.css','text/css; charset=utf-8'],
+  '/prospect-links.js':['./prospect-links.js','text/javascript; charset=utf-8'],
   '/prospect-dashboard.js':['./prospect-dashboard.js','text/javascript; charset=utf-8'],
   '/prospect-radar.css':['./prospect-radar.css','text/css; charset=utf-8'],
   '/prospect-radar.js':['./prospect-radar.js','text/javascript; charset=utf-8'],
@@ -106,9 +126,12 @@ http.createServer(async(req,res)=>{
   try{const v=await usageBudget(token,false);return json(res,200,{...v,remaining:Math.max(0,LIMIT-v.used),enabled:true})}
   catch(e){return json(res,200,{month:month(),limit:LIMIT,used:null,remaining:null,enabled:true,loginRequired:true,reason:e.message})}
  }
- if(u.pathname==='/api/search'){
+ if(u.pathname==='/api/search'||u.pathname==='/api/studio/place'){
+  const byId=u.pathname==='/api/studio/place';
+  const placeId=u.searchParams.get('id')||'';
   const term=(u.searchParams.get('term')||'').trim(),city=(u.searchParams.get('city')||'').trim();
-  if(!term||!city||term.length>100||city.length>100)return json(res,400,{error:'Informe setor e cidade.'});
+  if(byId&&!/^[A-Za-z0-9_-]{5,250}$/.test(placeId))return json(res,400,{error:'Identificador do local inválido.'});
+  if(!byId&&(!term||!city||term.length>100||city.length>100))return json(res,400,{error:'Informe setor e cidade.'});
   if(!process.env.GOOGLE_PLACES_API_KEY)return json(res,503,{error:'Google Places API ainda não configurada. Nenhuma cobrança foi gerada.'});
   const token=getToken(req);
   if(!token)return json(res,401,{error:'Faça login na sua conta do Portal Central IA para usar a busca automática.'});
@@ -118,10 +141,10 @@ http.createServer(async(req,res)=>{
    return json(res,503,{error:'Não foi possível confirmar a reserva da busca. Consulte a cota antes de tentar novamente.'});
   }
   try{
-   const upstream=await fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':process.env.GOOGLE_PLACES_API_KEY,'X-Goog-FieldMask':'places.id,places.displayName,places.formattedAddress,places.websiteUri,places.internationalPhoneNumber,places.googleMapsUri'},body:JSON.stringify({textQuery:term+' em '+city,languageCode:'pt-BR',regionCode:'BR',pageSize:20}),signal:AbortSignal.timeout(12000)});
+   const upstream=await queryPlaces({placeId:byId?placeId:'',term,city,identity:byId||u.searchParams.get('identity')==='1'});
    const j=await upstream.json();
    if(!upstream.ok)return json(res,502,{error:j.error?.message||'Falha na consulta Google Places'});
-   return json(res,200,{data:(j.places||[]).map(p=>({googleId:p.id,name:p.displayName?.text||'Empresa',address:p.formattedAddress||'',website:p.websiteUri||'',phone:p.internationalPhoneNumber||'',maps:p.googleMapsUri||''})),usage:{used:slot.used,limit:LIMIT}});
+   return json(res,200,{data:(byId?[j]:j.places||[]).map(p=>({googleId:p.id,name:p.displayName?.text||'Empresa',address:p.formattedAddress||'',website:p.websiteUri||'',phone:p.internationalPhoneNumber||'',maps:p.googleMapsUri||'',photosUrl:p.googleMapsLinks?.photosUri||'',attributions:p.attributions||[]})),usage:{used:slot.used,limit:LIMIT}});
   }catch(e){return json(res,502,{error:'Falha na pesquisa: '+e.message})}
  }
  if(u.pathname==='/'||u.pathname==='/index.html'||u.pathname==='/prospect-pro'||u.pathname==='/prospect-pro/'){

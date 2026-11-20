@@ -11,5 +11,14 @@ globalThis.fetch = (input, init) => {
   if (url.href === 'https://places.googleapis.com/v1/places:searchText') {
     return fetchHttp(new URL('/fixtures/google', fixtureOrigin), init);
   }
+  if (url.origin === 'https://places.googleapis.com' && url.pathname.startsWith('/v1/places/')) {
+    return fetchHttp(new URL('/fixtures/place/' + url.pathname.split('/').pop(), fixtureOrigin), init);
+  }
+  if (url.origin === 'https://graph.facebook.com') {
+    return fetchHttp(new URL('/fixtures/instagram' + url.search, fixtureOrigin), init);
+  }
+  if (url.origin === 'https://scontent.cdninstagram.com') {
+    return fetchHttp(new URL('/fixtures/insta-image', fixtureOrigin), init);
+  }
   throw new Error('A rede do teste não permite chamadas para ' + url.origin);
 };

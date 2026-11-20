@@ -438,3 +438,21 @@
 @media (prefers-reduced-motion: reduce) {
  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important }
 }
+
+.brand-panel { display: grid; gap: 14px; padding: 0 18px 18px; min-width: 0 }
+.brand-panel [hidden] { display: none }
+.brand-actions { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center }
+.brand-panel a { color: #4436a1; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere }
+.brand-panel .field-hint { margin: 0 }
+.brand-panel .field-hint:empty, #brandResults:empty { display: none }
+.brand-materials { min-width: 0; border-top: 1px solid var(--border) }
+.brand-materials > summary { font-size: 14px; cursor: pointer; padding: 12px 0 }
+.brand-materials .studio-brief-fields { padding: 0 0 14px }
+.brand-materials input[type=file] { width: 100%; min-width: 0; padding: 8px; font-size: 14px }
+.brand-review, .brand-place { display: grid; justify-items: start; gap: 10px; padding: 14px 0; border-top: 1px solid var(--border); overflow-wrap: anywhere }
+.brand-review p { margin: 4px 0; color: #4b5870; font-size: 14px }
+.brand-place > span { color: #4b5870 }
+.brand-panel .brand-choice { display: flex; flex-direction: row; align-items: center; gap: 12px; min-width: 0; font-weight: 450 }
+.brand-panel .brand-choice input { width: 18px; height: 18px; flex: none; margin: 0 }
+.brand-choice img { width: 64px; height: 52px; border: 1px solid var(--border); border-radius: 5px; object-fit: contain }
+#brandResults > a, #brandResults > button { margin: 4px 12px 4px 0 }
