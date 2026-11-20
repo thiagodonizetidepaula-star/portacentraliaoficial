@@ -7,6 +7,7 @@
  <title>Biblioteca de Sites | Portal Prospect PRO</title>
  <meta name="description" content="Crie, edite e publique demonstrações de sites para empresas no Portal Prospect PRO.">
  <link rel="stylesheet" href="/biblioteca.css">
+ <script src="/publication-config.js" defer></script>
  <script src="/prospect-links.js" defer></script>
  <script src="/biblioteca-data.js" defer></script>
  <script src="/biblioteca.js" defer></script>
@@ -226,6 +227,7 @@
     <div class="form-actions">
      <button id="resetModel" class="button secondary" type="button">Restaurar estilo</button>
      <button id="downloadSite" class="button secondary" type="button">Baixar HTML</button>
+     <button id="downloadFinalSite" class="button secondary" type="button">Baixar site aprovado (.zip)</button>
      <button id="copyHtml" class="button secondary" type="button">Copiar HTML</button>
     </div>
     </div>
@@ -293,6 +295,11 @@
   <p class="publish-success">Demonstração publicada</p>
   <label>Link público<input id="publicLink" readonly></label>
   <div class="publish-buttons"><button id="copyPublicLink" class="button secondary" type="button">Copiar link</button><button id="openPublicLink" class="button secondary" type="button">Abrir site</button></div>
+  <details class="domain-help">
+   <summary>Usar o domínio da empresa</summary>
+   <p>Após a aprovação, baixe o site e publique o ZIP em um projeto Netlify da empresa. Em <strong>Domain management</strong>, adicione o domínio. No provedor que gerencia o DNS, aplique os registros indicados pela Netlify.</p>
+   <button id="downloadApprovedZip" class="button secondary" type="button">Baixar site aprovado (.zip)</button>
+  </details>
   <label>Mensagem para a empresa<textarea id="publicMessage" rows="6"></textarea></label>
   <p id="publishContactStatus" class="muted-copy">Revise a mensagem antes de abrir o WhatsApp.</p>
   <label id="publishDuplicate" class="publish-check" hidden><input id="publishRepeat" type="checkbox"> Quero preparar outra mensagem para esta empresa.</label>

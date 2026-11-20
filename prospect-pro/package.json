@@ -1,1 +1,1 @@
-{"name":"portal-prospect-pro-preview","version":"1.0.0","private":true,"type":"module","scripts":{"start":"node server.js"},"engines":{"node":">=20"},"dependencies":{"htmlparser2":"10.0.0","ipaddr.js":"2.3.0"}}
+{"name":"portal-prospect-pro-preview","version":"1.0.0","private":true,"type":"module","scripts":{"start":"node server.js"},"engines":{"node":">=20"},"dependencies":{"fflate":"0.8.2","htmlparser2":"10.0.0","ipaddr.js":"2.3.0"}}

@@ -641,8 +641,9 @@ function renderProjects() {
   const date = new Date(project.updatedAt);
   const updated = Number.isNaN(date.getTime()) ? '' : '<p>Editado em ' +
     esc(date.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })) + '</p>';
-  const publicLink = project.publicSlug
-   ? '<a class="button secondary" href="/mvp/' + encodeURIComponent(project.publicSlug) + '" target="_blank" rel="noopener">Abrir prévia</a>'
+  const url = window.ProspectLinks.previewUrl(project.publicSlug, project.publicShareSlug);
+  const publicLink = url
+   ? '<a class="button secondary" href="' + esc(url) + '" target="_blank" rel="noopener">Abrir prévia</a>'
    : '';
   const historyButton = project.cloudOwned
    ? '<button type="button" class="button secondary" data-versions="' + esc(project.id) + '">Versões</button>'
@@ -707,6 +708,7 @@ async function showVersions(project) {
     start(version.project.templateId, {
      ...version.project,
      publicSlug: project.publicSlug,
+     publicShareSlug: project.publicShareSlug,
      publishedId: project.publishedId
     });
     const current = { ...getDefault(template), ...project };
@@ -744,17 +746,37 @@ window.addEventListener('portal-project-version', event => {
  }
 });
 
-$('downloadSite').onclick = () => {
- const url = URL.createObjectURL(new Blob([buildSite(selected, template)], { type: 'text/html;charset=utf-8' }));
+function downloadFile(blob, name, container) {
+ const url = URL.createObjectURL(blob);
  const anchor = document.createElement('a');
  anchor.href = url;
- anchor.download = slug(selected.name) + '-site.html';
- editor.append(anchor);
+ anchor.download = name;
+ container.append(anchor);
  anchor.click();
  anchor.remove();
  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+$('downloadSite').onclick = () => {
+ readFields();
+ downloadFile(new Blob([buildSite(selected, template)], {type:'text/html;charset=utf-8'}), slug(selected.name) + '-site.html', editor);
  notify('Arquivo HTML gerado');
 };
+async function downloadApprovedSite(event) {
+ const button = event.currentTarget;
+ button.disabled = true;
+ try {
+  readFields();
+  const html = buildSite(selected, template, {finalSite:true});
+  const filename = (slug(selected.name) || 'empresa') + '-site.zip';
+  const {zipSync, strToU8} = await import('/vendor/fflate.mjs');
+  const zip = zipSync({'index.html':strToU8(html)});
+  downloadFile(new Blob([zip], {type:'application/zip'}), filename, button.parentElement);
+  notify('Site pronto para o domínio da empresa');
+ } catch { notify('Não foi possível baixar o site. Tente novamente.'); }
+ finally { button.disabled = false; }
+}
+$('downloadFinalSite').onclick = downloadApprovedSite;
+$('downloadApprovedZip').onclick = downloadApprovedSite;
 $('copyHtml').onclick = async () => {
  try {
   await navigator.clipboard.writeText(buildSite(selected, template));
@@ -935,7 +957,7 @@ const premiumCss=[
  '@keyframes scene-rise{from{opacity:.65;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}@keyframes scene-focus{from{transform:scale(1.034)}to{transform:scale(1)}}',
  '@media(prefers-reduced-motion:no-preference){.hero-text{animation:scene-rise .58s ease-out both}.hero-image img,.catalog-gallery img{animation:none}.direction-experiencia .hero-text{animation:scene-rise .72s .09s cubic-bezier(.22,.7,.4,1) both}.direction-experiencia .hero-image img{animation:scene-focus 1.15s ease-out both}.direction-pratico .hero-text{animation:scene-rise .4s ease-out both}.direction-pratico .hero-image img{animation:none}.services .service-card{transition:none}.hero-button,.cta-button{transition:filter .16s ease}.hero-button:hover,.cta-button:hover{transform:none}}'
 ].join('');
-function buildSite(info,t) {
+function buildSite(info,t,{finalSite=false}={}) {
  const name=text(info.name)||t.example,kind=text(info.industry)||t.label;
  const showLocation=info.showLocation!==false;
  const city=showLocation?text(info.city):'',address=showLocation?text(info.address):'';
@@ -1069,6 +1091,10 @@ function buildSite(info,t) {
 
  const title=name+' | '+kind+(city?' em '+city:'');
  const meta=summary.slice(0,155);
+ const social = finalSite ? '<meta property="og:type" content="website"><meta property="og:locale" content="pt_BR">'+
+  '<meta property="og:site_name" content="'+esc(name)+'"><meta property="og:title" content="'+esc(title)+'">'+
+  '<meta property="og:description" content="'+esc(meta)+'">'+
+  (image?'<meta property="og:image" content="'+esc(image)+'"><meta name="twitter:card" content="summary_large_image">':'') : '';
  const schema={'@context':'https://schema.org','@type':'LocalBusiness',name,description:meta,
   ...(address||city?{address:{'@type':'PostalAddress',...(address?{streetAddress:address}:{}),...(city?{addressLocality:city}:{}),addressCountry:'BR'}}:{}),
   ...(telephone?{telephone}:{}),...(email?{email}:{}),...(map?{hasMap:map}:{}),...(instagram?{sameAs:[instagram]}:{})};
@@ -1079,7 +1105,7 @@ function buildSite(info,t) {
 
  return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
   '<meta name="theme-color" content="'+bg+'"><meta name="description" content="'+esc(meta)+'">'+
-  '<title>'+esc(title)+'</title>'+
+  '<title>'+esc(title)+'</title>'+social+
   '<script type="application/ld+json">'+schemaSafe+'</script><style>'+pageStyle+'</style></head>'+
   '<body class="variant-'+variant+(direction?' direction-'+direction:'')+spacing+' art-'+art+'" data-direction="'+direction+'">'+
   '<a class="skip-link" href="#inicio">Ir para o conteúdo</a>'+
@@ -1091,13 +1117,18 @@ function buildSite(info,t) {
   (hasContact?'<a class="nav-cta" href="#contato">Contato</a>':'')+'</nav></header>'+
   '<main id="inicio">'+hero+sections+portfolio+(faq.length?faqMarkup(faq):'')+contactHtml+'</main>'+
   '<footer class="footer container"><span>© '+new Date().getFullYear()+' '+esc(name)+'</span>'+
-  '<span>'+esc((direction?'Proposta de site · ':'')+kind+(city?' em '+city:''))+'</span></footer></body></html>';
+  '<span>'+esc((direction&&!finalSite?'Proposta de site · ':'')+kind+(city?' em '+city:''))+'</span></footer></body></html>';
 }
 window.PortalSiteStudio={
  start,buildSite,getDefault,pendingLead,templates,renderProjects,save:saveSelected,
  otherCovers:(name,city)=>new Set(projects.filter(p=>slug(p.name)!==slug(name)||slug(p.city)!==slug(city)).map(p=>p.photo)),
  getCurrent:()=>{if(!selected||!template)return null;readFields();return {data:{...selected},template:{...template}};},
- updatePublished:(id,pubSlug)=>{if(selected){selected.publishedId=id;selected.publicSlug=pubSlug}}
+ updatePublished:(id, original, share)=>{
+  if (!selected) return;
+  selected.publishedId=id;
+  selected.publicSlug=original;
+  selected.publicShareSlug=share;
+ }
 };
 updateProjectCount();
 if (location.pathname.startsWith('/studio')) {

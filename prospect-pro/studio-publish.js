@@ -360,7 +360,7 @@ function reflectContact() {
 
 async function writePreview(payload, user, publishingId, retry) {
  const base = '/rest/v1/prospect_site_previews';
- const selection = 'select=id,slug';
+ const selection = 'select=id,slug,share_slug,updated_at';
  const owner = '&owner_id=eq.' + encodeURIComponent(user.id);
  const token = session.access_token;
  let id = publishingId;
@@ -375,6 +375,19 @@ async function writePreview(payload, user, publishingId, retry) {
  const row = rows?.[0];
  if (!row?.id || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(row.slug)) throw Error('O serviço não confirmou o link publicado.');
  return row;
+}
+
+async function confirmPublicVersion(link, updatedAt) {
+ const expected = Date.parse(updatedAt);
+ for (const wait of [0, 1500, 4000, 4000]) {
+  if (wait) await new Promise(resolve => setTimeout(resolve, wait));
+  try {
+   const response = await fetch(link, {method:'HEAD', cache:'no-store', credentials:'omit', signal:AbortSignal.timeout(5000)});
+   const visible = response.headers.get('X-Prospect-Updated');
+   if (response.ok && visible && Number(visible) >= expected) return;
+  } catch { /* Retry until this version is visible at the public address. */ }
+ }
+ throw Error('O projeto foi salvo. A prévia ainda não confirmou a atualização. Tente novamente para verificar o mesmo link.');
 }
 
 async function publish() {
@@ -419,9 +432,14 @@ async function publish() {
    updated_at: timestamp
   };
   const row = await writePreview(payload, user, data.publishedId, retry);
-  engine.updatePublished(row.id, row.slug);
+  engine.updatePublished(row.id, row.slug, row.share_slug);
   const saved = engine.save();
-  const link = location.origin + '/mvp/' + encodeURIComponent(row.slug);
+  const link = window.ProspectLinks.previewUrl(row.slug, row.share_slug);
+  if (!link) throw Error('O endereço da prévia não foi confirmado.');
+  if (window.ProspectLinks.externalPreviews) {
+   status('Conferindo a versão que o cliente vai abrir…');
+   await confirmPublicVersion(link, row.updated_at);
+  }
   const result = lastPublic = { link, data: { ...data, name }, user, checking: Boolean(data.leadId) };
   $('publicLink').value = link;
   $('publicMessage').value = businessMessage(result.data, link);
@@ -435,7 +453,7 @@ async function publish() {
   if (data.leadId) {
    try {
     result.lead = await checkLead(data.leadId, user);
-    const fields = { preview_slug: row.slug };
+    const fields = { preview_slug: row.share_slug || row.slug };
     if (!result.lead.proposalSentAt && !result.lead.optedOut &&
      (!result.lead.stage || ['Novo', 'Em análise'].includes(result.lead.stage))) fields.stage = 'Site criado';
     await markLead(data.leadId, user, result.lead, fields);

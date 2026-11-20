@@ -4,6 +4,8 @@
 import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
+import {readFile} from 'node:fs/promises';
+import {unzipSync, strFromU8} from 'fflate';
 import {createServer} from 'node:net';
 import {test} from 'node:test';
 import {setTimeout as delay} from 'node:timers/promises';
@@ -26,7 +28,7 @@ async function availablePort() {
   return port;
 }
 
-async function startApp(t, providers, googleEnabled, {aiEnabled = false, metaEnabled = false} = {}) {
+async function startApp(t, providers, googleEnabled, {aiEnabled = false, metaEnabled = false, netlifyEnabled = false} = {}) {
   const port = await availablePort();
   const origin = 'http://127.0.0.1:' + port;
   const child = spawn(process.execPath, ['--import', guardPath, serverPath], {
@@ -34,6 +36,7 @@ async function startApp(t, providers, googleEnabled, {aiEnabled = false, metaEna
       NODE_ENV: 'test',
       PORT: String(port),
       PREVIEW_PUBLIC_ORIGIN: origin,
+      PROSPECT_PUBLICATION_ORIGIN: netlifyEnabled ? providers.origin : '',
       PROSPECT_PROVIDER_FIXTURE_ORIGIN: providers.origin,
       PROSPECT_PROVIDER_PUBLIC_ORIGIN: providers.publicOrigin,
       SUPABASE_URL: aiEnabled || metaEnabled ? providers.publicOrigin : providers.origin,
@@ -341,7 +344,7 @@ test('API protege a chave e bloqueia a 51ª consulta antes de chamar Google', {t
 test('Prospecção, três propostas, edição, publicação e confirmação de envio', {timeout: 65000}, async t => {
   const providers = await startProviders();
   t.after(providers.close);
-  const origin = await startApp(t, providers, true);
+  const origin = await startApp(t, providers, true, {netlifyEnabled:true});
   const browser = await chromium.launch({executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium'});
   t.after(() => browser.close());
   const {context, openedUrls} = await browserContext(browser, origin, providers, {viewport: {width: 1440, height: 1000}});
@@ -483,7 +486,13 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   await page.locator('#confirmPublish').click();
   await page.locator('#publishResult').waitFor();
   const link = await page.locator('#publicLink').inputValue();
-  assert.match(new URL(link).pathname, /^\/mvp\/salao-aurora-/);
+  assert.equal(link, providers.origin + '/p/salao-aurora');
+  const record = [...providers.state.previews.values()][0];
+  const legacy = await fetch(origin + '/mvp/' + record.slug);
+  assert.equal(legacy.status, 200);
+  assert.ok((await legacy.text()).includes(customHeadline));
+  assert.equal((await fetch(origin + '/mvp/salao-aurora')).status, 200);
+  assert.equal((await fetch(origin + '/mvp/nao-publicado')).status, 404);
   const opened = context.waitForEvent('page');
   await page.locator('#openPublicLink').click();
   const publicPage = await opened;
@@ -523,6 +532,35 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   await visibleText(secondPage.locator('#projectsList'), 'Prévia publicada');
   await secondPage.locator('#projectsView [data-load]').click();
   assert.equal(await secondPage.locator('#headline').inputValue(), customHeadline);
+  const updatedHeadline = 'Uma nova coleção de cortes no Salão Aurora';
+  await secondPage.locator('#headline').fill(updatedHeadline);
+  await secondPage.locator('#publishPreview').click();
+  const updateButton = secondPage.getByRole('button', {name:'Atualizar link publicado'});
+  // An old 200 from the CDN must not release the share button before this version arrives.
+  let checks = 0;
+  await secondPage.route(link, async route => {
+    if (route.request().method() !== 'HEAD' || ++checks > 1) return route.continue();
+    await route.fulfill({status:200, headers:{'Access-Control-Allow-Origin':'*','Access-Control-Expose-Headers':'X-Prospect-Updated','X-Prospect-Updated':'1'}});
+  });
+  await updateButton.click();
+  await secondPage.locator('#publishResult').waitFor();
+  assert.ok(checks >= 2);
+  assert.equal(await secondPage.locator('#publicLink').inputValue(), link);
+  assert.ok((await (await fetch(link)).text()).includes(updatedHeadline));
+  assert.equal(providers.state.previews.size, 1);
+  assert.equal(providers.state.leads.get(lead.id).preview_slug, 'salao-aurora');
+  await secondPage.getByText('Usar o domínio da empresa', {exact:true}).click();
+  const download = secondPage.waitForEvent('download');
+  await secondPage.locator('#downloadApprovedZip').click();
+  const archive = await download;
+  assert.equal(archive.suggestedFilename(), 'salao-aurora-site.zip');
+  const files = unzipSync(await readFile(await archive.path()));
+  assert.deepEqual(Object.keys(files), ['index.html']);
+  const finalHtml = strFromU8(files['index.html']);
+  assert.ok(finalHtml.includes(updatedHeadline));
+  assert.ok(finalHtml.includes('property="og:title"'));
+  assert.doesNotMatch(finalHtml, /Proposta de site ·|noindex|Demonstração Portal Central IA/);
+  await secondPage.locator('#closePublish').click();
   await secondPage.locator('#closeEditor').click();
   await secondPage.goto(origin + '/studio?lead=' + encodeURIComponent(lead.id));
   await secondPage.locator('#threeProposals .proposal-card').nth(2).waitFor();
