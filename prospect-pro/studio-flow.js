@@ -27,6 +27,15 @@ const tokenKey='prospect_publisher_session_v1';
 let formChanged=false;
 let generation;
 let capability={text:false,images:false};
+function matchesLead() {
+ return lead && norm(lead.name)===norm(formValue('studioCompany')) &&
+  (!lead.city || norm(lead.city)===norm(formValue('studioCity'))) &&
+  (!lead.address || norm(lead.address)===norm(formValue('studioAddress')));
+}
+const brandPanel=window.createProspectBrand({
+ sessionToken, getPlaceId:()=>matchesLead() ? lead.googlePlaceId||lead.googleId||'' : '',
+ aiAvailable:()=>Boolean(capability.text)
+});
 const options=fetch('/api/studio/ai/status',{cache:'no-store'})
  .then(response=>response.ok?response.json():capability).catch(()=>capability)
  .then(value=>{capability=value;reflectOptions();return value;});
@@ -40,6 +49,7 @@ function reflectOptions(){
  const connected=Boolean(sessionToken());
  $('studioAiConnect').hidden=!(capability.text||capability.images)||connected;
  $('studioImageOptions').hidden=!capability.images||!connected;
+ brandPanel.refresh();
 }
 
 function brazilNumber(value){
@@ -75,15 +85,16 @@ function fillClient(company) {
   studioAddress:company?.address,
   studioPhone:company?.phone,
   studioWhatsApp:company?.whatsapp,
-  studioWebsite:normalizeWebsite(company?.website),
+  studioWebsite:window.ProspectLinks.instagram(company?.website)?'':normalizeWebsite(company?.website),
   studioGoogleMapsUrl:company?.mapsUrl||company?.maps,
   studioHours:company?.hours,
   studioEmail:company?.email,
-  studioInstagram:company?.instagram
+  studioInstagram:company?.instagram||window.ProspectLinks.instagram(company?.website)
  };
  for(const [id,value] of Object.entries(values))$(id).value=value||'';
  $('studioWhatsAppConfirmed').checked=Boolean(company?.whatsappConfirmed===true&&!company?.whatsapp);
  reflectContact();
+ brandPanel.refresh();
 }
 
 function matchTemplate(value) {
@@ -149,23 +160,35 @@ function makeProposals(client) {
  const suggested=!client.services.length;
  const services=suggested?match?.services||[]:client.services.map(item=>item.split('|')[0].trim()).filter(Boolean);
  const serviceDetails=client.services.filter(item=>item.includes('|')).join('\n');
- const leadId=lead&&norm(lead.name)===norm(client.name)?lead.id:null;
- const googlePlaceId=leadId ? lead.googlePlaceId||lead.googleId||'' : '';
+ const crmPlace=lead?.googlePlaceId||lead?.googleId||'';
+ const leadId=matchesLead() && (!client.brand.placeId || !crmPlace || client.brand.placeId===crmPlace) ? lead.id : null;
+ const googlePlaceId=client.brand.placeId;
+ const brand=client.brand;
+ const seed=Array.from(norm(client.name+' '+client.city)).reduce((hash,c)=>(Math.imul(hash,31)+c.charCodeAt(0))>>>0,0);
+ const ownPhotos=brand.photos;
+ const recent=app.otherCovers(client.name,client.city);
+ const rotated=base.photos.map((_,i)=>base.photos[(i+seed%base.photos.length)%base.photos.length]);
+ const pictures=ownPhotos.length ? ownPhotos : [...rotated.filter(url=>!recent.has(url)),...rotated.filter(url=>recent.has(url))];
  const about=client.about||[identity,profile.story||next.trim()].filter(Boolean).join(' ');
  return visualDirections.map((direction,index)=>{
   const template={
    id:base.id+'-studio-'+index,
    label:category,category:base.category,example:client.name,profile,
-   direction:direction.id,layout:direction.layout(base),...direction.colors(base),
+   direction:direction.id,layout:direction.layout(base),...direction.colors(brand.color?{...base,accent:brand.color}:base),
    headline:headlines[index],summary:summaries[index].slice(0,320),services,
-   photo:base.photos[index],detailPhoto:base.photos[(index+1)%base.photos.length]
+   photo:pictures[index%pictures.length],
+   detailPhoto:ownPhotos.length?'':pictures[(index+1)%pictures.length],
+   photoOrigin:ownPhotos.length?'business':'reference',brandColor:brand.color||'',
+   logo:brand.logo,brandGallery:ownPhotos.join('\n')
   };
   const data={
    ...app.getDefault(template),
    name:client.name,industry:category,city:client.city,address:client.address,
    phone:client.phone,whatsapp:client.whatsapp,whatsappConfirmed:Boolean(client.whatsapp),website:client.website,
    hours:client.hours,email:client.email,instagram:client.instagram,mapsUrl:client.mapsUrl,googlePlaceId,
-   about,serviceDetails,servicesSuggested:suggested,photoOrigin:'reference',
+   about,serviceDetails,servicesSuggested:suggested,photoOrigin:template.photoOrigin,
+   logo:brand.logo,brandGallery:ownPhotos.join('\n'),brandSources:brand.sources,
+   variant:String((seed+index)%3),
    companyFacts:{summary:client.summary,about:client.about,services:client.services},
    leadId,templateSnapshot:template
   };
@@ -207,16 +230,18 @@ function showProposalsStatus(client,proposals){
  status.textContent='Três propostas para '+client.name+'. Escolha uma para personalizar.'+suggestion;
 }
 
-function readClient(){
+function readClient(brand){
  const phone=formValue('studioPhone');
  const explicit=formValue('studioWhatsApp');
+ const website=normalizeWebsite(formValue('studioWebsite'));
+ const profile=window.ProspectLinks.instagram(website);
  return {
   name:formValue('studioCompany'),category:formValue('studioSegment'),city:formValue('studioCity'),
   phone,whatsapp:explicit||($('studioWhatsAppConfirmed').checked?phone:''),
-  address:formValue('studioAddress'),website:normalizeWebsite(formValue('studioWebsite')),
+  address:formValue('studioAddress'),website:profile?'':website,
   mapsUrl:formValue('studioGoogleMapsUrl'),hours:formValue('studioHours'),
-  email:formValue('studioEmail'),instagram:formValue('studioInstagram'),
-  summary:formValue('studioSummary'),about:formValue('studioAbout'),
+  email:formValue('studioEmail'),instagram:formValue('studioInstagram')||profile,
+  summary:formValue('studioSummary'),about:formValue('studioAbout'),brand,
   services:formValue('studioServices').split(/\r?\n/).map(service=>service.trim()).filter(Boolean).slice(0,8)
  };
 }
@@ -253,14 +278,15 @@ async function enhanceProposals(client,proposals,controller){
  if(signal.aborted||!token||(!available.text&&!available.images))return;
  const tasks=[];
  const company={name:client.name,industry:client.category,city:client.city,address:client.address,
-  summary:[client.summary,client.about].filter(Boolean).join('\n'),services:client.services};
+  summary:[client.summary,client.about].filter(Boolean).join('\n'),services:client.services,
+  brand:{hasLogo:Boolean(client.brand.logo),color:client.brand.color,photos:client.brand.photos.length}};
  if(available.text){
   tasks.push(aiRequest('text',{mode:'generate',company},token,signal).then(({proposals:copies})=>{
    if(signal.aborted||!Array.isArray(copies)||copies.length!==3)return;
    copies.forEach((copy,index)=>{refineCopy(proposals[index],copy,client);refreshCard(proposals[index],index)});
   }));
  }
- if(available.images&&$('studioGenerateImages').checked){
+ if(available.images&&!client.brand.photos.length&&$('studioGenerateImages').checked){
   const imageBriefs=[
    'Imagem principal de apresentação da atividade, com composição clara e espaço negativo.',
    'Cena próxima de uma experiência típica do segmento, com luz e textura em destaque.',
@@ -288,7 +314,10 @@ async function enhanceProposals(client,proposals,controller){
 }
 
 function previewThree(enhance=false) {
- const client=readClient();
+ let brand;
+ try { brand=brandPanel.read(); }
+ catch(error) { status.textContent=error.message; return; }
+ const client=readClient(brand);
  if(client.name.length<2){
   $('studioCompany').focus();
   status.textContent='Informe o nome da empresa.';
@@ -315,9 +344,12 @@ function previewThree(enhance=false) {
  });
 }
 
-form.addEventListener('submit',event=>{
+form.addEventListener('submit',async event=>{
  event.preventDefault();
  formChanged=true;
+ try {
+  if (!await brandPanel.prepare()) { status.textContent='Confira a identidade da empresa antes de gerar as propostas.'; return; }
+ } catch (error) { status.textContent=error.message; return; }
  previewThree(true);
 });
 form.addEventListener('input',event=>{

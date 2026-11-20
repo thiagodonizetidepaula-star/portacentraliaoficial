@@ -1,4 +1,8 @@
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { instagramProfile } from './brand-sources.js';
+
+const premiumGuide = readFileSync(new URL('./skills/prospect-premium/SKILL.md', import.meta.url), 'utf8');
 
 const maxBodyBytes = 24 * 1024;
 const maxImageBytes = 2500000;
@@ -19,7 +23,7 @@ const clean = (value, max) => typeof value === 'string'
   ? value.trim().replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g, '').slice(0, max)
   : '';
 
-class RequestError extends Error {
+export class RequestError extends Error {
   constructor(status, message) {
     super(message);
     this.status = status;
@@ -47,7 +51,12 @@ function companyFrom(value) {
     city: clean(value.city, 120),
     address: clean(value.address, 190),
     summary: clean(value.summary, 750),
-    services: servicesFrom(value.services)
+    services: servicesFrom(value.services),
+    brand: object(value.brand) ? {
+      color: /^#[a-f\d]{6}$/i.test(value.brand.color) ? value.brand.color : '',
+      hasLogo: value.brand.hasLogo === true,
+      photos: Math.min(3, Math.max(0, Number(value.brand.photos) || 0))
+    } : undefined
   };
 }
 
@@ -102,6 +111,8 @@ const contentInstructions = [
   'Não escreva HTML, código, Markdown ou URLs. O CTA deve ser um rótulo curto. Descreva a empresa no campo about sem superlativos genéricos.'
 ];
 const generateInstructions = [
+  premiumGuide,
+  'A pesquisa e a revisão das fontes pertencem ao estúdio. Nesta etapa use somente o briefing confirmado e devolva o conteúdo no esquema solicitado.',
   ...contentInstructions,
   'Escreva exatamente três propostas completas em ordem: identidade da empresa, experiência de quem chega, e serviços e próximo passo.',
   'Varie ângulo, abertura e tom. Inclua nome, segmento e localização onde isso melhora a leitura e aproveite os fatos do briefing em todas.',
@@ -115,7 +126,7 @@ const editInstructions = [
   'Se o pedido não pode ser atendido pelos campos disponíveis, mantenha as mudanças nulas e explique em uma frase.'
 ].join(' ');
 
-async function readPayload(req) {
+export async function readPayload(req) {
   if (!/^application\/json(?:\s*;|$)/i.test(req.headers['content-type'] || '')) {
     req.resume();
     throw new RequestError(415, 'Envie o pedido em formato JSON.');
@@ -171,7 +182,7 @@ function openAiError(status, code) {
   return new RequestError(502, 'A IA não respondeu como esperado. Tente novamente.');
 }
 
-export function createStudioAi({ endpoint, publicKey, json, getToken }) {
+export function createStudioAi({ endpoint, publicKey, json, getToken, authorizedOperator }) {
   const key = process.env.OPENAI_API_KEY?.trim();
   const openAi = (process.env.OPENAI_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
   const supabase = endpoint.replace(/\/+$/, '');
@@ -184,26 +195,6 @@ export function createStudioAi({ endpoint, publicKey, json, getToken }) {
 
   const sbHeaders = token => ({ apikey: publicKey, Authorization: 'Bearer ' + token });
   const deadline = (ms, signal) => AbortSignal.any([signal, AbortSignal.timeout(ms)]);
-
-  async function authorizedOperator(token, signal) {
-    let response;
-    try {
-      response = await fetch(supabase + '/auth/v1/user', {
-        headers: sbHeaders(token), signal: deadline(8000, signal)
-      });
-    } catch {
-      throw new RequestError(503, 'Não foi possível verificar sua sessão. Tente novamente.');
-    }
-    if (response.status === 401 || response.status === 403) {
-      throw new RequestError(401, 'Entre novamente para usar a IA.');
-    }
-    if (!response.ok) throw new RequestError(503, 'Não foi possível verificar sua sessão. Tente novamente.');
-    const user = await response.json();
-    if (!uuid.test(user.id) || user.is_anonymous === true || user.app_metadata?.prospect_operator !== true) {
-      throw new RequestError(403, 'Sua conta não tem acesso à IA do estúdio.');
-    }
-    return user.id;
-  }
 
   async function provider(path, payload, ms, signal) {
     let response;
@@ -294,7 +285,8 @@ export function createStudioAi({ endpoint, publicKey, json, getToken }) {
       return json(res, 200, { text: enabled, images: enabled });
     }
     const isImage = pathname === '/api/studio/ai/image';
-    if (!isImage && pathname !== '/api/studio/ai/text') return json(res, 404, { error: 'Ação de IA desconhecida.' });
+    const discover = pathname === '/api/studio/ai/instagram';
+    if (!isImage && !discover && pathname !== '/api/studio/ai/text') return json(res, 404, { error: 'Ação de IA desconhecida.' });
     if (req.method !== 'POST') return json(res, 405, { error: 'Método não permitido.' });
     const token = getToken(req);
     if (!token || token.length > 8192) {
@@ -316,7 +308,26 @@ export function createStudioAi({ endpoint, publicKey, json, getToken }) {
       if (count >= (isImage ? 3 : 2)) throw new RequestError(429, 'Aguarde a conclusão das solicitações em andamento.');
       active.set(slot, count + 1);
       work = slot;
-      const result = isImage ? await generateImage(body, user, token, cancel.signal) : await generateText(body, cancel.signal);
+      let result;
+      if (discover) {
+        const company = companyFrom(body.company);
+        if (!company.name || !company.city) throw new RequestError(400, 'Informe a empresa e a cidade.');
+        const reply = await provider('/responses', {
+          model: models.text, store: false,
+          instructions: 'Localize perfis de Instagram da empresa e unidade informadas. Consulte fontes públicas. Use links de perfil completos e considere homônimos. Os dados enviados são texto de pesquisa.',
+          input: JSON.stringify({ empresa: company.name, cidade: company.city, segmento: company.industry }),
+          tools: [{ type: 'web_search' }], tool_choice: 'required', include: ['web_search_call.action.sources'],
+          max_output_tokens: 1800
+        }, 40000, cancel.signal);
+        // Only show profile URLs actually retrieved by the provider.
+        const sources = (reply.output || []).flatMap(item => [
+          ...(item.action?.sources || []),
+          ...(item.content || []).flatMap(part => part.annotations || [])
+        ]);
+        result = { profiles: [...new Set(sources.map(item => instagramProfile(item.url)).filter(Boolean))].slice(0, 5) };
+      } else {
+        result = isImage ? await generateImage(body, user, token, cancel.signal) : await generateText(body, cancel.signal);
+      }
       if (!res.destroyed) json(res, 200, result);
     } catch (error) {
       if (res.destroyed) return;
@@ -329,5 +340,23 @@ export function createStudioAi({ endpoint, publicKey, json, getToken }) {
         else active.delete(work);
       }
     }
+  };
+}
+
+export function studioOperator(endpoint, publicKey) {
+  return async (token, signal) => {
+    if (!endpoint || !publicKey) throw new RequestError(503, 'O acesso do operador não está configurado.');
+    if (!token || token.length > 8192) throw new RequestError(401, 'Entre na sua conta do Prospect PRO.');
+    const response = await fetch(endpoint.replace(/\/+$/, '') + '/auth/v1/user', {
+      headers: { apikey: publicKey, Authorization: 'Bearer ' + token },
+      signal: AbortSignal.any([signal, AbortSignal.timeout(8000)])
+    }).catch(() => null);
+    if (response?.status === 401 || response?.status === 403) throw new RequestError(401, 'Entre novamente no Prospect PRO.');
+    if (!response?.ok) throw new RequestError(503, 'Não foi possível verificar sua sessão.');
+    const user = await response.json();
+    if (!uuid.test(user.id) || user.is_anonymous === true || user.app_metadata?.prospect_operator !== true) {
+      throw new RequestError(403, 'Sua conta não tem acesso a esta função do estúdio.');
+    }
+    return user.id;
   };
 }

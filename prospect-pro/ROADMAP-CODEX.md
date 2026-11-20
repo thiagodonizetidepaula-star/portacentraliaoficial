@@ -13,6 +13,12 @@ Este documento registra o escopo e a situação real do aplicativo de prospecç�
 - `prospect-crm.js`: CRM com sincronização privada Supabase, histórico de buscas por Place IDs, acompanhamento de propostas, confirmação manual de envio.
 - `biblioteca-data.js`, `biblioteca.js`, `studio-flow.js`, `studio-publish.js`: biblioteca interna (oculta ao operador), motor de propostas, editor, publicação e mensagem WhatsApp.
 
+## Identidade da empresa no estúdio
+
+O gerador usa `skills/prospect-premium/SKILL.md` nas propostas com IA. O fluxo local também aceita logo, galeria e cor. A consulta ao Google por nome ou Place ID compartilha a cota do radar. Uma página oficial HTTPS pode fornecer sugestões de logo, fotos, descrição, cor e Instagram para revisão. Os materiais importados ficam no bucket existente `prospect-site-images` e as fontes ficam no rascunho.
+
+A descoberta de perfis profissionais no Instagram utiliza a integração da Meta com Facebook Login. Configure no servidor `INSTAGRAM_BUSINESS_ACCOUNT_ID` (ID da conta profissional que consulta) e `INSTAGRAM_GRAPH_ACCESS_TOKEN` com acesso a Business Discovery. A versão padrão é v25.0, ajustável com `INSTAGRAM_GRAPH_VERSION`. Na ausência dessa conexão, o operador pode vincular o perfil e importar os arquivos autorizados. A pesquisa de perfis na web com IA utiliza a conexão OpenAI existente quando disponível. O endpoint `/api/studio/brand/status` informa as integrações configuradas e a revisão publicada pelo Render.
+
 ## Requisitos inegociáveis
 1. O operador pesquisa cidade + segmento; radar exibe etapas reais e feedback. Se Google estiver bloqueado, exibir erro e não simular empresas.
 2. API Google Place Search (New), chave exclusivamente no backend; cota mensal de **50** invocações de pesquisa, atômica no Supabase, com fuso de São Paulo. Não autorizar cobrança nem alterar plano sem permissão.

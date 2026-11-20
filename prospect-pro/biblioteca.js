@@ -53,12 +53,12 @@ const editFields = {
  addressName: 'address', companyWebsite: 'website', companyMapsUrl: 'mapsUrl', companyEmail: 'email',
  companyInstagram: 'instagram', companyHours: 'hours',
  headline: 'headline', summary: 'summary', aboutCopy: 'about', ctaCopy: 'cta', services: 'services',
- serviceDetails: 'serviceDetails', faqCopy: 'faq', logoUrl: 'logo',
+ serviceDetails: 'serviceDetails', faqCopy: 'faq', logoUrl: 'logo', brandGallery: 'brandGallery',
  photoUrl: 'photo', photoOrigin: 'photoOrigin', brandColor: 'color', layoutVariant: 'variant', headingFont: 'headingFont',
  headingSize: 'headingSize', buttonStyle: 'buttonStyle', motionStyle: 'motionStyle',
  sectionSpacing: 'spacing', showServices: 'showServices', showLocation: 'showLocation'
 };
-const styleFields = ['logo', 'photo', 'photoOrigin', 'color', 'variant', 'headingFont', 'headingSize', 'buttonStyle',
+const styleFields = ['logo', 'photo', 'photoOrigin', 'brandGallery', 'color', 'variant', 'headingFont', 'headingSize', 'buttonStyle',
  'motionStyle', 'spacing', 'showServices', 'showLocation'];
 const editor = $('editorOverlay');
 const mobileEditor = matchMedia('(max-width: 760px)');
@@ -78,7 +78,7 @@ function getDefault(t) {
   mapsUrl: pendingLead?.mapsUrl || '', email: '', instagram: '', hours: '',
   headline: t.headline, summary: t.summary, about: '', cta: '', services: (t.services || []).join('\n'),
   serviceDetails: '', faq: '', photo: t.photo, photoOrigin: t.photoOrigin || 'reference',
-  logo: '', color: t.accent, variant: '0', headingFont: 'auto', headingSize: '1',
+  logo: photo(t.logo), brandGallery: t.brandGallery || '', color: t.accent, variant: '0', headingFont: 'auto', headingSize: '1',
   buttonStyle: 'auto', motionStyle: t.motionStyle || 'soft', spacing: 'balanced', showServices: true, showLocation: true
  };
 }
@@ -148,6 +148,18 @@ function start(id, project) {
  resetAssistant();
  setEditorTool(false);
  $('modelName').textContent = template.label;
+ const evidence = $('brandEvidence');
+ const sourceLinks = (Array.isArray(selected.brandSources) ? selected.brandSources : []).map(photo).filter(Boolean);
+ evidence.hidden = !sourceLinks.length;
+ evidence.replaceChildren();
+ if (sourceLinks.length) {
+  evidence.append('Fontes conferidas para este projeto');
+  for (const url of sourceLinks) {
+   const link=document.createElement('a'); link.href=url; link.textContent=new URL(url).hostname;
+   link.target='_blank'; link.rel='noopener noreferrer';
+   evidence.append(document.createElement('br'),link);
+  }
+ }
  writeFields();
  readFields();
  edits = [snapshot()];
@@ -815,11 +827,11 @@ function servicesMarkup(list,profile,info,isSuggested) {
   }).join('')+'</ul></div></section>';
 }
 
-function storyMarkup(name,heading,copy,image) {
+function storyMarkup(name,heading,copy,image,businessImage=false) {
  return '<section class="story section" id="sobre" aria-labelledby="story-title"><div class="container story-grid">'+
   '<div class="story-copy"><h2 id="story-title">'+esc(heading||'Conheça '+name)+'</h2>'+
   (copy?'<p>'+esc(copy)+'</p>':'')+'</div>'+
-  (image?'<figure class="story-image"><img loading="lazy" decoding="async" width="850" height="650" src="'+esc(image)+'" alt=""><figcaption>Imagem ilustrativa</figcaption></figure>':'')+
+  (image?'<figure class="story-image"><img loading="lazy" decoding="async" width="850" height="650" src="'+esc(image)+'" alt="">'+(businessImage?'':'<figcaption>Imagem ilustrativa</figcaption>')+'</figure>':'')+
   '</div></section>';
 }
 
@@ -962,8 +974,9 @@ function buildSite(info,t) {
  const heroHref=whatsapp||(telephone?'tel:'+telephone:hasServices?'#servicos':hasContact?'#contato':'#sobre');
 
  const selectedImage=photo(info.photo),image=selectedImage||photo(t.photo),logo=photo(info.logo);
+ const ownPhotos=[...new Set(fieldLines(info.brandGallery,3).map(photo).filter(Boolean))];
  const related=templates.filter(item=>item.category===t.category&&item.id!==t.id).map(item=>item.photo);
- const supporting=[...new Set([t.detailPhoto,...(t.photos||[]),...related].map(photo))].filter(url=>url&&url!==image);
+ const supporting=(ownPhotos.length?ownPhotos:[...new Set([t.detailPhoto,...(t.photos||[]),...related].map(photo))]).filter(url=>url&&url!==image);
  const [secondary,tertiary]=supporting;
  const origin=selectedImage&&['generated','business','reference'].includes(info.photoOrigin)
   ?info.photoOrigin:image===photo(t.photo)?'reference':'business';
@@ -975,7 +988,7 @@ function buildSite(info,t) {
   '<a class="hero-button" href="'+esc(heroHref)+'"'+(whatsapp?external:'')+'>'+esc(heroAction)+'</a></div></div>';
  const layout=['editorial','technical','immersive','serene','artisan','kinetic','corporate','catalog','directory'].includes(t.layout)?t.layout:'corporate';
  const supportingPhoto=src=>src?'<img src="'+esc(src)+'" width="600" height="600" decoding="async" loading="lazy" alt="">':'';
- const galleryCaption=secondary||tertiary
+ const galleryCaption=ownPhotos.length ? imageCaption : secondary||tertiary
   ?origin==='generated'?'Imagem principal gerada por IA. Imagens de apoio ilustrativas.'
     :origin==='business'?'Imagens de apoio ilustrativas.':'Imagens ilustrativas'
   :imageCaption;
@@ -989,7 +1002,11 @@ function buildSite(info,t) {
  const profileStory=text(profile.story);
  const story=storyMarkup(name,about?'Conheça '+name:profile.planning,
   about||(summary!==profileStory?profileStory:''),
-  direction==='pratico'?'':secondary);
+  direction==='pratico'?'':secondary,ownPhotos.length>0);
+ const portfolio=ownPhotos.length>1?'<section class="brand-portfolio container" aria-label="Fotos da empresa"><details>'+
+  '<summary>Ver galeria de '+esc(name)+'</summary><div class="portfolio-strip">'+ownPhotos.map((src,i)=>
+   '<a href="'+esc(src)+'"'+external+' aria-label="Abrir foto '+(i+1)+' em tamanho original"><img src="'+esc(src)+'" alt="Foto '+(i+1)+' de '+esc(name)+'" width="720" height="540" loading="lazy"></a>'
+  ).join('')+'</div></details></section>':'';
  const sections=direction==='experiencia'||(!direction&&['catalog','artisan'].includes(layout))
   ?story+serviceSection
   :serviceSection+story;
@@ -1044,10 +1061,11 @@ function buildSite(info,t) {
   (info.buttonStyle==='square'?'.hero-button,.cta-button,.nav-cta{border-radius:0!important}':'')+
   (info.motionStyle==='none'?'html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}':'')+
   (info.motionStyle==='strong'?'@media(prefers-reduced-motion:no-preference){.hero-text,.hero-image img{animation-duration:.52s!important}}':'');
+ const portfolioCss='.brand-portfolio{padding-block:28px}.brand-portfolio summary{cursor:pointer;font:600 1.15rem system-ui;padding:.8em 0;border-block:1px solid var(--line)}.portfolio-strip{display:flex;overflow-x:auto;gap:16px;scroll-snap-type:x proximity;padding:16px 2px}.portfolio-strip a{scroll-snap-align:start;flex:1 0 min(72%,220px)}.portfolio-strip img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}.brand-portfolio :focus-visible{outline:3px solid currentColor;outline-offset:2px}';
  const pageStyle=font.rule+css+
   ':root{--accent:'+accent+';--surface:'+bg+';--ink:'+ink+';--dark:'+dark+
   ';--buttonInk:'+buttonInk+';--muted:'+muted+';--line:'+line+';--display:'+font.family+
-  ';--material:'+artStyle.material+';--material-ink:'+artStyle.ink+'}'+compositionCss+premiumCss+designOverrides;
+  ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+portfolioCss+designOverrides;
 
  const title=name+' | '+kind+(city?' em '+city:'');
  const meta=summary.slice(0,155);
@@ -1071,12 +1089,13 @@ function buildSite(info,t) {
   (hasServices?'<a href="#servicos">'+esc(profile.services)+'</a>':'')+
   '<a href="#sobre">Sobre</a>'+(faq.length?'<a href="#perguntas">Perguntas</a>':'')+
   (hasContact?'<a class="nav-cta" href="#contato">Contato</a>':'')+'</nav></header>'+
-  '<main id="inicio">'+hero+sections+(faq.length?faqMarkup(faq):'')+contactHtml+'</main>'+
+  '<main id="inicio">'+hero+sections+portfolio+(faq.length?faqMarkup(faq):'')+contactHtml+'</main>'+
   '<footer class="footer container"><span>© '+new Date().getFullYear()+' '+esc(name)+'</span>'+
-  '<span>'+esc(kind+(city?' em '+city:''))+'</span></footer></body></html>';
+  '<span>'+esc((direction?'Proposta de site · ':'')+kind+(city?' em '+city:''))+'</span></footer></body></html>';
 }
 window.PortalSiteStudio={
  start,buildSite,getDefault,pendingLead,templates,renderProjects,save:saveSelected,
+ otherCovers:(name,city)=>new Set(projects.filter(p=>slug(p.name)!==slug(name)||slug(p.city)!==slug(city)).map(p=>p.photo)),
  getCurrent:()=>{if(!selected||!template)return null;readFields();return {data:{...selected},template:{...template}};},
  updatePublished:(id,pubSlug)=>{if(selected){selected.publishedId=id;selected.publicSlug=pubSlug}}
 };

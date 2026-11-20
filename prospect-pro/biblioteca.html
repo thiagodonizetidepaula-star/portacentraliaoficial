@@ -7,9 +7,11 @@
  <title>Biblioteca de Sites | Portal Prospect PRO</title>
  <meta name="description" content="Crie, edite e publique demonstrações de sites para empresas no Portal Prospect PRO.">
  <link rel="stylesheet" href="/biblioteca.css">
+ <script src="/prospect-links.js" defer></script>
  <script src="/biblioteca-data.js" defer></script>
  <script src="/biblioteca.js" defer></script>
  <script src="/studio-projects.js" defer></script>
+ <script src="/studio-brand.js" defer></script>
  <script src="/studio-flow.js" defer></script>
  <script src="/studio-publish.js" defer></script>
 </head>
@@ -59,6 +61,33 @@
      <label class="control-check"><input id="studioWhatsAppConfirmed" type="checkbox"> Confirmo que o telefone informado também atende por WhatsApp</label>
      <p id="studioWhatsAppSuggestion" class="field-hint" role="status"></p>
     </fieldset>
+    <details class="studio-brief brand-brief" open>
+     <summary>Identidade da empresa</summary>
+     <div class="brand-panel">
+      <div class="brand-actions">
+       <button id="brandResearch" type="button" class="button secondary">Pesquisar identidade</button>
+       <button id="brandReadSocial" hidden type="button" class="plain-btn">Consultar Instagram</button>
+       <a id="brandMaps" hidden target="_blank" rel="noopener noreferrer">Ver no Maps</a>
+       <a id="brandFindSocial" hidden target="_blank" rel="noopener noreferrer">Localizar Instagram</a>
+       <button id="brandSearchAI" type="button" class="plain-btn" hidden>Buscar perfil com IA</button>
+      </div>
+      <label id="brandGoogleOption" class="control-check" hidden><input type="checkbox" id="brandGoogleAtGenerate"> Pesquisar no Google ao gerar as propostas (1 das 50 buscas mensais)</label>
+      <p id="brandStatus" class="field-hint" role="status"></p>
+      <div id="brandResults"></div>
+      <button type="button" class="plain-btn" id="brandSkip" hidden>Gerar com os dados já confirmados</button>
+      <details class="brand-materials">
+       <summary>Adicionar logo, fotos e cor da marca</summary>
+       <div class="studio-brief-fields">
+        <label>Link do logo autorizado<input id="brandLogo" type="url" maxlength="1800" placeholder="https://"></label>
+        <label>Cor da marca<input id="brandColorHex" type="text" maxlength="7" pattern="#[0-9a-fA-F]{6}" placeholder="#145B52"></label>
+        <label class="studio-address">Links de até três fotos autorizadas, um por linha<textarea id="brandPhotos" rows="3" maxlength="5500" placeholder="https://"></textarea></label>
+        <label>Arquivo do logo<input id="brandLogoFile" type="file" accept="image/png,image/jpeg,image/webp"></label>
+        <label>Arquivos das fotos<input id="brandPhotoFiles" type="file" multiple accept="image/png,image/jpeg,image/webp"></label>
+       </div>
+       <button id="brandUpload" type="button" class="button secondary">Importar arquivos autorizados</button>
+      </details>
+     </div>
+    </details>
     <details class="studio-brief" open>
      <summary>Descrição e serviços da empresa</summary>
      <div class="studio-brief-fields">
@@ -174,6 +203,8 @@
       <div class="field-group">
        <label>Logotipo (URL HTTPS)<input id="logoUrl" type="url" maxlength="1000" placeholder="https://"></label>
        <label>Imagem principal (URL HTTPS)<input id="photoUrl" type="url" maxlength="1000" placeholder="https://"></label>
+       <label>Galeria da empresa (até três links HTTPS)<textarea id="brandGallery" rows="3" maxlength="5500"></textarea></label>
+       <div id="brandEvidence" class="field-hint" hidden></div>
        <label>Origem da imagem<select id="photoOrigin"><option value="reference">Foto ilustrativa</option><option value="generated">Imagem ilustrativa gerada com IA</option><option value="business">Foto autorizada da empresa</option></select></label>
        <label>Cor de destaque<input id="brandColor" type="color" value="#305a80"></label>
        <label>Fonte dos títulos<select id="headingFont"><option value="auto">Estilo original</option><option value="editorial">Editorial clássica</option><option value="modern">Moderna</option><option value="luxury">Elegante</option><option value="impact">Impacto</option></select></label>

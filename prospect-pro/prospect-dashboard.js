@@ -97,7 +97,7 @@ function progressRow(label, count, total) {
 }
 
 function renderOverview() {
-  const noWebsite = leads.filter(lead => !lead.website).length;
+  const noWebsite = leads.filter(lead => !window.ProspectLinks.hasWebsite(lead)).length;
   const sent = leads.filter(lead => lead.proposalSentAt).length;
   const won = leads.filter(lead => lead.stage === 'Fechado').length;
   const metrics = [
@@ -129,7 +129,8 @@ function renderOverview() {
 }
 
 function websiteTag(lead) {
-  return lead.website ? '<span class="tag yes">Com site</span>' : '<span class="tag no">Não informado</span>';
+  if (window.ProspectLinks.instagram(lead.website)) return '<span class="tag no">Apenas Instagram</span>';
+  return window.ProspectLinks.hasWebsite(lead) ? '<span class="tag yes">Com site</span>' : '<span class="tag no">Não informado</span>';
 }
 
 function leadMatches(lead, filter) {
@@ -137,8 +138,8 @@ function leadMatches(lead, filter) {
   if (filter === 'archived') return lead.stage === 'Arquivado';
   if (filter === 'sent') return !!lead.proposalSentAt;
   if (lead.stage === 'Arquivado') return false;
-  if (filter === 'no') return !lead.website;
-  if (filter === 'yes') return !!lead.website;
+  if (filter === 'no') return !window.ProspectLinks.hasWebsite(lead);
+  if (filter === 'yes') return window.ProspectLinks.hasWebsite(lead);
   return !lead.proposalSentAt && !lead.optedOut && lead.stage !== 'Não contatar';
 }
 
