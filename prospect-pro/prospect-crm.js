@@ -6,6 +6,7 @@ const KEY='prospect_publisher_session_v1',el=id=>document.getElementById(id);
 const plain=s=>String(s||'').trim();
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let cfg=null,account=null,cloudRows=new Map(),persistTimer=null,syncing=false,bookmarks=[];
+let loadingCRM=null,pendingPersist=false;
 let statusText='Dados locais — faça login para sincronizar com a nuvem.';
 function inform(text){statusText=text;const node=el('crmSyncStatus');if(node)node.textContent=text;}
 function token(){try{return JSON.parse(sessionStorage.getItem(KEY)||'null')?.access_token||''}catch{return ''}}
@@ -54,7 +55,7 @@ const fromRow=r=>({
  updatedAt:r.updated_at
 });
 function approved(l){return !!(l.name&&(l.operatorConfirmed||(!l.googleId&&l.origin!=='google-places')))}
-const originalSave=save,originalRender=render,originalPage=page;
+const originalSave=save,originalRender=render;
 let lastSerialized=new Map();
 function snapshot(){
  return leads.map(l=>({id:l.id,object:{id:l.id,googleId:l.googleId||'',name:l.name,phone:l.phone||'',address:l.address||'',website:l.website||'',category:l.category||'',city:l.city||'',stage:l.stage||'Novo',previewSlug:l.previewSlug||'',proposalSentAt:l.proposalSentAt||null,messageOpenedAt:l.messageOpenedAt||null,archivedAt:l.archivedAt||null,optedOut:!!l.optedOut,operatorConfirmed:!!l.operatorConfirmed,origin:l.origin||'manual',notes:l.notes||''}}));
@@ -69,9 +70,15 @@ function updateModified(){
   lastSerialized.set(v.id,signature);
  }
 }
+function rememberState(){
+ lastSerialized=new Map(snapshot().map(({id,object})=>[id,JSON.stringify(object)]));
+}
 function schedule(){
- if(!account||syncing)return;
- clearTimeout(persistTimer);persistTimer=setTimeout(()=>{syncChanges().catch(e=>inform('Falha ao sincronizar: '+e.message))},650);
+ if(!account)return;
+ pendingPersist=true;
+ if(syncing||loadingCRM)return;
+ clearTimeout(persistTimer);
+ persistTimer=setTimeout(syncChanges,650);
 }
 save=function(){
  updateModified();originalSave();schedule();
@@ -80,7 +87,7 @@ function decorated(){
  const rows=el('leadRows');if(rows){
   for(const tr of rows.querySelectorAll('tr')){
    const stageSelect=tr.querySelector('[data-stage]');if(!stageSelect)continue;
-   const l=leads.find(x=>x.id===stageSelect.dataset.stage);if(!l)continue;
+   const l=find(stageSelect.dataset.stage);if(!l)continue;
    const td=tr.querySelector('td:first-child');if(!td)continue;
    const notice=l.proposalSentAt?'✓ Proposta enviada em '+new Date(l.proposalSentAt).toLocaleDateString('pt-BR'):
     l.messageOpenedAt?'WhatsApp aberto — envio ainda não confirmado':
@@ -104,12 +111,19 @@ function decorated(){
  renderSent();
  inform(statusText);
 }
+rememberState();
 render=function(){originalRender();decorated()};
-page=function(p){originalPage(p);if(p==='sent')renderSent()};
-document.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>page(b.dataset.page));
-function find(id){return leads.find(l=>l.id===id)}
+function find(id){return leads.find(l=>String(l.id)===String(id))}
 function archive(id){const l=find(id);if(!l)return;if(!confirm('Arquivar '+l.name+'? Ela sairá da lista de oportunidades ativas, mas continuará no histórico.'))return;l.stage='Arquivado';l.archivedAt=new Date().toISOString();save()}
-function restore(id){const l=find(id);if(!l)return;l.stage=l.proposalSentAt?'Proposta enviada':'Novo';l.archivedAt=null;save()}
+function restore(id){
+ const l=find(id);if(!l)return;
+ if(l.optedOut)l.stage='Não contatar';
+ else if(l.proposalSentAt)l.stage='Proposta enviada';
+ else if(l.messageOpenedAt)l.stage='Proposta pronta';
+ else if(l.previewSlug)l.stage='Site criado';
+ else l.stage='Novo';
+ l.archivedAt=null;save();
+}
 function reviewOld(id){
  const l=find(id);if(!l)return;
  confirmGoogleLead(l,l.category,()=>{l.operatorConfirmed=true;save()},true);
@@ -119,46 +133,47 @@ function confirmSent(id){
  if(l.proposalSentAt){alert('Já existe um registro de proposta enviada para esta empresa.');return}
  if(!l.previewSlug&&!publishedLink(id)){alert('Publique uma prévia de site antes de registrar uma proposta enviada.');return}
  modal('Confirmar proposta enviada','<p>Marque como enviada <strong>somente se você já clicou em Enviar no WhatsApp</strong>. Abrir a conversa não confirma a entrega.</p><p>Empresa: <strong>'+escape(l.name)+'</strong></p><p>O registro ficará salvo com a data de hoje e aparecerá na aba Propostas enviadas.</p><label><input id="sent-confirm-checkbox" type="checkbox" style="width:auto"> Confirmo que enviei a mensagem para a empresa</label>',()=>{
-  if(!el('sent-confirm-checkbox')?.checked)return alert('Confirme que realmente enviou a mensagem.');
-  l.proposalSentAt=new Date().toISOString();l.stage='Proposta enviada';l.messageOpenedAt=l.messageOpenedAt||new Date().toISOString();
-  save();el('modal').classList.add('hidden');
- });
+  if(!el('sent-confirm-checkbox')?.checked)return modalError('Confirme que realmente enviou a mensagem.');
+  l.proposalSentAt=new Date().toISOString();
+  if(l.stage!=='Arquivado'&&l.stage!=='Não contatar')l.stage='Proposta enviada';
+  save();closeModal();
+ },{confirm:'Registrar envio'});
 }
 function publishedLink(id){
  const l=find(id);if(!l)return null;
  if(l.previewSlug)return location.origin+'/mvp/'+encodeURIComponent(l.previewSlug);
  try{
-  const p=JSON.parse(localStorage.getItem('prospect_library_projects')||'[]').find(p=>p.leadId===id&&p.publicSlug);
+  const p=readList('prospect_library_projects').find(p=>String(p.leadId)===String(id)&&p.publicSlug);
   if(p){l.previewSlug=p.publicSlug;save();return location.origin+'/mvp/'+encodeURIComponent(p.publicSlug)}
  }catch{}
  return null;
 }
 function composeMessage(id){
  const l=find(id);if(!l)return;
- if(l.optedOut||l.stage==='Não contatar')return alert('Empresa sinalizada para não receber novas propostas.');
+ if(l.optedOut||l.stage==='Não contatar'||l.stage==='Arquivado')return alert('Esta oportunidade está arquivada ou sinalizada para não receber propostas.');
  if(l.proposalSentAt){
-  modal('Proposta já enviada','<p>Uma proposta para <strong>'+escape(l.name)+'</strong> já foi registrada como enviada em '+escape(new Date(l.proposalSentAt).toLocaleString('pt-BR'))+'.</p><p>Evite abordagens repetidas. Você pode consultar o link ou acompanhar a resposta no funil de vendas.</p>',()=>el('modal').classList.add('hidden'));return;
+  modal('Proposta já enviada','<p>Uma proposta para <strong>'+escape(l.name)+'</strong> já foi registrada como enviada em '+escape(new Date(l.proposalSentAt).toLocaleString('pt-BR'))+'.</p>',closeModal,{confirm:'Entendi'});return;
  }
  const link=publishedLink(id);
  if(!link){
-  modal('Site ainda não publicado','<p>Crie as três propostas, escolha a melhor, ajuste o design e clique em <strong>Publicar prévia</strong> antes de preparar a mensagem.</p>',()=>{location.href='/studio?lead='+encodeURIComponent(id)});
+  modal('Site ainda não publicado','<p>Escolha uma proposta no estúdio e publique a prévia. O link será incluído na mensagem.</p>',()=>openStudioForLead(l),{confirm:'Ir para o estúdio'});
   return;
  }
  let number=plain(l.phone).replace(/\D/g,'');if(number.length===10||number.length===11)number='55'+number;
  if(!/^55\d{10,11}$/.test(number)){alert('Confirme o telefone com DDD da empresa no cadastro antes de abrir o WhatsApp.');return}
- const msg='Olá! Tudo bem? Sou do Portal Central IA. Preparei uma demonstração de site para '+l.name+', com uma proposta de presença digital para a empresa.\n\nVocê pode conferir aqui: '+link+'\n\nPosso explicar a ideia? Sem compromisso. Se não desejar contatos, basta avisar.';
+ const msg=formatProposalMessage(l,link);
  modal('Mensagem personalizada · '+l.name,
   '<p>Confira os dados e o link. Esta ação apenas <strong>abre o WhatsApp com a mensagem pronta</strong>, sem enviar automaticamente.</p><textarea id="message">'+escape(msg)+'</textarea><label><input id="permit" type="checkbox" style="width:auto"> Tenho motivo legítimo para contatar esta empresa e respeitarei qualquer recusa.</label>'+
   '<p class="muted">Depois de enviar no WhatsApp, volte à aba Oportunidades e clique em <strong>Confirmar envio</strong>. Nenhum envio é presumido.</p>',()=>{
-   if(!el('permit')?.checked)return alert('Confirme antes de prosseguir.');
+   if(!el('permit')?.checked)return modalError('Confirme que o contato é apropriado antes de prosseguir.');
    const url='https://wa.me/'+number+'?text='+encodeURIComponent(el('message').value);
-   const opened=window.open(url,'_blank','noopener');
-   l.messageOpenedAt=new Date().toISOString();if(!l.proposalSentAt)l.stage='Proposta pronta';save();
-   el('modal').classList.add('hidden');
-   if(!opened)alert('O navegador pode ter bloqueado o WhatsApp. Permita pop-ups para abrir a conversa.');
-  });
+   window.open(url,'_blank','noopener,noreferrer');
+   l.messageOpenedAt=new Date().toISOString();
+   if(['Novo','Em análise','Site criado'].includes(l.stage))l.stage='Proposta pronta';
+   save();closeModal();
+  },{confirm:'Abrir WhatsApp'});
 }
-function confirmGoogleLead(x,category,callback,existing=false){
+function confirmGoogleLead(x,category,callback,existing=false,searchCity=''){
  const source=x||{};
  const name=plain(source.name),phone=plain(source.phone),address=plain(source.address);
  modal('Confirmar dados do estabelecimento',
@@ -168,19 +183,20 @@ function confirmGoogleLead(x,category,callback,existing=false){
   '<label>Endereço confirmado<input id="crm-address" maxlength="300" value="'+escape(address)+'"></label>'+
   '<label>Site identificado fora do perfil (opcional)<input id="crm-site" maxlength="350" value="'+escape(plain(source.website))+'"></label>'+
   '<label><input id="crm-verified" type="checkbox" style="width:auto"> Conferi essas informações e quero manter este cadastro comercial</label>',()=>{
-  if(!el('crm-verified')?.checked)return alert('Confirme a verificação dos dados.');
+  if(!el('crm-verified')?.checked)return modalError('Confirme que revisou os dados comerciais.');
   const name=plain(el('crm-name').value),phone=plain(el('crm-phone').value),address=plain(el('crm-address').value),website=plain(el('crm-site').value);
-  if(name.length<2)return alert('Informe o nome do estabelecimento.');
+  if(name.length<2)return modalError('Informe o nome do estabelecimento.');
   const lead=existing?source:leads.find(l=>source.googleId&&l.googleId===source.googleId);
-  if(lead){lead.name=name;lead.phone=phone;lead.address=address;lead.website=website;lead.category=category||lead.category;lead.operatorConfirmed=true;lead.origin='google-places';save()}
+  const city=plain(searchCity)||plain(el('city')?.value);
+  if(lead){lead.name=name;lead.phone=phone;lead.address=address;lead.website=website;lead.category=category||lead.category;lead.city=lead.city||city;lead.operatorConfirmed=true;lead.origin='google-places';save()}
   else{
-   const leadNew={id:uid(),googleId:source.googleId||'',name,phone,address,website:'',category:category||'',city:plain(el('city')?.value),origin:'google-places',operatorConfirmed:true,stage:'Novo',previewSlug:'',proposalSentAt:null};
+   const leadNew={id:uid(),googleId:source.googleId||'',name,phone,address,website:'',category:category||'',city,origin:'google-places',operatorConfirmed:true,stage:'Novo',previewSlug:'',proposalSentAt:null};
    leadNew.website=website;leads.unshift(leadNew);save();
   }
-  el('modal').classList.add('hidden');
+  closeModal();
   const out=existing?source:leads.find(l=>l.googleId&&l.googleId===source.googleId);
   if(callback)callback(out||leads[0]);
- });
+ },{confirm:'Salvar empresa'});
 }
 function renderSent(){
  const box=el('sentProposalRows');if(!box)return;
@@ -192,6 +208,7 @@ function renderSent(){
 function publishedLinkForDisplay(l){return l.previewSlug?location.origin+'/mvp/'+encodeURIComponent(l.previewSlug):''}
 async function syncChanges(){
  if(!account||syncing)return;
+ pendingPersist=false;
  syncing=true;
  try{
   const rows=leads.filter(approved).map(l=>toRow(l,account));
@@ -202,12 +219,21 @@ async function syncChanges(){
   }
   inform('Sincronizado com Supabase · '+rows.length+' oportunidades confirmadas salvas.');
  }catch(e){inform('Armazenamento local ativo · falha na nuvem: '+e.message)}
- finally{syncing=false}
+ finally{syncing=false;if(pendingPersist)schedule()}
 }
-async function sync(){
- if(syncing)return;
+function sync(){
+ if(loadingCRM)return loadingCRM;
+ loadingCRM=loadCRM().finally(()=>{
+  loadingCRM=null;
+  if(pendingPersist)schedule();
+ });
+ return loadingCRM;
+}
+async function loadCRM(){
  try{
-  account=await authorize();
+  const authorized=await authorize();
+  if(account?.id!==authorized?.id)cloudRows.clear();
+  account=authorized;
   if(!account){inform('Entre com sua conta para recuperar as oportunidades da nuvem.');return}
   const rows=await request('/rest/v1/prospect_crm_leads?select=*&order=updated_at.desc&limit=1000');
   for(const row of rows||[]){
@@ -217,7 +243,7 @@ async function sync(){
    else if(Date.parse(row.updated_at||'1970-01-01')>=Date.parse(leads[i].updatedAt||'1970-01-01'))leads[i]={...leads[i],...fromRow(row)};
   }
   // Preserve existing manually confirmed local records from the older version.
-  updateModified();originalSave();
+  rememberState();originalSave();
   await syncChanges();await loadHistory();
  }catch(e){inform('Falha ao recuperar oportunidades: '+e.message)}
 }

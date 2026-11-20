@@ -1,123 +1,199 @@
 (function(){
 'use strict';
-if(!location.pathname.startsWith('/studio'))return;
+if(!/^\/studio\/?$/.test(location.pathname))return;
+
 const $=id=>document.getElementById(id);
 const app=window.PortalSiteStudio;
-const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const search=new URLSearchParams(location.search);
+const projectMode=search.get('view')==='projects';
+const leadKey=search.get('lead');
 let lead=app.pendingLead;
-const leadKey=new URLSearchParams(location.search).get('lead');
-document.title='Criar sites premium | Portal Prospect PRO';
+
+document.title=(projectMode?'Meus projetos':'Criar sites')+' | Portal Prospect PRO';
 document.querySelector('.intro').hidden=true;
 document.querySelector('.workspace-nav').hidden=true;
-const projectMode=new URLSearchParams(location.search).get('view')==='projects';
-$('galleryView').hidden=true;$('projectsView').hidden=!projectMode;$('studioView').hidden=projectMode;
+$('galleryView').hidden=true;
+$('projectsView').hidden=!projectMode;
+$('studioView').hidden=projectMode;
 if(projectMode){app.renderProjects();return;}
-document.querySelector('.identity small').textContent='PROSPECÇÃO · STUDIO';
-const client={name:lead?.name||'',category:lead?.category||lead?.categories?.[0]||localStorage.getItem('prospect_last_segment')||'',city:lead?.address||'Mauá, SP',phone:lead?.phone||''};
-$('studioCompany').value=client.name;$('studioSegment').value=client.category;$('studioCity').value=client.city;$('studioPhone').value=client.phone;
-const fields={barbearia:['barbearia','barber','corte masculino'],salao:['salao','cabeleireir','hair','beauty','studio beleza'],hamburgueria:['hamburg','burger'],restaurante:['restaurante','churrasc','lanchonete','sushi'],pizzaria:['pizza'],cafeteria:['cafe','cafeteria'],clinica:['clinica','medic','hospital'],odontologia:['odont','dentista'],estetica:['estetica','spa','design sobrancelha'],imobiliaria:['imobiliaria','imoveis','corretor'],advocacia:['advog','advocacia','juridic'],contabilidade:['contabil','contador'],oficina:['oficina','mecanica'],esteticaauto:['lava rapido','detalhamento automotivo'],veterinaria:['veterinaria','veterinario'],petshop:['pet','banho tosa'],academia:['academia','fitness','crossfit'],construcao:['construcao','reforma'],arquitetura:['arquitetura'],moda:['moda','boutique'],hotelaria:['hotel','pousada'],logistica:['logistica','transporte'],farmacia:['farmacia'],educacao:['escola','curso'],fotografia:['fotografia']};
-function chooseBase(category,name){
- const q=norm(category+' '+name);
- for(const [id,tests] of Object.entries(fields)){if(tests.some(k=>q.includes(k)))return app.templates.find(t=>t.id===id)}
- return app.templates.find(t=>norm(t.label)===norm(category))||app.templates.find(t=>t.id==='consultoria');
+
+const form=$('studioClientForm');
+const result=$('threeProposals');
+const status=$('studioStep');
+const norm=value=>String(value||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+ .toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const formValue=id=>$(id)?.value.trim()||'';
+let formChanged=false;
+
+function fillClient(company) {
+ $('studioCompany').value=company?.name||'';
+ $('studioSegment').value=company?.category||company?.categories?.[0]||'';
+ $('studioCity').value=company?.city||company?.address||'';
+ $('studioPhone').value=company?.phone||'';
 }
-function colorScheme(base,index){
- const schemes=[
- {layout:base.layout,bg:base.bg,ink:base.ink,accent:base.accent,title:'Assinatura Original',summary:'O estilo editorial pensado para comunicar a identidade da empresa.'},
- {layout:base.layout==='immersive'?'editorial':base.layout==='editorial'?'immersive':'immersive',bg:'#1b242d',ink:'#ffffff',accent:base.accent,title:'Experiência Imersiva',summary:'Imagens em destaque, tipografia marcante e apresentação cinematográfica.'},
- {layout:['corporate','technical','kinetic'].includes(base.layout)?'serene':'corporate',bg:'#f5f7f8',ink:'#253749',accent:base.accent,title:'Premium Contemporâneo',summary:'Composição elegante, comunicação objetiva e design sofisticado.'}
- ];return schemes[index];
+
+function matchTemplate(value) {
+ const query=norm(value);
+ if(!query)return null;
+ let best=null,bestScore=0;
+ for(const template of app.templates){
+  const label=norm(template.label);
+  if(query===label)return template;
+  for(const alias of [label,...template.aliases.map(norm)]){
+   if(!(' '+query).includes(' '+alias))continue;
+   const score=query===alias?100+alias.length:alias.length;
+   if(score>bestScore){best=template;bestScore=score;}
+  }
+ }
+ return best;
 }
-// Three licensed-demo style image references per segment; replace with the client's own media before delivery.
-const photoBuckets={
- hamburgueria:['photo-1550547660-d9450f859349','photo-1571091718767-18b5b1457add'],
- restaurante:['photo-1517248135467-4c7edcad34c4','photo-1552566626-52f8b828add9'],
- pizzaria:['photo-1513104890138-7c749659a591','photo-1574071318508-1cdbab80d002'],
- cafeteria:['photo-1442512595331-e89e73853f31','photo-1501339847302-ac426a4a7cbb'],
- barbearia:['photo-1599351431202-1e0f0137899a','photo-1621605815971-fbc98d665033'],
- salao:['photo-1522335789203-aabd1fc54bc9','photo-1512290923902-8a9f81dc236c'],
- spa:['photo-1512290923902-8a9f81dc236c','photo-1540555700478-4be289fbecef'],
- estetica:['photo-1512290923902-8a9f81dc236c','photo-1522335789203-aabd1fc54bc9'],
- clinica:['photo-1576091160399-112ba8d25d1d','photo-1551076805-e1869033e561'],
- odontologia:['photo-1606811971618-4486d14f3f99','photo-1551076805-e1869033e561'],
- imobiliaria:['photo-1600566753086-00f18fb6b3ea','photo-1600585154340-be6161a56a0c'],
- arquitetura:['photo-1600607687920-4e2a09cf159d','photo-1600566753086-00f18fb6b3ea'],
- oficina:['photo-1485291571150-772bcfc10da5','photo-1517524206127-48bbd363f3d7'],
- esteticaauto:['photo-1517524206127-48bbd363f3d7','photo-1486496572940-2bb2341fdbdf'],
- advocacia:['photo-1589829545856-d10d557cf95f','photo-1497366811353-6870744d04b2'],
- contabilidade:['photo-1497366754035-f200968a6e72','photo-1497366811353-6870744d04b2'],
- academia:['photo-1517836357463-d25dfeac3438','photo-1571019614242-c5c5dee9f50b'],
- educacao:['photo-1427504494785-3a9ca7044f45','photo-1523240795612-9a054b0db644'],
- veterinaria:['photo-1583337130417-3346a1be7dee','photo-1517849845537-4d257902454b'],
- petshop:['photo-1548199973-03cce0bbc87b','photo-1583337130417-3346a1be7dee'],
- hotelaria:['photo-1566073771259-6a8506099945','photo-1571896349842-33c89424de2d'],
- fotografia:['photo-1542038784456-1ea8e935640e','photo-1497366754035-f200968a6e72'],
- generic:['photo-1497366811353-6870744d04b2','photo-1600585154340-be6161a56a0c']
-};
-function differentPhoto(base,index){
- if(index===0)return base.photo;
- const bucket=photoBuckets[base.id]||photoBuckets.generic;
- const id=bucket[index-1];
- const url='https://images.unsplash.com/'+id+'?auto=format&fit=crop&w=1600&q=80';
- return url!==base.photo?url:('https://images.unsplash.com/'+photoBuckets.generic[index-1]+'?auto=format&fit=crop&w=1600&q=80');
-}
-function proposalData(t){
- const name=$('studioCompany').value.trim()||'Empresa demonstrativa';
- const category=$('studioSegment').value.trim()||t.label;
- const city=$('studioCity').value.trim()||'Mauá, SP';
- const phone=$('studioPhone').value.trim();
- return {...app.getDefault(t),leadId:lead?.id||leadKey||null,templateId:t.id,name,industry:category,city,phone,headline:t.headline,summary:t.summary,color:t.accent,photo:t.photo};
-}
-function previewThree(){
- const name=$('studioCompany').value.trim(),category=$('studioSegment').value.trim();
- if(name.length<2){$('studioCompany').focus();$('studioStep').textContent='Informe o nome da empresa para gerar propostas.';return}
- if(!category){$('studioSegment').focus();$('studioStep').textContent='Informe o segmento da empresa.';return}
- const base=chooseBase(category,name);
- const metas=[0,1,2].map(i=>{
-  const style=colorScheme(base,i);
-  const t={...base,id:base.id+'-studio-'+i,layout:style.layout,bg:style.bg,ink:style.ink,accent:style.accent,photo:differentPhoto(base,i),label:category,headline:i===0?base.headline:i===1?'Uma experiência que merece ser descoberta.':'Conheça uma nova forma de viver nossos serviços.'};
-  return {template:t,info:proposalData(t),style};
+
+function blend(color, other, weight) {
+ const parts=[1,3,5].map(index=>{
+  const first=parseInt(color.slice(index,index+2),16),second=parseInt(other.slice(index,index+2),16);
+  return Math.round(first*(1-weight)+second*weight).toString(16).padStart(2,'0');
  });
- window.__generatedTemplates=metas.map(x=>x.template);
- $('studioStep').classList.add('studio-loading');
- $('studioStep').textContent='Combinando conteúdo e layouts para '+name+'…';
- $('threeProposals').replaceChildren();
- requestAnimationFrame(()=>{
-  setTimeout(()=>{
-   $('threeProposals').innerHTML=metas.map(({template:t,info,style},i)=>
-    '<article class="proposal-card">'+
-    '<div class="proposal-preview"><span class="proposal-label">PROPOSTA 0'+(i+1)+'</span><iframe sandbox="" tabindex="-1" title="Prévia da proposta '+(i+1)+'" loading="lazy"></iframe></div>'+
-    '<div class="proposal-info"><h3>'+style.title+'</h3><p>'+style.summary+'</p><button type="button" class="button accent" data-choose="'+i+'">Abrir no editor profissional</button></div></article>'
-   ).join('');
-   document.querySelectorAll('.proposal-card').forEach((card,i)=>{
-    card.querySelector('iframe').srcdoc=app.buildSite(metas[i].info,metas[i].template);
-   });
-   document.querySelectorAll('[data-choose]').forEach(b=>b.onclick=()=>{
-    const item=metas[Number(b.dataset.choose)];app.start(item.template.id,{...item.info,templateSnapshot:item.template})
-   });
-   $('studioStep').classList.remove('studio-loading');
-   $('studioStep').textContent='Três propostas geradas. Abra qualquer uma no editor, faça os ajustes e publique uma demonstração.';
-  },250)
+ return '#'+parts.join('');
+}
+
+const visualDirections=[
+ {
+  id:'assinatura',title:'Identidade',description:'Apresentação da empresa, com espaço para a marca e os serviços.',
+  layout:base=>base.layout,colors:base=>({bg:base.bg,ink:base.ink,accent:base.accent})
+ },
+ {
+  id:'experiencia',title:'Experiência',description:'Fotografia em destaque e conteúdo que convida a conhecer o negócio.',
+  layout:base=>base.layout==='immersive'?'artisan':'immersive',
+  colors:base=>({bg:blend(base.accent,'#141e29',.88),ink:'#ffffff',accent:blend(base.accent,'#fff1d9',.55)})
+ },
+ {
+  id:'pratico',title:'Direto ao ponto',description:'Serviços e contato organizados para quem já sabe o que procura.',
+  layout:()=> 'directory',
+  colors:base=>({bg:blend(base.accent,'#ffffff',.94),ink:'#172533',accent:blend(base.accent,'#233448',.54)})
+ }
+];
+
+function makeProposals(client) {
+ const match=matchTemplate(client.category)||matchTemplate(client.name);
+ const base=match||app.templates.find(template=>template.id==='consultoria');
+ const profile=match?base.profile:{
+  experience:'Conheça '+client.name+'.',practical:'Informações para seu próximo contato.',
+  services:'Serviços',action:'Solicitar informações',
+  story:'Entre em contato para saber mais sobre as opções de atendimento.'
+ };
+ const headlines=[match?base.headline:client.name,profile.experience,profile.practical];
+ const summaries=[
+  client.summary||[client.name+'.',match?.summary].filter(Boolean).join(' '),
+  client.summary||profile.story,
+  [client.name+' · '+client.category+'.',client.summary].filter(Boolean).join(' ')
+ ];
+ const services=client.services.length?client.services:match?.services||[];
+ return visualDirections.map((direction,index)=>{
+  const template={
+   id:base.id+'-studio-'+index,
+   label:client.category,category:base.category,example:client.name,profile,
+   direction:direction.id,layout:direction.layout(base),...direction.colors(base),
+   headline:headlines[index],summary:summaries[index].slice(0,320),services,
+   photo:base.photos[index],detailPhoto:base.photos[(index+1)%base.photos.length]
+  };
+  const data={
+   ...app.getDefault(template),name:client.name,industry:client.category,city:client.city,phone:client.phone,
+   leadId:lead&&norm(lead.name)===norm(client.name)?lead.id:null,
+   templateSnapshot:template
+  };
+  return {template,data,direction};
  });
 }
-$('generateThree').onclick=previewThree;
-if(lead){if(!$('studioSegment').value)$('studioSegment').value='Serviços profissionais';previewThree()}
-else if(leadKey){
- $('studioStep').textContent='Recuperando empresa salva no CRM…';
+
+function renderProposals(proposals) {
+ const cards=document.createDocumentFragment();
+ proposals.forEach(({template,data,direction},index)=>{
+  const card=document.createElement('article');
+  card.className='proposal-card';
+  card.innerHTML=
+   '<div class="proposal-preview"><iframe sandbox="" tabindex="-1" loading="lazy" referrerpolicy="no-referrer"></iframe></div>'+
+   '<div class="proposal-info"><h3></h3><p></p><button type="button" class="button accent">Personalizar</button></div>';
+  const preview=card.querySelector('iframe');
+  preview.title='Prévia do site '+direction.title;
+  preview.srcdoc=app.buildSite(data,template);
+  card.querySelector('h3').textContent=direction.title;
+  card.querySelector('p').textContent=direction.description;
+  const button=card.querySelector('button');
+  button.dataset.choose=String(index);
+  button.setAttribute('aria-label','Personalizar proposta '+direction.title);
+  button.addEventListener('click',()=>app.start(template.id,data));
+  cards.append(card);
+ });
+ result.replaceChildren(cards);
+}
+
+function previewThree() {
+ const client={
+  name:formValue('studioCompany'),category:formValue('studioSegment'),city:formValue('studioCity'),
+  phone:formValue('studioPhone'),summary:formValue('studioSummary'),
+  services:formValue('studioServices').split(/\r?\n/).map(service=>service.trim()).filter(Boolean).slice(0,8)
+ };
+ if(client.name.length<2){
+  $('studioCompany').focus();
+  status.textContent='Informe o nome da empresa.';
+  return;
+ }
+ if(!client.category){
+  $('studioSegment').focus();
+  status.textContent='Informe o segmento da empresa.';
+  return;
+ }
+ const proposals=makeProposals(client);
+ renderProposals(proposals);
+ status.textContent=client.services.length||!proposals[0].template.services.length
+  ?'Três propostas para '+client.name+'. Escolha uma para personalizar.'
+  :'Três propostas para '+client.name+'. Revise os serviços sugeridos antes de publicar.';
+}
+
+form.addEventListener('submit',event=>{
+ event.preventDefault();
+ formChanged=true;
+ previewThree();
+});
+form.addEventListener('input',()=>{
+ formChanged=true;
+ if(!result.childElementCount)return;
+ result.replaceChildren();
+ status.textContent='Dados alterados. Gere as propostas para atualizar as prévias.';
+});
+
+fillClient(lead);
+if(lead){
+ if(!$('studioSegment').value)$('studioSegment').value='Serviços profissionais';
+ previewThree();
+}else if(leadKey){
+ status.textContent='Recuperando empresa salva no CRM…';
  (async()=>{
   try{
-   let session;try{session=JSON.parse(sessionStorage.getItem('prospect_publisher_session_v1')||'null')}catch{}
+   let session;
+   try{session=JSON.parse(sessionStorage.getItem('prospect_publisher_session_v1')||'null')}catch{}
    if(!session?.access_token)throw Error('Entre no Prospect PRO para recuperar esta empresa da nuvem.');
-   const response=await fetch('/api/public-config',{cache:'no-store'}),c=await response.json();
-   if(!c.configured)throw Error('Armazenamento não configurado.');
-   const r=await fetch(c.supabaseUrl+'/rest/v1/prospect_crm_leads?id=eq.'+encodeURIComponent(leadKey)+'&select=id,business_name,business_category,city,address,phone&limit=1',{headers:{apikey:c.publishableKey,Authorization:'Bearer '+session.access_token}});
-   if(!r.ok)throw Error('Não foi possível recuperar o cadastro.');
-   const rows=await r.json();if(!rows.length)throw Error('Empresa não encontrada. Abra Oportunidades e confirme seu cadastro.');
-   const d=rows[0];lead={id:d.id,name:d.business_name,category:d.business_category,city:d.city,address:d.address,phone:d.phone};
-   $('studioCompany').value=lead.name;$('studioSegment').value=lead.category||'Serviços profissionais';$('studioCity').value=lead.city||'Mauá, SP';$('studioPhone').value=lead.phone;
+   const response=await fetch('/api/public-config',{cache:'no-store'});
+   const config=await response.json();
+   if(!response.ok||!config.configured)throw Error('Armazenamento não configurado.');
+   const url=new URL('/rest/v1/prospect_crm_leads',config.supabaseUrl);
+   url.search=new URLSearchParams({
+    id:'eq.'+leadKey,
+    select:'id,business_name,business_category,city,address,phone',
+    limit:'1'
+   });
+   const lookup=await fetch(url,{headers:{apikey:config.publishableKey,Authorization:'Bearer '+session.access_token}});
+   if(!lookup.ok)throw Error('Não foi possível recuperar o cadastro.');
+   const [row]=await lookup.json();
+   if(!row)throw Error('Empresa não encontrada. Confira o cadastro em Oportunidades.');
+   lead={id:row.id,name:row.business_name,category:row.business_category,city:row.city,address:row.address,phone:row.phone};
+   if(formChanged)return;
+   fillClient(lead);
+   if(!$('studioSegment').value)$('studioSegment').value='Serviços profissionais';
    previewThree();
-  }catch(e){$('studioStep').textContent=e.message||'Informe a empresa manualmente para gerar propostas.'}
+  }catch(error){
+   if(!formChanged)status.textContent=error.message||'Informe a empresa manualmente para gerar propostas.';
+  }
  })();
 }
-else $('studioStep').textContent='Informe a empresa acima para gerar automaticamente três propostas de site.';
 })();

@@ -5,7 +5,7 @@ let cfg=null;
 const show=(s)=>{$a('radarAuthStatus').textContent=s||''};
 function getSession(){try{return JSON.parse(sessionStorage.getItem(key)||'null')}catch{return null}}
 async function config(){
- if(cfg)return cfg;
+ if(cfg?.configured)return cfg;
  const r=await fetch('/api/public-config',{cache:'no-store'});
  if(!r.ok)throw Error('Integração Supabase indisponível');
  cfg=await r.json();
@@ -34,12 +34,14 @@ async function authenticated(){
 async function updateAuth(){
  if(await authenticated()){
   $a('prospectAuthPanel').hidden=true;
+  $a('accountLogin').hidden=true;
+  if(typeof refreshQuota==='function')refreshQuota();
   if(window.PortalCRM?.sync)window.PortalCRM.sync();
   return;
  }
- const q=await fetch('/api/quota',{cache:'no-store'}).then(r=>r.json()).catch(()=>null);
- $a('prospectAuthPanel').hidden=!(q&&q.enabled);
- if(q?.enabled)show('Entre para realizar buscas reais e proteger o limite de consultas.');
+ const available=!!(await config().catch(()=>null));
+ $a('prospectAuthPanel').hidden=!available;
+ $a('accountLogin').hidden=!available;
 }
 async function doLogin(){
  const email=$a('radarEmail').value.trim(),password=$a('radarPassword').value;
@@ -50,7 +52,7 @@ async function doLogin(){
   if(!s.access_token)throw Error('A conta não retornou sessão.');
   sessionStorage.setItem(key,JSON.stringify(s));
   if(!await authenticated())throw Error('Não foi possível confirmar sua sessão.');
-  $a('radarPassword').value='';$a('prospectAuthPanel').hidden=true;
+  $a('radarPassword').value='';$a('prospectAuthPanel').hidden=true;$a('accountLogin').hidden=true;
   show('Acesso confirmado.');
   if(typeof refreshQuota==='function')refreshQuota();
   if(window.PortalCRM?.sync)window.PortalCRM.sync();
@@ -74,7 +76,7 @@ async function verifyOtp(){
  try{
   const s=await callAuth('verify',{email,token,type:'email'});
   if(!s.access_token)throw Error('Código não gerou sessão.');
-  sessionStorage.setItem(key,JSON.stringify(s));$a('prospectAuthPanel').hidden=true;
+  sessionStorage.setItem(key,JSON.stringify(s));$a('prospectAuthPanel').hidden=true;$a('accountLogin').hidden=true;
   show('Autenticado. Você pode realizar sua pesquisa.');
   if(typeof refreshQuota==='function')refreshQuota();
   if(window.PortalCRM?.sync)window.PortalCRM.sync();
@@ -83,6 +85,9 @@ async function verifyOtp(){
 $a('radarLogin').onclick=doLogin;
 $a('radarMagic').onclick=magic;
 $a('radarVerifyOtp').onclick=verifyOtp;
+$a('accountLogin').addEventListener('click',()=>{
+ requestAnimationFrame(()=>$a('radarEmail').focus());
+});
 (function acceptEmailLink(){
  const params=new URLSearchParams(location.hash.slice(1));
  const access=params.get('access_token');
@@ -91,5 +96,5 @@ $a('radarVerifyOtp').onclick=verifyOtp;
   history.replaceState(null,'',location.pathname+location.search);
  }
 })();
-updateAuth();
+updateAuth().catch(()=>show('Não foi possível verificar o acesso.'));
 })();

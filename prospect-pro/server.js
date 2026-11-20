@@ -62,7 +62,7 @@ http.createServer(async(req,res)=>{
     '<meta name="robots" content="noindex,nofollow">';
    const raw=String(p.html||'');
    if(raw.length>280000||!/<\/head>/i.test(raw))return json(res,500,{error:'Prévia inválida'});
-   const html=raw.replace(/<\/head>/i,meta+'</head>');
+   const html=raw.replace(/<\/head>/i,()=>meta+'</head>');
    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'public, max-age=60','X-Content-Type-Options':'nosniff','X-Frame-Options':'SAMEORIGIN','Referrer-Policy':'strict-origin-when-cross-origin','Content-Security-Policy':"default-src 'none'; img-src https: data:; style-src 'unsafe-inline'; font-src https: data:; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'self'"});
    return res.end(html);
   }catch(e){return json(res,503,{error:'Não foi possível carregar a demonstração'})}
@@ -81,8 +81,12 @@ http.createServer(async(req,res)=>{
   '/biblioteca-data.js':['./biblioteca-data.js','text/javascript; charset=utf-8'],
   '/studio-flow.js':['./studio-flow.js','text/javascript; charset=utf-8'],
   '/studio-publish.js':['./studio-publish.js','text/javascript; charset=utf-8'],
+  '/studio-projects.js':['./studio-projects.js','text/javascript; charset=utf-8'],
+  '/prospect-dashboard.css':['./prospect-dashboard.css','text/css; charset=utf-8'],
+  '/prospect-dashboard.js':['./prospect-dashboard.js','text/javascript; charset=utf-8'],
   '/prospect-radar.css':['./prospect-radar.css','text/css; charset=utf-8'],
   '/prospect-radar.js':['./prospect-radar.js','text/javascript; charset=utf-8'],
+  '/google-maps-attribution.png':['./google-maps-attribution.png','image/png'],
   '/prospect-auth.js':['./prospect-auth.js','text/javascript; charset=utf-8'],
   '/prospect-crm.js':['./prospect-crm.js','text/javascript; charset=utf-8']
  };
@@ -106,7 +110,10 @@ http.createServer(async(req,res)=>{
   const token=getToken(req);
   if(!token)return json(res,401,{error:'Faça login na sua conta do Portal Central IA para usar a busca automática.'});
   let slot;try{slot=await usageBudget(token,true)}catch(e){return json(res,403,{error:e.message})}
-  if(slot.blocked)return json(res,429,{error:'Limite de segurança de 50 buscas atingido neste mês. O acesso será liberado no próximo mês.',used:slot.used,limit:LIMIT});
+  if(slot?.blocked===true)return json(res,429,{error:'Limite de segurança de 50 buscas atingido neste mês. O acesso será liberado no próximo mês.',used:slot.used,limit:LIMIT});
+  if(!Number.isInteger(slot?.used)||slot.used<1||slot.used>LIMIT){
+   return json(res,503,{error:'Não foi possível confirmar a reserva da busca. Consulte a cota antes de tentar novamente.'});
+  }
   try{
    const upstream=await fetch('https://places.googleapis.com/v1/places:searchText',{method:'POST',headers:{'Content-Type':'application/json','X-Goog-Api-Key':process.env.GOOGLE_PLACES_API_KEY,'X-Goog-FieldMask':'places.id,places.displayName,places.formattedAddress,places.websiteUri,places.internationalPhoneNumber,places.googleMapsUri'},body:JSON.stringify({textQuery:term+' em '+city,languageCode:'pt-BR',regionCode:'BR',pageSize:20}),signal:AbortSignal.timeout(12000)});
    const j=await upstream.json();
@@ -114,7 +121,7 @@ http.createServer(async(req,res)=>{
    return json(res,200,{data:(j.places||[]).map(p=>({googleId:p.id,name:p.displayName?.text||'Empresa',address:p.formattedAddress||'',website:p.websiteUri||'',phone:p.internationalPhoneNumber||'',maps:p.googleMapsUri||''})),usage:{used:slot.used,limit:LIMIT}});
   }catch(e){return json(res,502,{error:'Falha na pesquisa: '+e.message})}
  }
- if(u.pathname==='/'||u.pathname==='/index.html'){
+ if(u.pathname==='/'||u.pathname==='/index.html'||u.pathname==='/prospect-pro'||u.pathname==='/prospect-pro/'){
   try{const html=await readFile(new URL('./index.html',import.meta.url));res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});return res.end(html)}catch{return json(res,500,{error:'Arquivo indisponível'})}
  }
  return json(res,404,{error:'Não encontrado'});

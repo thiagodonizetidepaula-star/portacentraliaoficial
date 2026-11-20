@@ -1,4 +1,4 @@
-// Biblioteca inicial — 36 segmentos, oito direções de arte independentes.
+// Modelos e referências visuais por segmento.
 // Fotografias externas são demonstrativas e precisam ser substituídas por material licenciado antes da entrega.
 const source = [
 ["salao","Salão de beleza","Beleza e bem-estar","editorial","Studio Aurora","Beleza que revela o seu melhor.","Cuidado, expressão e detalhes feitos para cada pessoa.","Corte e finalização|Coloração|Tratamentos capilares","photo-1560066984-138dadb4c035","#b77969","#f6ede7","#241d22"],
@@ -40,4 +40,149 @@ const source = [
 ["academia","Academia e fitness","Educação e esportes","kinetic","Forma Ativa","O próximo passo é seu.","Treino, energia e movimento em um só lugar.","Musculação|Treinamento funcional|Aulas em grupo","photo-1534438327276-14e5300c3a48","#d0f95b","#17211b","#ffffff"],
 ["farmacia","Farmácia","Saúde","corporate","VidaFarma","Cuidado no dia a dia.","Produtos e atendimento para sua rotina de bem-estar.","Medicamentos e cuidados|Higiene pessoal|Orientações de atendimento","photo-1576091160399-112ba8d25d1d","#3a9ca8","#f1f9fa","#243748"]
 ];
-window.SITE_TEMPLATES = source.map(function(a){return {id:a[0],label:a[1],category:a[2],layout:a[3],example:a[4],headline:a[5],summary:a[6],services:a[7].split('|'),photo:'https://images.unsplash.com/'+a[8]+'?auto=format&fit=crop&w=1600&q=82',accent:a[9],bg:a[10],ink:a[11]};});
+const segmentAliases = {
+ salao:['salão','cabeleireir','hair salon','manicure','esmalteria','nail studio'],
+ barbearia:['barbear','barber','corte masculino'],
+ spa:['spa','massagem','massoterap'],
+ estetica:['estética','sobrancelha','depilação','esteticista'],
+ odontologia:['odonto','dentista','ortodont'],
+ clinica:['clínica','médic','hospital','pediatria'],
+ fisioterapia:['fisioterap','pilates'],
+ psicologia:['psicolog','psicoterap','terapia'],
+ nutricao:['nutrição','nutricion'],
+ veterinaria:['veterinár'],
+ petshop:['pet shop','petshop','banho e tosa'],
+ hamburgueria:['hambúrg','burger'],
+ restaurante:['restaurante','churrasc','lanchonete','sushi','bistrô'],
+ pizzaria:['pizza'],
+ cafeteria:['café','cafeteria','coffee shop'],
+ padaria:['padaria','panifica','confeitaria','bakery'],
+ hotelaria:['hotel','pousada','hospedagem'],
+ turismo:['turismo','viagem','viagens'],
+ imobiliaria:['imobiliár','imóveis','corretor de imóveis'],
+ arquitetura:['arquitet'],
+ interiores:['design de interiores','designer de interiores','projeto de interiores'],
+ construcao:['construção','reforma','empreiteir'],
+ moveis:['móveis','marcenaria','decoração'],
+ oficina:['oficina','mecânica','auto center'],
+ esteticaauto:['estética auto','lava rápido','detalhamento auto','higienização automotiva'],
+ contabilidade:['contábil','contabilidade','contador'],
+ advocacia:['advocac','advog','jurídic'],
+ consultoria:['consultoria','consultor empresarial'],
+ logistica:['logístic','transportad','frete','transporte'],
+ tecnologia:['tecnologi','software','desenvolvimento web','informática'],
+ ecommerce:['ecommerce','e commerce','loja virtual'],
+ moda:['loja de roupa','moda','boutique','vestuário'],
+ fotografia:['fotógraf','fotografia','estúdio fotográfico'],
+ eventos:['eventos','cerimonial','buffet'],
+ floricultura:['floricultur','flores','florista'],
+ educacao:['escola','curso','colégio','ensino','educação'],
+ academia:['academia','fitness','crossfit','musculação'],
+ farmacia:['farmáci','drogaria']
+};
+
+const referencePhotos = {
+ salao:['photo-1522335789203-aabd1fc54bc9','photo-1512290923902-8a9f81dc236c'],
+ barbearia:['photo-1599351431202-1e0f0137899a','photo-1621605815971-fbc98d665033'],
+ spa:['photo-1512290923902-8a9f81dc236c','photo-1570172619644-dfd03ed5d881'],
+ estetica:['photo-1512290923902-8a9f81dc236c','photo-1522335789203-aabd1fc54bc9'],
+ clinica:['photo-1576091160399-112ba8d25d1d','photo-1551076805-e1869033e561'],
+ odontologia:['photo-1551076805-e1869033e561','photo-1576091160399-112ba8d25d1d'],
+ hamburgueria:['photo-1550547660-d9450f859349','photo-1571091718767-18b5b1457add'],
+ restaurante:['photo-1552566626-52f8b828add9','photo-1555396273-367ea4eb4db5'],
+ pizzaria:['photo-1513104890138-7c749659a591','photo-1574071318508-1cdbab80d002'],
+ cafeteria:['photo-1501339847302-ac426a4a7cbb','photo-1509042239860-f550ce710b93'],
+ imobiliaria:['photo-1600566753086-00f18fb6b3ea','photo-1600585154340-be6161a56a0c'],
+ arquitetura:['photo-1600607687920-4e2a09cf159d','photo-1600566753086-00f18fb6b3ea'],
+ oficina:['photo-1485291571150-772bcfc10da5','photo-1517524206127-48bbd363f3d7'],
+ esteticaauto:['photo-1517524206127-48bbd363f3d7','photo-1486496572940-2bb2341fdbdf'],
+ advocacia:['photo-1505664194779-8beaceb93744','photo-1497366811353-6870744d04b2'],
+ contabilidade:['photo-1497366754035-f200968a6e72','photo-1497366811353-6870744d04b2'],
+ consultoria:['photo-1497366811353-6870744d04b2','photo-1497366754035-f200968a6e72'],
+ academia:['photo-1517836357463-d25dfeac3438','photo-1571019614242-c5c5dee9f50b'],
+ educacao:['photo-1427504494785-3a9ca7044f45','photo-1523240795612-9a054b0db644'],
+ veterinaria:['photo-1583337130417-3346a1be7dee','photo-1548199973-03cce0bbc87b'],
+ petshop:['photo-1548199973-03cce0bbc87b','photo-1517849845537-4d257902454a'],
+ hotelaria:['photo-1571896349842-33c89424de2d','photo-1564501049412-61c2a3083791'],
+ turismo:['photo-1469474968028-56623f02e42e','photo-1476514525535-07fb3b4ae5f1'],
+ farmacia:['photo-1587854692152-cbe660dbde88','photo-1471864190281-a93a3070b6de'],
+ tecnologia:['photo-1555066931-4365d14bab8c','photo-1518770660439-4636190af475'],
+ ecommerce:['photo-1556742049-0cfed4f6a45d','photo-1607082348824-0a96f2a4b9da'],
+ fotografia:['photo-1516035069371-29a1b244cc32','photo-1452780212940-6f5c0d14d848']
+};
+
+const sectorCopy = {
+ 'Beleza e bem-estar': {
+  experience:'Reserve um momento para se cuidar.', practical:'Encontre o atendimento que procura.',
+  services:'Cuidados e serviços', action:'Consultar horários', story:'Tire dúvidas sobre o atendimento e encontre um horário que combine com a sua rotina.'
+ },
+ Saúde: {
+  experience:'Cuidado em cada etapa do atendimento.', practical:'Dê o próximo passo no seu cuidado.',
+  services:'Áreas de atendimento', action:'Informações de atendimento', story:'Peça informações sobre modalidades de atendimento, horários e orientações para a primeira visita.'
+ },
+ Pets: {
+  experience:'Cuidado para quem faz parte da família.', practical:'Encontre o que seu pet precisa.',
+  services:'Serviços para pets', action:'Consultar disponibilidade', story:'Conte o que seu pet precisa para saber quais serviços estão disponíveis e como funciona o atendimento.'
+ },
+ Gastronomia: {
+  experience:'O próximo encontro tem sabor.', practical:'Escolha o que provar hoje.',
+  services:'Opções da casa', action:'Consultar opções', story:'Fale com a casa para conhecer as opções disponíveis e planejar o próximo pedido ou visita.'
+ },
+ 'Hospitalidade e turismo': {
+  experience:'Viaje com tempo para aproveitar.', practical:'Planeje sua próxima viagem.',
+  services:'Opções para sua viagem', action:'Consultar disponibilidade', story:'Compartilhe as datas e o que você procura para descobrir as opções e condições disponíveis.'
+ },
+ 'Casa e imóveis': {
+  experience:'Um novo olhar para o seu espaço.', practical:'Tire sua ideia do papel.',
+  services:'Como podemos ajudar', action:'Conversar sobre o projeto', story:'Conte o que você busca para conversar sobre possibilidades, etapas e próximos passos.'
+ },
+ Automotivo: {
+  experience:'Atenção ao seu carro em cada detalhe.', practical:'Saiba o que fazer pelo seu veículo.',
+  services:'Serviços para seu veículo', action:'Consultar atendimento', story:'Informe o modelo do veículo e o que ele está precisando antes de combinar um atendimento.'
+ },
+ 'Serviços profissionais': {
+  experience:'Entenda suas opções com clareza.', practical:'Converse sobre o que você precisa.',
+  services:'Áreas de atuação', action:'Conversar sobre atendimento', story:'Explique sua situação para conhecer as opções de atendimento e combinar os próximos passos.'
+ },
+ 'Tecnologia e comércio': {
+  experience:'Explore o que funciona para você.', practical:'Encontre o próximo passo para sua ideia.',
+  services:'Soluções e serviços', action:'Solicitar informações', story:'Entre em contato para entender as opções disponíveis e esclarecer seus requisitos.'
+ },
+ 'Moda e criatividade': {
+  experience:'Ideias para momentos que importam.', practical:'Encontre a opção que combina com você.',
+  services:'O que você encontra aqui', action:'Consultar opções', story:'Conte a ocasião ou o que você está procurando para receber informações sobre as opções disponíveis.'
+ },
+ 'Educação e esportes': {
+  experience:'Toda jornada começa com um passo.', practical:'Encontre uma atividade para você.',
+  services:'Atividades e modalidades', action:'Consultar turmas e horários', story:'Pergunte sobre atividades, horários e condições para começar.'
+ }
+};
+
+const segmentCopy = {
+ salao:{experience:'Seu próximo visual começa com uma conversa.', practical:'Escolha como cuidar do seu cabelo.'},
+ barbearia:{experience:'Do corte à barba, encontre o seu estilo.', practical:'Combine seu próximo corte.'},
+ odontologia:{experience:'Converse sobre os cuidados com seu sorriso.', practical:'Informações para sua próxima consulta odontológica.'},
+ restaurante:{experience:'Sua próxima boa conversa começa à mesa.', practical:'Conheça as opções para sua próxima refeição.'},
+ hamburgueria:{experience:'Abra o apetite para o próximo burger.', practical:'Encontre seu próximo hambúrguer.'},
+ pizzaria:{experience:'O próximo encontro pede pizza.', practical:'Escolha o sabor da vez.'},
+ cafeteria:{experience:'Uma pausa com aroma de café.', practical:'Descubra o que acompanha seu café.'},
+ padaria:{experience:'O dia começa com cheiro de pão.', practical:'Descubra as opções da padaria.'},
+ hotelaria:{experience:'Sinta-se em casa em outro lugar.', practical:'Consulte acomodações para a sua estadia.'},
+ imobiliaria:{experience:'Imagine seu próximo endereço.', practical:'Encontre imóveis para comprar ou alugar.'},
+ fotografia:{experience:'Fotografias para guardar o que importa.', practical:'Planeje seu próximo ensaio.', action:'Consultar disponibilidade'},
+ advocacia:{experience:'Entenda as possibilidades para sua situação.', practical:'Conheça as áreas de atendimento jurídico.'},
+ contabilidade:{experience:'Organização para o dia a dia da empresa.', practical:'Encontre apoio para sua rotina contábil.'},
+ academia:{experience:'Movimento no seu próprio ritmo.', practical:'Conheça as modalidades e programe seu treino.'},
+ farmacia:{experience:'Apoio para seus cuidados do dia a dia.', practical:'Consulte produtos e atendimento.', action:'Consultar disponibilidade'}
+};
+
+window.SITE_TEMPLATES = source.map(([id,label,category,layout,example,headline,summary,serviceList,mainPhoto,accent,bg,ink])=>{
+ const related=source.filter(row=>row[2]===category&&row[0]!==id).map(row=>row[8]);
+ const photos=[...new Set([mainPhoto,...(referencePhotos[id]||[]),...related])]
+  .slice(0,3).map(photo=>`https://images.unsplash.com/${photo}?auto=format&fit=crop&w=1600&q=82`);
+ return {
+  id,label,category,layout,example,headline,summary,services:serviceList.split('|'),
+  photo:photos[0],photos,accent,bg,ink,aliases:segmentAliases[id]||[],
+  profile:{...sectorCopy[category],...segmentCopy[id]}
+ };
+});
