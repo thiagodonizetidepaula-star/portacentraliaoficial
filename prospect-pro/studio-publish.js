@@ -26,6 +26,7 @@ function saveSession(value) {
  else sessionStorage.removeItem(authKey);
  reflectAccountButton();
  window.PortalProjectStore?.refresh();
+ window.dispatchEvent(new Event('portal-studio-session'));
 }
 
 function reflectAccountButton() {
@@ -333,12 +334,17 @@ function contactNumber(value) {
  return /^55[1-9]\d{9,10}$/.test(number) ? number : '';
 }
 
+function draftWhatsApp(data) {
+ if (!data) return '';
+ return contactNumber(Object.hasOwn(data, 'whatsapp') ? data.whatsapp : data.phone);
+}
+
 function reflectContact() {
  const item = lastPublic;
  const control = $('openBusinessWhatsapp');
  const duplicate = Boolean(item?.lead?.proposalSentAt || item?.lead?.messageOpenedAt);
  const permitted = item && !item.checking && (!item.data.leadId || item.lead?.known) && !item.lead?.optedOut;
- const number = contactNumber(item?.data.phone);
+ const number = draftWhatsApp(item?.data);
  $('publishDuplicate').hidden = !permitted || !number || !duplicate;
  control.disabled = !permitted || !number || (duplicate && !$('publishRepeat').checked);
  $('copyPublicMessage').disabled = !permitted;
@@ -346,7 +352,7 @@ function reflectContact() {
   : !permitted ? item?.lead?.optedOut
     ? 'Esta empresa foi marcada para não receber novas propostas.'
     : 'O estado desta oportunidade não pôde ser verificado. Consulte Oportunidades.'
-  : !number ? 'Adicione um WhatsApp com DDD no editor para abrir a conversa.'
+  : !number ? 'Confirme um número de WhatsApp com DDD no editor para abrir a conversa.'
   : duplicate ? 'Já existe um registro de contato para esta empresa. Confira o histórico antes de preparar outra mensagem.'
   : 'Revise o texto. Após enviar pelo WhatsApp, confirme o envio em Oportunidades.';
  $('publishContactStatus').textContent = message;
@@ -480,7 +486,7 @@ $('openBusinessWhatsapp').onclick = () => {
   $('publicMessage').focus();
   return;
  }
- const number = contactNumber(item.data.phone);
+ const number = draftWhatsApp(item.data);
  if (!number) return;
  window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(message), '_blank', 'noopener');
  status('WhatsApp aberto. Após enviar a mensagem, confirme o envio em Oportunidades.');

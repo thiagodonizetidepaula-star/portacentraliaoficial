@@ -8,7 +8,7 @@ import {createServer} from 'node:net';
 import {test} from 'node:test';
 import {setTimeout as delay} from 'node:timers/promises';
 import {fileURLToPath} from 'node:url';
-import {business, operator, publishableKey, startProviders, token} from './fixtures/providers.mjs';
+import {business, openaiKey, operator, publishableKey, startProviders, token, viewOnlyToken} from './fixtures/providers.mjs';
 
 const playwrightModule = process.env.PROSPECT_PLAYWRIGHT_MODULE || 'playwright-core';
 const {chromium} = await import(playwrightModule);
@@ -25,7 +25,7 @@ async function availablePort() {
   return port;
 }
 
-async function startApp(t, providers, googleEnabled) {
+async function startApp(t, providers, googleEnabled, {aiEnabled = false} = {}) {
   const port = await availablePort();
   const origin = 'http://127.0.0.1:' + port;
   const child = spawn(process.execPath, ['--import', guardPath, serverPath], {
@@ -34,9 +34,12 @@ async function startApp(t, providers, googleEnabled) {
       PORT: String(port),
       PREVIEW_PUBLIC_ORIGIN: origin,
       PROSPECT_PROVIDER_FIXTURE_ORIGIN: providers.origin,
-      SUPABASE_URL: providers.origin,
+      PROSPECT_PROVIDER_PUBLIC_ORIGIN: providers.publicOrigin,
+      SUPABASE_URL: aiEnabled ? providers.publicOrigin : providers.origin,
       SUPABASE_PUBLISHABLE_KEY: publishableKey,
       GOOGLE_PLACES_API_KEY: googleEnabled ? 'only_local_fixture_google_key' : '',
+      OPENAI_API_KEY: aiEnabled ? openaiKey : '',
+      OPENAI_BASE_URL: providers.origin + '/v1',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -64,6 +67,11 @@ async function browserContext(browser, origin, providers, options = {}) {
   const openedUrls = [];
   await context.route('**/*', async route => {
     const url = new URL(route.request().url());
+    if (url.origin === providers.publicOrigin) {
+      const response = await route.fetch({url: providers.origin + url.pathname + url.search, maxRedirects: 0});
+      await route.fulfill({response});
+      return;
+    }
     if ([origin, providers.origin].includes(url.origin)) {
       await route.continue();
       return;
@@ -99,6 +107,203 @@ async function searchInputs(page) {
 async function visibleText(locator, text) {
   await locator.filter({hasText: text}).waitFor();
 }
+
+const mockOutput = result => [200, {
+  output: [{type: 'message', content: [{type: 'output_text', text: JSON.stringify(result)}]}],
+}];
+
+test('IA valida o operador, preserva os contatos e gera três propostas no servidor', {timeout: 20000}, async t => {
+  const providers = await startProviders();
+  t.after(providers.close);
+  const unconfigured = await startApp(t, providers, false);
+  const statusRoute = '/api/studio/ai/status';
+  const textRoute = '/api/studio/ai/text';
+  const company = {
+    name: business.displayName.text,
+    industry: 'Salão de beleza',
+    city: 'Mauá, SP',
+    address: business.formattedAddress,
+    phone: business.internationalPhoneNumber,
+    email: 'contato-privado@example.test',
+    services: ['Corte | Lavagem e finalização'],
+  };
+  const proposalRequest = {mode: 'generate', company};
+  async function requestText(base, body, bearer) {
+    const headers = {'Content-Type': 'application/json'};
+    if (bearer) headers.Authorization = 'Bearer ' + bearer;
+    return fetch(base + textRoute, {method: 'POST', headers, body: JSON.stringify(body)});
+  }
+  assert.deepEqual(await fetch(unconfigured + statusRoute).then(res => res.json()), {text: false, images: false});
+  assert.equal((await requestText(unconfigured, proposalRequest, token)).status, 503);
+  const origin = await startApp(t, providers, false, {aiEnabled: true});
+  assert.deepEqual(await fetch(origin + statusRoute).then(res => res.json()), {text: true, images: true});
+  assert.equal((await requestText(origin, proposalRequest)).status, 401);
+  assert.equal((await requestText(origin, proposalRequest, 'invalid-token')).status, 401);
+  assert.equal((await requestText(origin, proposalRequest, viewOnlyToken)).status, 403);
+  assert.equal((await fetch(origin + '/api/studio/ai/image', {method: 'POST'})).status, 401);
+  assert.equal(providers.state.aiTexts.length, 0);
+  assert.equal(providers.state.aiImages.length, 0);
+
+  const proposals = [
+    {
+      headline: 'Corte pensado para a rotina em Mauá',
+      summary: 'O Salão Aurora oferece corte com lavagem e finalização.',
+      about: 'Converse com o Salão Aurora sobre como adaptar o corte ao tempo que você tem para finalizar o cabelo.',
+      cta: 'Consultar horários', services: company.services, faq: [],
+    },
+    {
+      headline: 'Da lavagem à finalização no mesmo atendimento',
+      summary: 'Confira como o corte é preparado e finalizado no Salão Aurora.',
+      about: 'Use a conversa antes do atendimento para mostrar suas referências e explicar como costuma arrumar seu cabelo.',
+      cta: 'Conversar com o salão', services: company.services, faq: [],
+    },
+    {
+      headline: 'Conheça as etapas do próximo corte',
+      summary: 'Veja o que o salão informou sobre corte, lavagem e finalização.',
+      about: 'Peça os detalhes do corte e confirme com a equipe o horário mais adequado antes de ir ao salão.',
+      cta: 'Pedir mais detalhes', services: company.services, faq: [],
+    },
+  ];
+  providers.controlAiText(() => mockOutput({proposals}));
+  const generated = await requestText(origin, proposalRequest, token);
+  assert.equal(generated.status, 200);
+  assert.deepEqual(await generated.json(), {proposals});
+  const payload = providers.state.aiTexts[0];
+  assert.equal(payload.store, false);
+  assert.equal(payload.text.format.name, 'site_proposals');
+  const context = JSON.parse(payload.input).company;
+  assert.equal(context.name, company.name);
+  assert.deepEqual(context.services, company.services);
+  assert.equal(context.phone, undefined);
+  assert.equal(context.email, undefined);
+
+  providers.controlAiText(() => mockOutput({
+    changes: {
+      headline: 'Cortes no Salão Aurora', color: '#267841', headingSize: '1.15',
+      phone: '1111111111', name: 'Outro estabelecimento', photo: 'https://example.test/imagem.webp',
+    },
+    summary: 'Ajuste de título e destaque.',
+  }));
+  const edited = await requestText(origin, {
+    mode: 'edit', company, request: 'Ajuste o título e a cor.',
+    draft: {headline: proposals[0].headline, phone: company.phone, email: company.email},
+  }, token);
+  assert.equal(edited.status, 200);
+  assert.deepEqual(await edited.json(), {
+    changes: {headline: 'Cortes no Salão Aurora', color: '#267841', headingSize: '1.15'},
+    summary: 'Ajuste de título e destaque.',
+  });
+  assert.equal(providers.state.aiTexts[1].text.format.name, 'site_edit');
+  const editedDraft = JSON.parse(providers.state.aiTexts[1].input).draft;
+  assert.deepEqual(editedDraft, {headline: proposals[0].headline});
+  providers.controlAiText(() => mockOutput({proposals: proposals.slice(0, 2)}));
+  assert.equal((await requestText(origin, proposalRequest, token)).status, 502);
+  assert.equal(providers.state.aiImages.length, 0);
+  assert.equal(providers.state.googleQueries.length, 0);
+  assert.deepEqual(providers.state.failures, []);
+});
+
+async function openSampleStudio(page, origin) {
+  await page.goto(origin + '/studio');
+  await page.locator('#studioCompany').fill(business.displayName.text);
+  await page.locator('#studioSegment').fill('Salão de beleza');
+  await page.locator('#studioCity').fill('Mauá, SP');
+  await page.locator('#generateThree').click();
+  const choices = page.locator('#threeProposals .proposal-card [data-choose]');
+  await choices.nth(2).waitFor();
+  await choices.first().click();
+}
+
+test('Assistente sugere texto e imagem sem alterar o site até aplicar', {timeout: 45000}, async t => {
+  const providers = await startProviders();
+  t.after(providers.close);
+  const requestedHeadline = 'Cuidado capilar para a rotina em Mauá';
+  providers.controlAiText(() => mockOutput({
+    changes: {headline: requestedHeadline},
+    summary: 'Título revisado para destacar o cuidado capilar no Salão Aurora.',
+  }));
+  const origin = await startApp(t, providers, false, {aiEnabled: true});
+  const browser = await chromium.launch({executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium'});
+  t.after(() => browser.close());
+  const {context} = await browserContext(browser, origin, providers, {viewport: {width: 1440, height: 1000}});
+  const page = await context.newPage();
+  await openSampleStudio(page, origin);
+  const preview = page.frameLocator('#websitePreview');
+  const oldHeadline = await preview.locator('h1').textContent();
+  const oldPhoto = await preview.locator('.hero img').first().getAttribute('src');
+
+  await page.locator('#editorAssistantTab').click();
+  await page.locator('#aiConnect').click();
+  await page.locator('#pubEmail').fill(operator.email);
+  await page.locator('#pubPass').fill('senha-do-teste-local');
+  await page.locator('#pubLogin').click();
+  await page.locator('#publishReady').waitFor();
+  await page.locator('#closePublish').click();
+
+  const request = page.locator('#aiRequest');
+  await request.fill('Ajuste o título para destacar cuidado capilar em Mauá.');
+  await page.locator('#aiRequestButton').click();
+  await page.locator('input[data-ai-field="headline"]').waitFor();
+  assert.equal(await preview.locator('h1').textContent(), oldHeadline);
+  assert.equal(providers.state.aiTexts.length, 1);
+  const textRequest = JSON.stringify(providers.state.aiTexts[0]);
+  assert.match(textRequest, /cuidado capilar/i);
+  assert.match(textRequest, /Salão Aurora/);
+  await page.locator('#aiPreviewChanges').click();
+  await visibleText(preview.locator('h1'), requestedHeadline);
+  assert.equal(await page.locator('#headline').inputValue(), oldHeadline);
+  await page.locator('#aiApply').click();
+  await visibleText(preview.locator('h1'), requestedHeadline);
+  await page.locator('#undoEdit').click();
+  await visibleText(preview.locator('h1'), oldHeadline);
+  assert.equal(providers.state.aiTexts.length, 1);
+
+  await page.locator('#editorAssistantTab').click();
+  await page.locator('#aiImageMode').click();
+  await request.fill('Fotografia horizontal de um salão com luz natural.');
+  await page.locator('#aiRequestButton').click();
+  const suggestion = page.locator('#aiImagePreview');
+  await suggestion.waitFor();
+  const generatedImage = await suggestion.getAttribute('src');
+  assert.equal(new URL(generatedImage).origin, providers.publicOrigin);
+  assert.match(generatedImage, /\/storage\/v1\/object\/public\/prospect-site-images\//);
+  assert.equal(await preview.locator('.hero img').first().getAttribute('src'), oldPhoto);
+  assert.equal(providers.state.aiImages.length, 1);
+  assert.equal(providers.state.uploadedImages.size, 1);
+  await page.locator('#aiApply').click();
+  await eventually(
+    async () => await preview.locator('.hero img').first().getAttribute('src') === generatedImage,
+    'A imagem revisada não entrou na prévia.'
+  );
+  await visibleText(preview.locator('.hero figcaption'), /gerada por IA/i);
+  await page.locator('#undoEdit').click();
+  await eventually(
+    async () => await preview.locator('.hero img').first().getAttribute('src') === oldPhoto,
+    'Desfazer não restaurou a imagem anterior.'
+  );
+
+  let releaseEdit;
+  const waitForEdit = new Promise(resolve => {releaseEdit = resolve;});
+  t.after(releaseEdit);
+  providers.controlAiText(async () => {
+    await waitForEdit;
+    return mockOutput({changes: {headline: 'Sugestão para a versão anterior'}, summary: 'Título para outra revisão.'});
+  });
+  await page.locator('#aiTextMode').click();
+  await request.fill('Sugira um título mais curto.');
+  await page.locator('#aiRequestButton').click();
+  await eventually(() => providers.state.aiTexts.length === 2, 'A segunda sugestão não chegou à IA simulada.');
+  await page.locator('#editorFieldsTab').click();
+  const manualHeadline = 'Novo título escrito no editor';
+  await page.locator('#headline').fill(manualHeadline);
+  await page.locator('#editorAssistantTab').click();
+  releaseEdit();
+  await visibleText(page.locator('#aiStatus'), /rascunho mudou/i);
+  assert.equal(await page.locator('#aiSuggestion').isVisible(), false);
+  await visibleText(preview.locator('h1'), manualHeadline);
+  assert.equal(providers.state.googleQueries.length, 0);
+  assert.deepEqual(providers.state.failures, []);
+});
 
 test('API protege a chave e bloqueia a 51ª consulta antes de chamar Google', {timeout: 20000}, async t => {
   const providers = await startProviders();
@@ -166,6 +371,7 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   releaseGoogle();
   await page.locator('#radarStage[data-state="done"]').waitFor();
   await visibleText(page.locator('#searchResults'), business.displayName.text);
+  assert.equal(await page.locator('#searchResults .opp-map-link').getAttribute('href'), business.googleMapsUri);
   assert.equal(await page.locator('#searchResults').getByText('Salão Horizonte').count(), 0);
   await page.locator('#searchResults [data-radar-filter="yes"]').click();
   await visibleText(page.locator('#searchResults'), 'Salão Horizonte');
@@ -181,6 +387,8 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   const lead = [...providers.state.leads.values()][0];
   assert.equal(lead.google_place_id, business.id);
   assert.equal(lead.operator_confirmed, true);
+  assert.equal(lead.phone, business.internationalPhoneNumber);
+  assert.equal(lead.address, business.formattedAddress);
   const saveAgain = page.locator('#searchResults [data-radar-save]').first();
   if (await saveAgain.isEnabled()) await saveAgain.click();
   assert.equal(await page.locator('#crm-verified').isVisible(), false);
@@ -193,21 +401,53 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   await leadRow.locator('[data-site]').click();
   await page.waitForURL('**/studio?lead=*');
   assert.equal(await page.locator('#studioCompany').inputValue(), business.displayName.text);
+  assert.equal(await page.locator('#studioAddress').inputValue(), business.formattedAddress);
+  assert.equal(await page.locator('#studioPhone').inputValue(), business.internationalPhoneNumber);
+  assert.equal(await page.locator('#studioWhatsApp').inputValue(), '');
   const proposals = page.locator('#threeProposals .proposal-card');
   await proposals.nth(2).waitFor();
+  const automaticPreview = proposals.first().frameLocator('iframe');
+  assert.equal(await automaticPreview.locator('.hero-button').getAttribute('href'), 'tel:+5511900000001');
+  assert.equal(await automaticPreview.locator('a[href^="https://wa.me/"]').count(), 0);
+
+  await page.locator('#studioWhatsAppConfirmed').check();
+  await page.locator('details summary').filter({hasText: /horário.*redes sociais.*mapa/i}).click();
+  await page.locator('#studioHours').fill('Segunda a sexta, 09:00 às 18:00');
+  await page.locator('#studioEmail').fill('recepcao+site@aurora.example.test');
+  await page.locator('#studioInstagram').fill('https://www.instagram.com/salaoaurora.example/');
+  await page.locator('#generateThree').click();
+  await proposals.nth(2).waitFor();
   assert.equal(await proposals.count(), 3);
-  const directions = [], headlines = [], images = [], layouts = [];
+  const directions = [], headlines = [], summaries = [], images = [], layouts = [];
   for (let index = 0; index < 3; index++) {
     const preview = proposals.nth(index).frameLocator('iframe');
     const hero = preview.locator('.hero');
     await hero.waitFor({state: 'attached'});
     directions.push(await preview.locator('body').getAttribute('data-direction'));
     headlines.push(await hero.locator('h1').textContent());
+    summaries.push(await hero.locator('.hero-summary').textContent());
     images.push(await hero.locator('img').first().getAttribute('src'));
     layouts.push(await hero.getAttribute('class'));
     assert.match(await preview.locator('body').textContent(), /Salão Aurora/);
+    await visibleText(preview.locator('.content-reference'), /confirme a disponibilidade/i);
+    assert.match(await preview.locator('.service-detail').first().textContent(), /cabelo|coloração|tratamento/i);
+    await visibleText(preview.locator('#contato address'), business.formattedAddress);
+    await visibleText(preview.locator('#contato .business-hours'), 'Segunda a sexta');
+    const map = new URL(await preview.locator('#contato .map-link').getAttribute('href'));
+    assert.equal(map.hostname, 'www.google.com');
+    assert.equal(map.searchParams.get('query_place_id'), business.id);
+    assert.ok(map.searchParams.get('query').includes('Rua das Flores'));
+    assert.equal(await preview.locator('[data-contact="phone"]').getAttribute('href'), 'tel:+5511900000001');
+    assert.equal(await preview.locator('[data-contact="email"]').getAttribute('href'), 'mailto:recepcao%2Bsite@aurora.example.test');
+    assert.equal(await preview.locator('[data-contact="instagram"]').getAttribute('href'), 'https://www.instagram.com/salaoaurora.example/');
+    const whatsappLink = await hero.locator('.hero-button').getAttribute('href');
+    const whatsapp = new URL(whatsappLink);
+    assert.equal(whatsapp.origin + whatsapp.pathname, 'https://wa.me/5511900000001');
+    assert.match(whatsapp.searchParams.get('text'), /Olá!.*Salão Aurora/is);
+    assert.match(whatsapp.searchParams.get('text'), /corte|cabelo|atendimento/i);
+    assert.match(whatsappLink, /Ol%C3%A1/);
   }
-  for (const values of [directions, headlines, images, layouts]) {
+  for (const values of [directions, headlines, summaries, images, layouts]) {
     assert.ok(values.every(Boolean), 'Cada proposta precisa renderizar o elemento avaliado.');
     assert.equal(new Set(values).size, 3, 'As três propostas devem ser distintas.');
   }
@@ -250,6 +490,10 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   assert.match(await publicPage.locator('meta[property="og:title"]').getAttribute('content'), /Salão Aurora/);
   await publicPage.setViewportSize({width: 375, height: 812});
   assert.equal(await publicPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+  await visibleText(publicPage.locator('#contato address'), business.formattedAddress);
+  assert.notEqual(await publicPage.locator('.hero-text').evaluate(element => getComputedStyle(element).animationName), 'none');
+  await publicPage.emulateMedia({reducedMotion: 'reduce'});
+  assert.equal(await publicPage.locator('.hero-text').evaluate(element => getComputedStyle(element).animationName), 'none');
   assert.equal(providers.state.previews.size, 1);
   await publicPage.close();
 
@@ -258,6 +502,7 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   await page.locator('#openBusinessWhatsapp').click();
   await eventually(() => openedUrls.some(url => url.hostname === 'wa.me'), 'O WhatsApp simulado não foi aberto.');
   const whatsapp = openedUrls.find(url => url.hostname === 'wa.me');
+  assert.equal(whatsapp.pathname, '/5511900000001');
   assert.ok(whatsapp.searchParams.get('text').includes(link));
   await eventually(() => providers.state.messages.length === 1, 'A abertura do WhatsApp não foi registrada.');
   assert.equal(providers.state.leads.get(lead.id).proposal_sent_at, null);
@@ -275,6 +520,10 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   await secondPage.locator('#projectsView [data-load]').click();
   assert.equal(await secondPage.locator('#headline').inputValue(), customHeadline);
   await secondPage.locator('#closeEditor').click();
+  await secondPage.goto(origin + '/studio?lead=' + encodeURIComponent(lead.id));
+  await secondPage.locator('#threeProposals .proposal-card').nth(2).waitFor();
+  assert.equal(await secondPage.locator('#studioAddress').inputValue(), business.formattedAddress);
+  assert.equal(await secondPage.locator('#studioPhone').inputValue(), business.internationalPhoneNumber);
   await secondPage.goto(origin);
   await secondPage.locator('[data-page="leads"]').click();
   await visibleText(secondPage.locator('#leadRows'), /WhatsApp aberto/);
@@ -308,12 +557,14 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   await page.locator('#studioCompany').fill('Oficina Pinheiro');
   await page.locator('#studioSegment').fill('Oficina mecânica');
   await page.locator('#studioCity').fill('São Caetano do Sul, SP');
-  await page.locator('.studio-brief summary').click();
-  await page.locator('#studioServices').fill('Revisão preventiva\nDiagnóstico de motor');
+  await page.locator('#studioServices').fill('Revisão preventiva | Conferência de freios e fluidos\nDiagnóstico de motor');
   await page.locator('#generateThree').click();
   const workshop = page.locator('#threeProposals .proposal-card').first().frameLocator('iframe');
   await visibleText(workshop.locator('body'), 'Oficina Pinheiro');
   await visibleText(workshop.locator('body'), 'Revisão preventiva');
+  await visibleText(workshop.locator('.service-detail').first(), 'Conferência de freios e fluidos');
+  assert.equal(await workshop.locator('.content-reference').count(), 0);
+  assert.doesNotMatch(await workshop.locator('body').textContent(), /cuidado capilar|Salão Aurora/i);
   assert.equal(headlines.includes(await workshop.locator('h1').textContent()), false);
   assert.equal(images.includes(await workshop.locator('.hero img').first().getAttribute('src')), false);
   assert.deepEqual(pageErrors, []);

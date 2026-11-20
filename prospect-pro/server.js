@@ -1,5 +1,6 @@
 import http from 'node:http';
 import {readFile} from 'node:fs/promises';
+import {createStudioAi} from './studio-ai.js';
 const port=process.env.PORT||3000;
 const LIMIT=50;
 // Cota persistente e atômica no Supabase, só para o operador autorizado.
@@ -28,6 +29,7 @@ const safeSlug=x=>typeof x==='string'&&/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(x)&&x.l
 const escapeHtml=x=>String(x||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const endpoint=process.env.SUPABASE_URL||'';
 const publicKey=process.env.SUPABASE_PUBLISHABLE_KEY||'';
+const studioAi=createStudioAi({endpoint,publicKey,json,getToken});
 async function publicPreview(slug){
  if(!endpoint||!publicKey)throw new Error('Banco de dados não configurado');
  const url=endpoint+'/rest/v1/prospect_site_previews?slug=eq.'+encodeURIComponent(slug)+'&status=eq.published&select=business_name,business_category,city,description,cover_image,html,slug&limit=1';
@@ -39,6 +41,7 @@ async function publicPreview(slug){
 
 http.createServer(async(req,res)=>{
  const u=new URL(req.url,'http://localhost');
+ if(u.pathname.startsWith('/api/studio/ai/'))return studioAi(req,res,u.pathname);
  if(req.method!=='GET')return json(res,405,{error:'Método não permitido'});
  if(u.pathname==='/health')return json(res,200,{ok:true});
  if(u.pathname==='/api/public-config')return json(res,200,{supabaseUrl:endpoint,publishableKey:publicKey,configured:!!endpoint&&!!publicKey});

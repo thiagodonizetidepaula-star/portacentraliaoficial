@@ -173,7 +173,7 @@ function composeMessage(id){
    save();closeModal();
   },{confirm:'Abrir WhatsApp'});
 }
-function confirmGoogleLead(x,category,callback,existing=false,searchCity=''){
+function confirmGoogleLead(x,category,callback,existing=false,searchCity='',placeId=x?.googleId){
  const source=x||{};
  const name=plain(source.name),phone=plain(source.phone),address=plain(source.address);
  modal('Confirmar dados do estabelecimento',
@@ -186,15 +186,15 @@ function confirmGoogleLead(x,category,callback,existing=false,searchCity=''){
   if(!el('crm-verified')?.checked)return modalError('Confirme que revisou os dados comerciais.');
   const name=plain(el('crm-name').value),phone=plain(el('crm-phone').value),address=plain(el('crm-address').value),website=plain(el('crm-site').value);
   if(name.length<2)return modalError('Informe o nome do estabelecimento.');
-  const lead=existing?source:leads.find(l=>source.googleId&&l.googleId===source.googleId);
+  const lead=existing?source:leads.find(l=>placeId&&l.googleId===placeId);
   const city=plain(searchCity)||plain(el('city')?.value);
-  if(lead){lead.name=name;lead.phone=phone;lead.address=address;lead.website=website;lead.category=category||lead.category;lead.city=lead.city||city;lead.operatorConfirmed=true;lead.origin='google-places';save()}
+  if(lead){lead.name=name;lead.phone=phone;lead.address=address;lead.website=website;lead.category=category||lead.category;lead.city=lead.city||city;lead.googleId||=placeId||'';lead.operatorConfirmed=true;lead.origin='google-places';save()}
   else{
-   const leadNew={id:uid(),googleId:source.googleId||'',name,phone,address,website:'',category:category||'',city,origin:'google-places',operatorConfirmed:true,stage:'Novo',previewSlug:'',proposalSentAt:null};
+   const leadNew={id:uid(),googleId:placeId||'',name,phone,address,website:'',category:category||'',city,origin:'google-places',operatorConfirmed:true,stage:'Novo',previewSlug:'',proposalSentAt:null};
    leadNew.website=website;leads.unshift(leadNew);save();
   }
   closeModal();
-  const out=existing?source:leads.find(l=>l.googleId&&l.googleId===source.googleId);
+  const out=existing?source:leads.find(l=>l.googleId&&l.googleId===placeId);
   if(callback)callback(out||leads[0]);
  },{confirm:'Salvar empresa'});
 }
