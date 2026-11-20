@@ -141,10 +141,10 @@ function confirmSent(id){
 }
 function publishedLink(id){
  const l=find(id);if(!l)return null;
- if(l.previewSlug)return location.origin+'/mvp/'+encodeURIComponent(l.previewSlug);
+ if(l.previewSlug)return window.ProspectLinks.previewUrl(l.previewSlug);
  try{
   const p=readList('prospect_library_projects').find(p=>String(p.leadId)===String(id)&&p.publicSlug);
-  if(p){l.previewSlug=p.publicSlug;save();return location.origin+'/mvp/'+encodeURIComponent(p.publicSlug)}
+  if(p){l.previewSlug=p.publicShareSlug||p.publicSlug;save();return window.ProspectLinks.previewUrl(p.publicSlug,p.publicShareSlug)}
  }catch{}
  return null;
 }
@@ -205,7 +205,7 @@ function renderSent(){
  box.innerHTML=list.map(l=>'<article class="sent-row"><div><strong>'+escape(l.name)+'</strong><div class="crm-lead-note">Enviada: '+escape(new Date(l.proposalSentAt).toLocaleString('pt-BR'))+' · Status: '+escape(l.stage)+'</div></div><div class="sent-actions">'+(publishedLinkForDisplay(l)?'<a class="mini" href="'+escape(publishedLinkForDisplay(l))+'" target="_blank" rel="noopener noreferrer">Ver prévia</a>':'')+'<button class="mini" data-sent-archive="'+escape(l.id)+'">Arquivar</button></div></article>').join('')||'<div class="radar-empty">Nenhuma proposta marcada como enviada. Ao enviar uma mensagem pelo WhatsApp, volte ao lead e confirme o envio.</div>';
  box.querySelectorAll('[data-sent-archive]').forEach(e=>e.onclick=()=>archive(e.dataset.sentArchive));
 }
-function publishedLinkForDisplay(l){return l.previewSlug?location.origin+'/mvp/'+encodeURIComponent(l.previewSlug):''}
+function publishedLinkForDisplay(l){return l.previewSlug?window.ProspectLinks.previewUrl(l.previewSlug):''}
 async function syncChanges(){
  if(!account||syncing)return;
  pendingPersist=false;

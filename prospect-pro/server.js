@@ -1,4 +1,5 @@
 import http from 'node:http';
+import {publicationHtml, readPublication, validSlug, previewPolicy} from './public-page.mjs';
 import {readFile} from 'node:fs/promises';
 import {createStudioAi, studioOperator} from './studio-ai.js';
 import {createStudioBrand} from './studio-brand-api.js';
@@ -26,8 +27,6 @@ function getToken(req){
 }
 function json(res,status,obj){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(obj))}
 
-const safeSlug=x=>typeof x==='string'&&/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(x)&&x.length>=3&&x.length<=90;
-const escapeHtml=x=>String(x||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const endpoint=process.env.SUPABASE_URL||'';
 const publicKey=process.env.SUPABASE_PUBLISHABLE_KEY||'';
 const authorizedOperator=studioOperator(endpoint,publicKey);
@@ -47,44 +46,37 @@ function queryPlaces({placeId,term,city,identity}) {
   body:JSON.stringify({textQuery:term+' em '+city,languageCode:'pt-BR',regionCode:'BR',pageSize:20})
  });
 }
-async function publicPreview(slug){
- if(!endpoint||!publicKey)throw new Error('Banco de dados não configurado');
- const url=endpoint+'/rest/v1/prospect_site_previews?slug=eq.'+encodeURIComponent(slug)+'&status=eq.published&select=business_name,business_category,city,description,cover_image,html,slug&limit=1';
- const response=await fetch(url,{headers:{apikey:publicKey},signal:AbortSignal.timeout(9000)});
- if(!response.ok)throw Error('Falha no banco: '+response.status);
- const rows=await response.json();
- return rows[0]||null;
+function publicationOrigin(value) {
+ try {
+  const url = new URL(value);
+  const testHost = process.env.NODE_ENV === 'test' && url.protocol === 'http:' && url.hostname === '127.0.0.1';
+  if ((url.protocol !== 'https:' && !testHost) || url.username || url.password || url.pathname !== '/' || url.search || url.hash) return '';
+  return url.origin;
+ } catch { return ''; }
 }
+const previewOrigin = publicationOrigin(process.env.PROSPECT_PUBLICATION_ORIGIN);
 
 http.createServer(async(req,res)=>{
  const u=new URL(req.url,'http://localhost');
  if(u.pathname.startsWith('/api/studio/brand/'))return studioBrand(req,res,u.pathname);
  if(u.pathname.startsWith('/api/studio/ai/'))return studioAi(req,res,u.pathname);
  if(req.method!=='GET')return json(res,405,{error:'Método não permitido'});
+ if(u.pathname==='/publication-config.js'){
+  res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});
+  return res.end('window.ProspectPreviewOrigin = '+JSON.stringify(previewOrigin)+';');
+ }
  if(u.pathname==='/health')return json(res,200,{ok:true});
  if(u.pathname==='/api/public-config')return json(res,200,{supabaseUrl:endpoint,publishableKey:publicKey,configured:!!endpoint&&!!publicKey});
  if(u.pathname.startsWith('/mvp/')){
   const slug=u.pathname.slice(5);
-  if(!safeSlug(slug))return json(res,404,{error:'Prévia não encontrada'});
+  if(!validSlug(slug))return json(res,404,{error:'Prévia não encontrada'});
   try{
-   const p=await publicPreview(slug);
+   const p=await readPublication(endpoint,publicKey,slug);
    if(!p)return json(res,404,{error:'Demonstração indisponível ou não publicada'});
    const base=process.env.PREVIEW_PUBLIC_ORIGIN||'https://portal-prospect-pro.onrender.com';
    const url=base+'/mvp/'+slug;
-   const title=String(p.business_name||'Site demonstrativo').slice(0,90)+' | Demonstração Portal Central IA';
-   const desc=String(p.description||'Uma proposta de site criada para esta empresa.').slice(0,160);
-   const img=typeof p.cover_image==='string'&&/^https:\/\/[^<>"' ]+$/.test(p.cover_image)?p.cover_image:'';
-   const meta='<meta property="og:type" content="website"><meta property="og:locale" content="pt_BR">'+
-    '<meta property="og:site_name" content="Portal Central IA · Demonstração">'+
-    '<meta property="og:title" content="'+escapeHtml(title)+'">'+
-    '<meta property="og:description" content="'+escapeHtml(desc)+'">'+
-    '<meta property="og:url" content="'+escapeHtml(url)+'">'+
-    (img?'<meta property="og:image" content="'+escapeHtml(img)+'"><meta name="twitter:card" content="summary_large_image">':'')+
-    '<meta name="robots" content="noindex,nofollow">';
-   const raw=String(p.html||'');
-   if(raw.length>280000||!/<\/head>/i.test(raw))return json(res,500,{error:'Prévia inválida'});
-   const html=raw.replace(/<\/head>/i,()=>meta+'</head>');
-   res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'public, max-age=60','X-Content-Type-Options':'nosniff','X-Frame-Options':'SAMEORIGIN','Referrer-Policy':'strict-origin-when-cross-origin','Content-Security-Policy':"default-src 'none'; img-src https: data:; style-src 'unsafe-inline'; font-src https: data:; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'; frame-ancestors 'self'"});
+   const html=publicationHtml(p,url);
+   res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'public, max-age=60','X-Content-Type-Options':'nosniff','X-Frame-Options':'SAMEORIGIN','Referrer-Policy':'strict-origin-when-cross-origin','Content-Security-Policy':previewPolicy});
    return res.end(html);
   }catch(e){return json(res,503,{error:'Não foi possível carregar a demonstração'})}
  }
@@ -94,6 +86,7 @@ http.createServer(async(req,res)=>{
  }
 
  const libraryFiles={
+  '/vendor/fflate.mjs':['./node_modules/fflate/esm/browser.js','text/javascript; charset=utf-8'],
   '/biblioteca':['./biblioteca.html','text/html; charset=utf-8'],
   '/biblioteca/':['./biblioteca.html','text/html; charset=utf-8'],
   '/biblioteca.html':['./biblioteca.html','text/html; charset=utf-8'],

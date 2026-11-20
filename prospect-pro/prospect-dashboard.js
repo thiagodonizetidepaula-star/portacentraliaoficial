@@ -146,7 +146,7 @@ function leadMatches(lead, filter) {
 function publishedSlugs() {
   const local = new Map();
   for (const project of readList('prospect_library_projects')) {
-    if (project.leadId && project.publicSlug) local.set(String(project.leadId), project.publicSlug);
+    if (project.leadId && project.publicSlug) local.set(String(project.leadId), project.publicShareSlug || project.publicSlug);
   }
   return local;
 }
@@ -158,7 +158,7 @@ function renderLeadRows() {
   $('#leadRows').innerHTML = list.map(lead => {
     const id = esc(lead.id);
     const name = esc(lead.name);
-    const slug = lead.previewSlug || localSlugs.get(String(lead.id));
+    const previewUrl = window.ProspectLinks.previewUrl(lead.previewSlug || localSlugs.get(String(lead.id)));
     const canContact = lead.stage !== 'Arquivado' && lead.stage !== 'Não contatar' && !lead.optedOut;
     const editableStages = stages.filter(stage => stage !== 'Proposta enviada' || lead.proposalSentAt || lead.stage === stage);
     const options = editableStages.map(stage => `<option${(lead.stage || 'Novo') === stage ? ' selected' : ''}>${stage}</option>`).join('');
@@ -171,7 +171,7 @@ function renderLeadRows() {
       <td><div class="actions">
         <button class="mini primary" type="button" data-site="${id}">Criar 3 sites</button>
         <button class="mini" type="button" data-edit="${id}">Editar empresa</button>
-        ${slug ? '<a class="mini" target="_blank" rel="noopener noreferrer" href="/mvp/' + encodeURIComponent(slug) + '">Ver prévia</a>' : ''}
+        ${previewUrl ? '<a class="mini" target="_blank" rel="noopener noreferrer" href="' + esc(previewUrl) + '">Ver prévia</a>' : ''}
         ${canContact ? '<button class="mini" type="button" data-wa="' + id + '">Preparar mensagem</button>' : ''}
       </div></td>
     </tr>`;

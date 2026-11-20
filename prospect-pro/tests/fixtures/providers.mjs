@@ -1,3 +1,4 @@
+import {publicationHtml} from '../../public-page.mjs';
 import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {once} from 'node:events';
@@ -170,27 +171,44 @@ export async function startProviders() {
       respond(response, 200, lead ? [lead] : []);
       return;
     }
+    if (pathname.startsWith('/p/') && (method === 'GET' || method === 'HEAD')) {
+      const share = pathname.slice(3);
+      const row = [...state.previews.values()].find(preview => preview.share_slug === share && preview.status === 'published');
+      if (!row) return respond(response, 404);
+      response.writeHead(200, {
+        'Content-Type': 'text/html; charset=utf-8',
+        'X-Prospect-Updated': String(Date.parse(row.updated_at)),
+        'Access-Control-Expose-Headers':'X-Prospect-Updated'
+      });
+      response.end(method === 'HEAD' ? undefined : publicationHtml(row, 'http://' + request.headers.host + pathname));
+      return;
+    }
     if (pathname === '/rest/v1/prospect_site_previews') {
       const slug = findValue(url, 'slug');
       const id = findValue(url, 'id');
-      if (method === 'GET' && slug && !request.headers.authorization) {
+      if (method === 'GET' && !request.headers.authorization) {
         assert.equal(request.headers.apikey, publishableKey);
         assert.equal(findValue(url, 'status'), 'published');
-        const row = [...state.previews.values()].find(preview => preview.slug === slug);
-        respond(response, 200, row ? [row] : []);
+        const lookup = /^\(slug\.eq\.([a-z0-9-]+),share_slug\.eq\.\1\)$/.exec(url.searchParams.get('or'));
+        assert.ok(lookup);
+        const rows = [...state.previews.values()].filter(preview =>
+          preview.status === 'published' && [preview.slug, preview.share_slug].includes(lookup[1]));
+        respond(response, 200, rows);
         return;
       }
       assert.ok(hasAuth(request));
       if (method === 'GET') {
-        respond(response, 200, [...state.previews.values()].filter(preview => !id || preview.id === id));
+        respond(response, 200, [...state.previews.values()].filter(preview => (!id || preview.id === id) && (!slug || preview.slug === slug)));
         return;
       }
       assert.ok(method === 'POST' || method === 'PATCH');
       const payload = await jsonBody(request);
       assert.equal(payload.owner_id, operator.id);
-      const row = {...state.previews.get(id), ...payload, id: id || randomUUID()};
+      const existing = state.previews.get(id);
+      const share = existing?.share_slug || payload.business_name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const row = {...existing, ...payload, id: id || randomUUID(), share_slug: share};
       state.previews.set(row.id, row);
-      respond(response, method === 'POST' ? 201 : 200, [{id: row.id, slug: row.slug}]);
+      respond(response, method === 'POST' ? 201 : 200, [{id: row.id, slug: row.slug, share_slug: share, updated_at: row.updated_at}]);
       return;
     }
     if (pathname === '/rest/v1/rpc/prospect_studio_current_projects') {
@@ -264,8 +282,8 @@ export async function startProviders() {
 
   const server = createServer((request, response) => {
     response.setHeader('Access-Control-Allow-Origin', '*');
-    response.setHeader('Access-Control-Allow-Headers', 'apikey,authorization,content-type,prefer,x-upsert');
-    response.setHeader('Access-Control-Allow-Methods', 'GET,POST,PATCH,OPTIONS');
+    response.setHeader('Access-Control-Allow-Headers', 'apikey,authorization,content-type,prefer,x-upsert,cache-control,pragma');
+    response.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,POST,PATCH,OPTIONS');
     handle(request, response).catch(error => {
       state.failures.push(error);
       respond(response, 500, {message: 'Erro na simulação local: ' + error.message});
