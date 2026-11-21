@@ -172,8 +172,15 @@
  height: calc(100% / var(--preview-scale));
  transform: scale(var(--preview-scale));
  transform-origin: top left;
- pointer-events: none;
 }
+.proposal-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:auto }
+#fullSiteDialog { position:fixed; inset:0; box-sizing:border-box; width:min(100%,1440px); height:100dvh; max-width:100%; max-height:100dvh; margin:auto; padding:0; border:0; background:white; color:#172533 }
+#fullSiteDialog[open] { display:flex; flex-direction:column }
+#fullSiteDialog::backdrop { background:#0b142b99 }
+#fullSiteDialog header { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 16px; border-bottom:1px solid var(--border) }
+#fullSiteDialog header strong { min-width:0; line-height:1.15 }
+#fullSiteDialog header button { flex:none }
+#fullSiteDialog iframe { border:0; flex:1; width:100%; min-height:0 }
 .proposal-info {
  display: flex;
  flex: 1;

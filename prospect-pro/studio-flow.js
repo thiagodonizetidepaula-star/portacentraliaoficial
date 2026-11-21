@@ -52,11 +52,6 @@ function reflectOptions(){
  brandPanel.refresh();
 }
 
-function brazilNumber(value){
- const digits=String(value||'').replace(/\D/g,'');
- return /^(?:55)?[1-9]\d{9,10}$/.test(digits)?digits:'';
-}
-
 function normalizeWebsite(value){
  const candidate=String(value||'').trim();
  if(!candidate)return '';
@@ -67,14 +62,16 @@ function normalizeWebsite(value){
  return '';
 }
 
-function reflectContact(){
- const phoneAvailable=Boolean(brazilNumber(formValue('studioPhone')));
- const confirmed=Boolean(formValue('studioWhatsApp'));
+function reflectContact(changed){
+ const number=window.ProspectLinks.whatsappNumber({phone:formValue('studioPhone')});
+ const input=$('studioWhatsApp');
  const check=$('studioWhatsAppConfirmed');
- check.disabled=!phoneAvailable||confirmed;
- $('studioWhatsAppSuggestion').textContent=confirmed?'O botão do site usará o WhatsApp acima.'
-  :phoneAvailable?'O telefone pode ser usado para ligações. Marque a opção acima se ele também recebe WhatsApp.'
-  :'Informe o WhatsApp da empresa para colocar um botão de conversa no site.';
+ if(changed==='studioWhatsApp')check.checked=false;
+ if(check.checked)input.value=number?formValue('studioPhone'):'';
+ else if(changed==='studioWhatsAppConfirmed')input.value='';
+ check.disabled=!number;
+ $('studioWhatsAppSuggestion').textContent=check.checked&&number?'O site e a proposta usarão este número. Você pode informar outro WhatsApp.'
+  :input.value?'O site e a proposta usarão o WhatsApp informado.':'Informe o WhatsApp ou use um telefone com DDD.';
 }
 
 function fillClient(company) {
@@ -84,15 +81,16 @@ function fillClient(company) {
   studioCity:company?.city,
   studioAddress:company?.address,
   studioPhone:company?.phone,
-  studioWhatsApp:company?.whatsapp,
-  studioWebsite:window.ProspectLinks.instagram(company?.website)?'':normalizeWebsite(company?.website),
+  studioWhatsApp:company?.whatsapp||window.ProspectLinks.whatsappLinkNumber(company?.website),
+  studioWebsite:window.ProspectLinks.hasWebsite(company||{})?normalizeWebsite(company.website):'',
   studioGoogleMapsUrl:company?.mapsUrl||company?.maps,
   studioHours:company?.hours,
   studioEmail:company?.email,
   studioInstagram:company?.instagram||window.ProspectLinks.instagram(company?.website)
  };
  for(const [id,value] of Object.entries(values))$(id).value=value||'';
- $('studioWhatsAppConfirmed').checked=Boolean(company?.whatsappConfirmed===true&&!company?.whatsapp);
+ $('studioWhatsAppConfirmed').checked=company?.whatsappUsePhone!==false&&(!values.studioWhatsApp ||
+  window.ProspectLinks.whatsappNumber({whatsapp:values.studioWhatsApp})===window.ProspectLinks.whatsappNumber({phone:values.studioPhone}));
  reflectContact();
  brandPanel.refresh();
 }
@@ -184,7 +182,7 @@ function makeProposals(client) {
   const data={
    ...app.getDefault(template),
    name:client.name,industry:category,city:client.city,address:client.address,
-   phone:client.phone,whatsapp:client.whatsapp,whatsappConfirmed:Boolean(client.whatsapp),website:client.website,
+   phone:client.phone,whatsapp:client.whatsapp,whatsappUsePhone:client.whatsappUsePhone,website:client.website,
    hours:client.hours,email:client.email,instagram:client.instagram,mapsUrl:client.mapsUrl,googlePlaceId,
    about,serviceDetails,servicesSuggested:suggested,photoOrigin:template.photoOrigin,
    logo:brand.logo,brandGallery:ownPhotos.join('\n'),brandSources:brand.sources,
@@ -202,15 +200,16 @@ function renderProposals(proposals) {
   const card=document.createElement('article');
   card.className='proposal-card';
   card.innerHTML=
-   '<div class="proposal-preview"><iframe sandbox="allow-popups allow-popups-to-escape-sandbox" tabindex="-1" loading="lazy" referrerpolicy="no-referrer"></iframe></div>'+
-   '<div class="proposal-info"><h3></h3><p></p><button type="button" class="button accent">Personalizar</button></div>';
+   '<div class="proposal-preview"><iframe sandbox="allow-popups allow-popups-to-escape-sandbox" loading="lazy" referrerpolicy="no-referrer"></iframe></div>'+
+   '<div class="proposal-info"><h3></h3><p></p><div class="proposal-actions"><button type="button" class="button secondary" data-full>Ver site completo</button><button type="button" class="button accent">Personalizar</button></div></div>';
   const preview=card.querySelector('iframe');
   preview.title='Prévia do site '+direction.title;
-  preview.srcdoc=app.buildSite(data,template);
+  app.showInFrame(preview,app.buildSite(data,template));
   card.querySelector('h3').textContent=direction.title;
   card.dataset.proposal=String(index);
   card.querySelector('p').textContent=direction.description;
-  const button=card.querySelector('button');
+  card.querySelector('[data-full]').onclick=()=>app.fullPreview(app.buildSite(data,template),data.name+' · '+direction.title);
+  const button=card.querySelector('.accent');
   button.dataset.choose=String(index);
   button.setAttribute('aria-label','Personalizar proposta '+direction.title);
   button.addEventListener('click',()=>app.start(template.id,data));
@@ -221,7 +220,7 @@ function renderProposals(proposals) {
 
 function refreshCard(proposal,index){
  const preview=result.querySelector('[data-proposal="'+index+'"] iframe');
- if(preview)preview.srcdoc=app.buildSite(proposal.data,proposal.template);
+ if(preview)app.showInFrame(preview,app.buildSite(proposal.data,proposal.template));
 }
 
 function showProposalsStatus(client,proposals){
@@ -237,8 +236,8 @@ function readClient(brand){
  const profile=window.ProspectLinks.instagram(website);
  return {
   name:formValue('studioCompany'),category:formValue('studioSegment'),city:formValue('studioCity'),
-  phone,whatsapp:explicit||($('studioWhatsAppConfirmed').checked?phone:''),
-  address:formValue('studioAddress'),website:profile?'':website,
+  phone,whatsapp:explicit,whatsappUsePhone:$('studioWhatsAppConfirmed').checked,
+  address:formValue('studioAddress'),website:profile||window.ProspectLinks.whatsappLinkNumber(website)?'':website,
   mapsUrl:formValue('studioGoogleMapsUrl'),hours:formValue('studioHours'),
   email:formValue('studioEmail'),instagram:formValue('studioInstagram')||profile,
   summary:formValue('studioSummary'),about:formValue('studioAbout'),brand,
@@ -328,7 +327,7 @@ function previewThree(enhance=false) {
   status.textContent='Informe o segmento da empresa.';
   return;
  }
- if(client.whatsapp&&!brazilNumber(client.whatsapp)){
+ if(client.whatsapp&&!window.ProspectLinks.whatsappNumber(client)){
   $(formValue('studioWhatsApp')?'studioWhatsApp':'studioPhone').focus();
   status.textContent='Confira o número de WhatsApp com DDD para gerar o botão de contato.';
   return;
@@ -353,7 +352,17 @@ form.addEventListener('submit',async event=>{
  previewThree(true);
 });
 form.addEventListener('input',event=>{
- reflectContact();
+ if(event.target.id==='studioWebsite'){
+  const number=window.ProspectLinks.whatsappLinkNumber(formValue('studioWebsite'));
+  if(number){
+   if(!formValue('studioWhatsApp')||$('studioWhatsAppConfirmed').checked){
+    $('studioWhatsAppConfirmed').checked=false;
+    $('studioWhatsApp').value=number;
+   }
+   $('studioWebsite').value='';
+  }
+ }
+ reflectContact(event.target.id);
  if(event.target.id==='studioGenerateImages')return;
  formChanged=true;
  generation?.abort();
@@ -380,7 +389,7 @@ if(lead){
    const url=new URL('/rest/v1/prospect_crm_leads',config.supabaseUrl);
    url.search=new URLSearchParams({
     id:'eq.'+leadKey,
-    select:'id,business_name,business_category,city,address,phone,website,google_place_id',
+    select:'id,business_name,business_category,city,address,phone,whatsapp,whatsapp_use_phone,website,google_place_id',
     limit:'1'
    });
    const lookup=await fetch(url,{headers:{apikey:config.publishableKey,Authorization:'Bearer '+session.access_token}});
@@ -388,7 +397,7 @@ if(lead){
    const [row]=await lookup.json();
    if(!row)throw Error('Empresa não encontrada. Confira o cadastro em Oportunidades.');
    lead={id:row.id,name:row.business_name,category:row.business_category,city:row.city,address:row.address,
-    phone:row.phone,website:row.website,googleId:row.google_place_id};
+    phone:row.phone,whatsapp:row.whatsapp,whatsappUsePhone:row.whatsapp_use_phone,website:row.website,googleId:row.google_place_id};
    if(formChanged)return;
    fillClient(lead);
    if(!$('studioSegment').value)$('studioSegment').value='Serviços profissionais';

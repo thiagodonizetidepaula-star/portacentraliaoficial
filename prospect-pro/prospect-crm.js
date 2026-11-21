@@ -38,6 +38,7 @@ const toRow=(l,user)=>({
  business_name:plain(l.name).slice(0,200),
  business_category:plain(l.category).slice(0,150),
  city:plain(l.city).slice(0,150),phone:plain(l.phone).slice(0,45),
+ whatsapp:plain(l.whatsapp).slice(0,160),whatsapp_use_phone:l.whatsappUsePhone!==false,
  address:plain(l.address).slice(0,320),website:plain(l.website).slice(0,400),
  origin:plain(l.origin)||(l.googleId?'google-places':'manual'),stage:plain(l.stage)||'Novo',
  preview_slug:plain(l.previewSlug)||null,
@@ -48,7 +49,7 @@ const toRow=(l,user)=>({
 });
 const fromRow=r=>({
  id:r.id,googleId:r.google_place_id||'',name:r.business_name,category:r.business_category,
- city:r.city,phone:r.phone,address:r.address,website:r.website,
+ city:r.city,phone:r.phone,whatsapp:r.whatsapp||'',whatsappUsePhone:r.whatsapp_use_phone!==false,address:r.address,website:r.website,
  stage:r.stage,origin:r.origin,previewSlug:r.preview_slug||'',
  proposalSentAt:r.proposal_sent_at,messageOpenedAt:r.message_opened_at,archivedAt:r.archived_at,
  optedOut:!!r.opted_out,operatorConfirmed:!!r.operator_confirmed,notes:r.notes,
@@ -58,7 +59,7 @@ function approved(l){return !!(l.name&&(l.operatorConfirmed||(!l.googleId&&l.ori
 const originalSave=save,originalRender=render;
 let lastSerialized=new Map();
 function snapshot(){
- return leads.map(l=>({id:l.id,object:{id:l.id,googleId:l.googleId||'',name:l.name,phone:l.phone||'',address:l.address||'',website:l.website||'',category:l.category||'',city:l.city||'',stage:l.stage||'Novo',previewSlug:l.previewSlug||'',proposalSentAt:l.proposalSentAt||null,messageOpenedAt:l.messageOpenedAt||null,archivedAt:l.archivedAt||null,optedOut:!!l.optedOut,operatorConfirmed:!!l.operatorConfirmed,origin:l.origin||'manual',notes:l.notes||''}}));
+ return leads.map(l=>({id:l.id,object:{id:l.id,googleId:l.googleId||'',name:l.name,phone:l.phone||'',whatsapp:l.whatsapp||'',whatsappUsePhone:l.whatsappUsePhone!==false,address:l.address||'',website:l.website||'',category:l.category||'',city:l.city||'',stage:l.stage||'Novo',previewSlug:l.previewSlug||'',proposalSentAt:l.proposalSentAt||null,messageOpenedAt:l.messageOpenedAt||null,archivedAt:l.archivedAt||null,optedOut:!!l.optedOut,operatorConfirmed:!!l.operatorConfirmed,origin:l.origin||'manual',notes:l.notes||''}}));
 }
 function updateModified(){
  const now=new Date().toISOString();
@@ -159,8 +160,8 @@ function composeMessage(id){
   modal('Site ainda não publicado','<p>Escolha uma proposta no estúdio e publique a prévia. O link será incluído na mensagem.</p>',()=>openStudioForLead(l),{confirm:'Ir para o estúdio'});
   return;
  }
- let number=plain(l.phone).replace(/\D/g,'');if(number.length===10||number.length===11)number='55'+number;
- if(!/^55\d{10,11}$/.test(number)){alert('Confirme o telefone com DDD da empresa no cadastro antes de abrir o WhatsApp.');return}
+ const number=window.ProspectLinks.whatsappNumber(l);
+ if(!number){alert('Informe o WhatsApp com DDD em Editar empresa.');return}
  const msg=formatProposalMessage(l,link);
  modal('Mensagem personalizada · '+l.name,
   '<p>Confira os dados e o link. Esta ação apenas <strong>abre o WhatsApp com a mensagem pronta</strong>, sem enviar automaticamente.</p><textarea id="message">'+escape(msg)+'</textarea><label><input id="permit" type="checkbox" style="width:auto"> Tenho motivo legítimo para contatar esta empresa e respeitarei qualquer recusa.</label>'+
@@ -180,17 +181,21 @@ function confirmGoogleLead(x,category,callback,existing=false,searchCity='',plac
   '<p>Para armazenar permanentemente uma oportunidade, confirme os dados comerciais que você verificou. O Google permite armazenar o <strong>Place ID</strong>, mas não copiar em massa seu conteúdo para um CRM. <a href="https://developers.google.com/maps/documentation/places/web-service/policies" target="_blank" rel="noopener noreferrer">Regras do Google Maps</a>.</p>'+
   '<label>Nome confirmado da empresa<input id="crm-name" maxlength="190" value="'+escape(name)+'"></label>'+
   '<label>Telefone comercial confirmado<input id="crm-phone" maxlength="40" value="'+escape(phone)+'"></label>'+
+  '<label>WhatsApp da empresa (se for outro número)<input id="crm-whatsapp" type="tel" maxlength="160" value="'+escape(source.whatsapp||window.ProspectLinks.whatsappLinkNumber(source.website))+'"></label>'+
   '<label>Endereço confirmado<input id="crm-address" maxlength="300" value="'+escape(address)+'"></label>'+
   '<label>Site identificado fora do perfil (opcional)<input id="crm-site" maxlength="350" value="'+escape(plain(source.website))+'"></label>'+
   '<label><input id="crm-verified" type="checkbox" style="width:auto"> Conferi essas informações e quero manter este cadastro comercial</label>',()=>{
   if(!el('crm-verified')?.checked)return modalError('Confirme que revisou os dados comerciais.');
   const name=plain(el('crm-name').value),phone=plain(el('crm-phone').value),address=plain(el('crm-address').value),website=plain(el('crm-site').value);
   if(name.length<2)return modalError('Informe o nome do estabelecimento.');
+  const entered=plain(el('crm-whatsapp').value);
+  const whatsapp=entered||window.ProspectLinks.whatsappLinkNumber(website);
+  if(whatsapp&&!window.ProspectLinks.whatsappNumber({whatsapp}))return modalError('Confira o número ou o link de WhatsApp da empresa.');
   const lead=existing?source:leads.find(l=>placeId&&l.googleId===placeId);
   const city=plain(searchCity)||plain(el('city')?.value);
-  if(lead){lead.name=name;lead.phone=phone;lead.address=address;lead.website=website;lead.category=category||lead.category;lead.city=lead.city||city;lead.googleId||=placeId||'';lead.operatorConfirmed=true;lead.origin='google-places';save()}
+  if(lead){lead.name=name;lead.phone=phone;lead.whatsapp=whatsapp;lead.address=address;lead.website=website;lead.category=category||lead.category;lead.city=lead.city||city;lead.googleId||=placeId||'';lead.operatorConfirmed=true;lead.origin='google-places';save()}
   else{
-   const leadNew={id:uid(),googleId:placeId||'',name,phone,address,website:'',category:category||'',city,origin:'google-places',operatorConfirmed:true,stage:'Novo',previewSlug:'',proposalSentAt:null};
+   const leadNew={id:uid(),googleId:placeId||'',name,phone,whatsapp,address,website:'',category:category||'',city,origin:'google-places',operatorConfirmed:true,stage:'Novo',previewSlug:'',proposalSentAt:null};
    leadNew.website=website;leads.unshift(leadNew);save();
   }
   closeModal();

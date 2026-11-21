@@ -129,6 +129,7 @@ function renderOverview() {
 }
 
 function websiteTag(lead) {
+  if (window.ProspectLinks.whatsappLinkNumber(lead.website)) return '<span class="tag no">Apenas WhatsApp</span>';
   if (window.ProspectLinks.instagram(lead.website)) return '<span class="tag no">Apenas Instagram</span>';
   return window.ProspectLinks.hasWebsite(lead) ? '<span class="tag yes">Com site</span>' : '<span class="tag no">Não informado</span>';
 }
@@ -163,9 +164,11 @@ function renderLeadRows() {
     const editableStages = stages.filter(stage => stage !== 'Proposta enviada' || lead.proposalSentAt || lead.stage === stage);
     const options = editableStages.map(stage => `<option${(lead.stage || 'Novo') === stage ? ' selected' : ''}>${stage}</option>`).join('');
     const details = [lead.category, lead.address || lead.city].filter(Boolean).map(esc).join(' · ');
+    const whatsapp=window.ProspectLinks.whatsappNumber(lead);
+    const contactLine=whatsapp?'<div class="lead-meta muted">WhatsApp +'+esc(whatsapp)+'</div>':'';
     return `<tr>
       <td><strong>${name}</strong>${details ? '<div class="lead-meta muted">' + details + '</div>' : ''}</td>
-      <td data-label="Telefone">${esc(lead.phone || '—')}</td>
+      <td data-label="Contato">${esc(lead.phone || (whatsapp ? '' : '—'))}${contactLine}</td>
       <td data-label="Site">${websiteTag(lead)}</td>
       <td data-label="Etapa"><select data-stage="${id}" aria-label="Etapa de ${name}">${options}</select></td>
       <td><div class="actions">
@@ -220,12 +223,14 @@ function editOpportunity(lead) {
     ['City', 'Cidade ou região', 'text', 100, lead?.city],
     ['Address', 'Endereço (opcional)', 'text', 300, lead?.address],
     ['Phone', 'Telefone com DDD (opcional)', 'tel', 40, lead?.phone],
+    ['Whatsapp', 'WhatsApp da empresa (se for outro número)', 'tel', 160, lead?.whatsapp],
     ['Site', 'Site (opcional)', 'text', 350, lead?.website]
   ];
   const body = fields.map(([key, label, type, max, value]) => `
     <label for="new${key}">${label}</label>
     <input id="new${key}" type="${type}" maxlength="${max}" value="${esc(value)}">`).join('');
-  modal(lead ? 'Editar empresa' : 'Nova oportunidade', body, () => {
+  const contactChoice='<label><input type="checkbox" id="crmUsePhone" style="width:auto" '+(lead?.whatsappUsePhone===false?'':'checked')+'> Usar o telefone no WhatsApp quando o campo estiver vazio</label>';
+  modal(lead ? 'Editar empresa' : 'Nova oportunidade', body+contactChoice, () => {
     const value = key => $('#new' + key).value.trim();
     const name = value('Name');
     if (!name) {
@@ -235,8 +240,9 @@ function editOpportunity(lead) {
     }
     const details = {
       name, category: value('Category'), city: value('City'), address: value('Address'),
-      phone: value('Phone'), website: value('Site')
+      phone:value('Phone'),whatsapp:value('Whatsapp'),whatsappUsePhone:$('#crmUsePhone').checked,website:value('Site')
     };
+    if(details.whatsapp&&!window.ProspectLinks.whatsappNumber(details))return modalError('Confira o número ou o link de WhatsApp da empresa.');
     if (lead) Object.assign(lead, details);
     else leads.unshift({ id: uid(), stage: 'Novo', origin: 'manual', operatorConfirmed: true, ...details });
     save();

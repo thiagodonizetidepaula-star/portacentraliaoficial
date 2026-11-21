@@ -421,13 +421,15 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   assert.equal(await page.locator('#studioCompany').inputValue(), business.displayName.text);
   assert.equal(await page.locator('#studioAddress').inputValue(), business.formattedAddress);
   assert.equal(await page.locator('#studioPhone').inputValue(), business.internationalPhoneNumber);
-  assert.equal(await page.locator('#studioWhatsApp').inputValue(), '');
+  assert.equal(await page.locator('#studioWhatsApp').inputValue(), business.internationalPhoneNumber);
   const proposals = page.locator('#threeProposals .proposal-card');
   await proposals.nth(2).waitFor();
   const automaticPreview = proposals.first().frameLocator('iframe');
-  assert.equal(await automaticPreview.locator('.hero-button').getAttribute('href'), 'tel:+5511900000001');
-  assert.equal(await automaticPreview.locator('a[href^="https://wa.me/"]').count(), 0);
-
+  assert.match(await automaticPreview.locator('.hero-button').getAttribute('href'), /^https:\/\/wa\.me\/5511900000001\?/);
+  await page.locator('#studioWhatsAppConfirmed').uncheck();
+  assert.equal(await page.locator('#studioWhatsApp').inputValue(),'');
+  await page.locator('#generateThree').click();
+  assert.equal(await automaticPreview.locator('.hero-button').getAttribute('href'),'tel:+5511900000001');
   await page.locator('#studioWhatsAppConfirmed').check();
   await page.locator('details summary').filter({hasText: /horário.*redes sociais.*mapa/i}).click();
   await page.locator('#studioHours').fill('Segunda a sexta, 09:00 às 18:00');
@@ -551,6 +553,7 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   assert.equal(await secondPage.locator('#headline').inputValue(), customHeadline);
   const updatedHeadline = 'Uma nova coleção de cortes no Salão Aurora';
   await secondPage.locator('#headline').fill(updatedHeadline);
+  await secondPage.locator('#whatsappNumber').fill('11 98888-0002');
   await secondPage.locator('#publishPreview').click();
   const updateButton = secondPage.getByRole('button', {name:'Atualizar link publicado'});
   // An old 200 from the CDN must not release the share button before this version arrives.
@@ -575,6 +578,14 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   assert.deepEqual(Object.keys(files), ['index.html']);
   const finalHtml = strFromU8(files['index.html']);
   assert.ok(finalHtml.includes(updatedHeadline));
+  assert.ok(finalHtml.includes('https://wa.me/5511988880002?'));
+  assert.ok(!finalHtml.includes('about:srcdoc'));
+  const exported=await secondBrowser.context.newPage();
+  await exported.route(origin+'/exportado.html',route=>route.fulfill({contentType:'text/html',body:finalHtml}));
+  await exported.goto(origin+'/exportado.html');
+  await exported.locator('nav a[href="#servicos"]').click();
+  await exported.locator('#servicos:target .service-name').first().waitFor();
+  await exported.close();
   assert.ok(finalHtml.includes('property="og:title"'));
   assert.doesNotMatch(finalHtml, /Proposta de site ·|noindex|Demonstração Portal Central IA/);
   await secondPage.locator('#closePublish').click();
@@ -583,6 +594,8 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   await secondPage.locator('#threeProposals .proposal-card').nth(2).waitFor();
   assert.equal(await secondPage.locator('#studioAddress').inputValue(), business.formattedAddress);
   assert.equal(await secondPage.locator('#studioPhone').inputValue(), business.internationalPhoneNumber);
+  assert.equal(await secondPage.locator('#studioWhatsApp').inputValue(), '+5511988880002');
+  assert.equal(providers.state.leads.get(lead.id).whatsapp,'+5511988880002');
   await secondPage.goto(origin);
   await secondPage.locator('[data-page="leads"]').click();
   await visibleText(secondPage.locator('#leadRows'), /WhatsApp aberto/);
@@ -628,6 +641,60 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   assert.equal(images.includes(await workshop.locator('.hero img').first().getAttribute('src')), false);
   assert.deepEqual(pageErrors, []);
   assert.deepEqual(providers.state.failures, []);
+});
+
+test('Abas do site e WhatsApp funcionam na miniatura, no editor e na prévia completa no celular', {timeout:30000}, async t=>{
+  const providers=await startProviders();
+  t.after(providers.close);
+  const origin=await startApp(t,providers,false);
+  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});
+  t.after(()=>browser.close());
+  const {context}=await browserContext(browser,origin,providers,{viewport:{width:375,height:812},hasTouch:true,isMobile:true,reducedMotion:'reduce'});
+  const page=await context.newPage();
+  await page.goto(origin+'/studio');
+  await page.locator('#studioCompany').fill('Chapa de Teste');
+  await page.locator('#studioSegment').fill('Hamburgueria');
+  await page.locator('#studioCity').fill('Mauá');
+  await page.locator('#studioPhone').fill('(11) 3333-3333');
+  assert.equal(await page.locator('#studioWhatsApp').inputValue(),'(11) 3333-3333');
+  await page.locator('#studioWhatsApp').fill('https://wa.me/5511900000001');
+  await page.locator('#generateThree').click();
+  const card=page.locator('.proposal-card').first();
+  const miniature=card.frameLocator('iframe');
+  await miniature.locator('nav a[href="#servicos"]').click();
+  await miniature.locator('#servicos:target .service-name').first().waitFor();
+  await card.getByRole('button',{name:'Ver site completo'}).click();
+  const full=page.frameLocator('#fullSiteFrame');
+  for(const [id,selector] of [['servicos','.service-card'],['sobre','.story-copy p'],['galeria','.portfolio-strip img'],['perguntas','summary'],['contato','.cta-button']]){
+    await full.locator('nav a[href="#'+id+'"]').click();
+    await full.locator('#'+id+':target '+selector).first().waitFor();
+    assert.ok(!(await full.locator('.hero').isVisible()),id);
+    if(id==='perguntas'){
+      await full.locator('summary').first().click();
+      assert.ok(await full.locator('details[open] p').first().isVisible());
+    }
+  }
+  assert.equal(await full.locator('[data-contact=phone]').getAttribute('href'),'tel:+551133333333');
+  assert.match(await full.locator('#contato .cta-button').getAttribute('href'),/^https:\/\/wa.me\/5511900000001\?/);
+  await full.locator('nav a[href="#inicio"]').click();
+  assert.ok(await full.locator('h1').isVisible());
+  assert.equal(await full.locator('html').evaluate(e=>e.scrollWidth<=e.clientWidth),true);
+  await page.locator('#closeFullSite').click();
+  await card.locator('[data-choose]').click();
+  await page.locator('#previewMobileView').click();
+  const edited=page.frameLocator('#websitePreview');
+  await edited.locator('nav a[href="#sobre"]').click();
+  await edited.locator('#sobre:target p').first().waitFor();
+  const recipients=await page.evaluate(()=>{
+    const parse=window.ProspectLinks.whatsappNumber;
+    return [
+      parse({phone:'(11) 90000-0001',whatsapp:''}),parse({phone:'(11) 90000-0001',whatsapp:'inválido'}),
+      parse({phone:'(11) 90000-0001',whatsappUsePhone:false}),parse({website:'https://api.whatsapp.com/send?phone=5511900000001'}),
+      parse({whatsapp:'https://wa.me.exemplo.test/5511900000001'}),parse({phone:'0800 123 4567'}),parse({phone:''})
+    ];
+  });
+  assert.deepEqual(recipients,['5511900000001','','','5511900000001','','','']);
+  assert.equal(providers.state.messages.length,0);
 });
 
 test('No celular, respeita movimento reduzido e separa busca vazia de erro', {timeout: 30000}, async t => {
@@ -768,7 +835,7 @@ test('No celular, confirma a unidade e aplica a marca nas prévias, no rascunho 
   assert.equal(snapshot.googlePlaceId,business.id); assert.equal(snapshot.logo,mark);
   assert.ok(snapshot.brandSources.includes('https://www.instagram.com/p/example1/'));
   const html=await page.evaluate(()=>{const {data,template}=window.PortalSiteStudio.getCurrent();return window.PortalSiteStudio.buildSite(data,template);});
-  assert.ok(html.includes(mark)); assert.ok(html.includes('Ver galeria'));
+  assert.ok(html.includes(mark)); assert.ok(html.includes('Galeria de fotos'));
   assert.ok(!html.includes('cdninstagram.com')); assert.ok(!html.includes('/p/example1/'));
   await page.locator('#saveProject').click();
   await eventually(()=>providers.state.projectVersions.size===1,'O rascunho da marca não foi salvo.');
@@ -806,7 +873,7 @@ test('Página oficial, arquivos próprios e cor do logo funcionam sem geração 
   await page.evaluate(token=>sessionStorage.setItem('prospect_publisher_session_v1',JSON.stringify({access_token:token})),token);
   const source='https://atelier.example.com/';
   const sourceData=websiteMetadata('<meta property="og:image" content="/colecao.jpg"><img src="/logo.png" alt="Logo">'+
-    '<a href="https://www.instagram.com/atelieroficial/">Instagram</a>',source);
+    '<a href="https://www.instagram.com/atelieroficial/">Instagram</a><a href="https://wa.me/5511988880002?text=contato">WhatsApp</a>',source);
   let reads=0;
   await page.route('**/api/studio/brand/website',async route=>{
     assert.equal(route.request().postDataJSON().url,source); reads++;
@@ -820,6 +887,7 @@ test('Página oficial, arquivos próprios e cor do logo funcionam sem geração 
   await page.getByRole('button',{name:'Aplicar seleção autorizada'}).click();
   await page.locator('[data-choose="2"]').waitFor();
   assert.equal(reads,1); assert.equal(await page.locator('#brandLogo').inputValue(),sourceData.logo);
+  assert.equal(await page.locator('#studioWhatsApp').inputValue(),'+5511988880002');
   const png=await page.evaluate(()=>{
     const canvas=document.createElement('canvas'); canvas.width=canvas.height=20;
     const ctx=canvas.getContext('2d');ctx.fillStyle='#347a55';ctx.fillRect(0,0,20,20);

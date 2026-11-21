@@ -61,7 +61,7 @@ window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
  const appliedFields = new Map();
  const setMessage = message => { feedback.textContent = message; };
  const social = () => profile(value('studioInstagram')) || profile(value('studioWebsite'));
- const official = () => !profile(value('studioWebsite')) && https(value('studioWebsite'));
+ const official = () => !profile(value('studioWebsite')) && !window.ProspectLinks.whatsappLinkNumber(value('studioWebsite')) && https(value('studioWebsite'));
  const key = () => [value('studioCompany'),value('studioCity')].join('\n');
  const fieldChange = () => form.dispatchEvent(new Event('input',{bubbles:true}));
  function refresh() {
@@ -161,6 +161,10 @@ window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
    const input = node('input'); input.type = kind === 'profile' ? 'radio' : 'checkbox';
    if (kind === 'profile') input.name = 'candidateProfile';
    input.checked = kind !== 'profile' || data.profiles.length === 1;
+   if(kind==='whatsapp'){
+    input.type='radio'; input.name='candidateWhatsapp';
+    input.checked=data.whatsappContacts.length===1 && (!$('studioWhatsApp').value.trim() || $('studioWhatsAppConfirmed').checked);
+   }
    line.append(input);
    if (item) {
     const img = node('img'); img.src = item.url; img.alt = ''; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer';
@@ -175,6 +179,7 @@ window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
   }
   if (data.color) choice('color','Cor sugerida '+data.color,data.color);
   if (data.description) choice('description',data.description,data.description);
+  for(const number of data.whatsappContacts||[])if(window.ProspectLinks.whatsappNumber({whatsapp:number}))choice('whatsapp','WhatsApp '+number,number);
   for (const url of data.profiles || []) if (profile(url)) choice('profile',profile(url),profile(url));
   if (items.length) {
    panel.append(node('p','Confira se a fonte é desta unidade e selecione o conteúdo autorizado para o site.'));
@@ -197,6 +202,7 @@ window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
       if (kind==='photo') photos.push(saved.url);
       if (kind==='color') $('brandColorHex').value=val;
       if (kind==='description') acceptField('studioSummary',val);
+      if (kind==='whatsapp') { $('studioWhatsAppConfirmed').checked=false; acceptField('studioWhatsApp',val); }
       if (kind==='profile') acceptField('studioInstagram',val);
       if (item?.source) remember(item.source);
      }
@@ -237,10 +243,17 @@ window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
    if (place.website) links.append(safeLink('Conferir página indicada',place.website));
    for (const credit of place.attributions||[]) if (credit.provider) links.append(safeLink(credit.provider,credit.providerUri));
    const pick=action('Usar esta unidade',()=>run(async(signal,active)=>{
-    selectedPlace=place.googleId; ambiguous=false; refresh(); fieldChange();
+    selectedPlace=place.googleId; ambiguous=false;
+    if(place.phone&&!value('studioPhone'))acceptField('studioPhone',place.phone);
+    const whatsapp=window.ProspectLinks.whatsappLinkNumber(place.website);
+    if(whatsapp&&(!value('studioWhatsApp')||$('studioWhatsAppConfirmed').checked)){
+     $('studioWhatsAppConfirmed').checked=false;
+     acceptField('studioWhatsApp',whatsapp);
+    }
+    refresh(); fieldChange();
     $('brandSkip').hidden=!waiting;
     results.replaceChildren();
-    const target=https(place.website) || social() || official();
+    const target=(!whatsapp&&https(place.website)) || social() || official();
     if (target) {
      await readSource(target,signal,active);
      if (active() && waiting) $('brandSkip').hidden=false;

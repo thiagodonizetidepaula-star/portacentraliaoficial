@@ -6,7 +6,7 @@ const engine = window.PortalSiteStudio;
 const dialog = $('publishOverlay');
 const authKey = 'prospect_publisher_session_v1';
 const leadKey = 'prospect_pro_leads';
-const leadFields = 'id,opted_out,proposal_sent_at,message_opened_at,stage';
+const leadFields = 'id,phone,opted_out,proposal_sent_at,message_opened_at,stage';
 let configCache;
 let session;
 let userCheck;
@@ -284,6 +284,10 @@ function localLeadUpdate(id, fields) {
   const lead = leads.find(item => item.id === id);
   if (!lead) return;
   if (fields.preview_slug) lead.previewSlug = fields.preview_slug;
+  if (Object.hasOwn(fields,'whatsapp')) {
+   lead.whatsapp=fields.whatsapp;
+   lead.whatsappUsePhone=fields.whatsapp_use_phone;
+  }
   if (fields.stage) lead.stage = fields.stage;
   if (fields.message_opened_at) lead.messageOpenedAt = fields.message_opened_at;
   lead.updatedAt = fields.updated_at;
@@ -303,6 +307,7 @@ async function checkLead(id, user) {
  return {
   cloud: Boolean(cloud),
   known: Boolean(cloud || local),
+  phone: cloud?.phone || local?.phone || '',
   optedOut: Boolean(cloud?.opted_out || local?.optedOut || cloud?.stage === 'Não contatar' || local?.stage === 'Não contatar'),
   proposalSentAt: cloud?.proposal_sent_at || local?.proposalSentAt,
   messageOpenedAt: cloud?.message_opened_at || local?.messageOpenedAt,
@@ -328,16 +333,7 @@ function businessMessage(data, link) {
   '\n\nSe fizer sentido para vocês, posso explicar como seria a versão final. Se preferirem não receber outros contatos, é só me avisar.';
 }
 
-function contactNumber(value) {
- const number = String(value || '').replace(/\D/g, '');
- if (/^[1-9]\d{9,10}$/.test(number)) return '55' + number;
- return /^55[1-9]\d{9,10}$/.test(number) ? number : '';
-}
-
-function draftWhatsApp(data) {
- if (!data) return '';
- return contactNumber(Object.hasOwn(data, 'whatsapp') ? data.whatsapp : data.phone);
-}
+const draftWhatsApp=window.ProspectLinks.whatsappNumber;
 
 function reflectContact() {
  const item = lastPublic;
@@ -354,7 +350,7 @@ function reflectContact() {
     : 'O estado desta oportunidade não pôde ser verificado. Consulte Oportunidades.'
   : !number ? 'Confirme um número de WhatsApp com DDD no editor para abrir a conversa.'
   : duplicate ? 'Já existe um registro de contato para esta empresa. Confira o histórico antes de preparar outra mensagem.'
-  : 'Revise o texto. Após enviar pelo WhatsApp, confirme o envio em Oportunidades.';
+  : 'WhatsApp da empresa: +' + number + '. Revise a mensagem antes de abrir a conversa.';
  $('publishContactStatus').textContent = message;
 }
 
@@ -454,7 +450,13 @@ async function publish() {
   if (data.leadId) {
    try {
     result.lead = await checkLead(data.leadId, user);
-    const fields = { preview_slug: row.share_slug || row.slug };
+    const fields = {preview_slug:row.share_slug || row.slug};
+    const recipient = draftWhatsApp(data);
+    if (recipient || data.whatsappUsePhone===false) {
+     const useLeadPhone=data.whatsappUsePhone!==false && recipient===draftWhatsApp({phone:result.lead.phone});
+     fields.whatsapp=recipient&&!useLeadPhone?'+'+recipient:'';
+     fields.whatsapp_use_phone=useLeadPhone;
+    }
     if (!result.lead.proposalSentAt && !result.lead.optedOut &&
      (!result.lead.stage || ['Novo', 'Em análise'].includes(result.lead.stage))) fields.stage = 'Site criado';
     await markLead(data.leadId, user, result.lead, fields);

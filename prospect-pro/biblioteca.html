@@ -44,6 +44,7 @@
    <div class="studio-heading">
     <h1>Crie um site para uma empresa</h1>
     <p>Confira os dados da empresa e compare três propostas de site antes de escolher qual vai editar.</p>
+    <a id="studioSample" href="https://portalcentralia.com.br/p/hamburgueria-exemplo" target="_blank" rel="noopener noreferrer">Ver exemplo completo de uma hamburgueria</a>
    </div>
    <form class="studio-client" id="studioClientForm">
     <div class="studio-client-fields">
@@ -55,11 +56,11 @@
      <legend>Contato e localização</legend>
      <div class="studio-contact-fields">
       <label>Telefone<input id="studioPhone" type="tel" inputmode="tel" autocomplete="off" maxlength="28" placeholder="(11) 3333-0000"></label>
-      <label>WhatsApp confirmado<input id="studioWhatsApp" type="tel" inputmode="tel" autocomplete="off" maxlength="28" placeholder="(11) 99999-9999"></label>
+      <label>WhatsApp da empresa<input id="studioWhatsApp" type="tel" inputmode="tel" autocomplete="off" maxlength="160" placeholder="Número com DDD ou link do WhatsApp"></label>
       <label>Site atual<input id="studioWebsite" type="url" autocomplete="off" maxlength="500" placeholder="https://"></label>
       <label class="studio-address">Endereço<input id="studioAddress" maxlength="220" placeholder="Rua, número e bairro"></label>
      </div>
-     <label class="control-check"><input id="studioWhatsAppConfirmed" type="checkbox"> Confirmo que o telefone informado também atende por WhatsApp</label>
+     <label class="control-check"><input id="studioWhatsAppConfirmed" type="checkbox" checked> Usar o telefone comercial também no WhatsApp</label>
      <p id="studioWhatsAppSuggestion" class="field-hint" role="status"></p>
     </fieldset>
     <details class="studio-brief brand-brief" open>
@@ -190,8 +191,8 @@
        <label>Cidade / região<input id="cityName" maxlength="90"></label>
        <label>Endereço<input id="addressName" maxlength="220"></label>
        <label>Telefone<input id="phoneNumber" type="tel" inputmode="tel" maxlength="28" placeholder="(11) 3333-0000"></label>
-       <label>WhatsApp confirmado<input id="whatsappNumber" type="tel" inputmode="tel" maxlength="28" placeholder="(11) 99999-9999"></label>
-       <button id="phoneAsWhatsapp" type="button" class="button secondary">Confirmar telefone como WhatsApp</button>
+       <label>WhatsApp da empresa<input id="whatsappNumber" type="tel" inputmode="tel" maxlength="160" placeholder="Número com DDD ou link do WhatsApp"></label>
+       <label class="control-check"><input id="phoneAsWhatsapp" type="checkbox"> Usar o telefone comercial também no WhatsApp</label>
        <label>Site atual<input id="companyWebsite" type="url" maxlength="500" placeholder="https://"></label>
        <label>Link público do mapa<input id="companyMapsUrl" type="url" maxlength="500" placeholder="https://maps.google.com/"></label>
        <label>E-mail<input id="companyEmail" type="email" maxlength="150"></label>
@@ -262,6 +263,7 @@
     <div class="preview-meta">
      <div><strong>Prévia ao vivo</strong><span id="previewLabel">Computador</span><span id="aiPreviewBadge" hidden> · Sugestão da IA</span></div>
      <div class="device-toggle" aria-label="Largura da prévia">
+      <button id="editorFullSite" type="button">Ver site completo</button>
       <button type="button" data-device="desktop" class="active" aria-pressed="true">Desktop</button>
       <button type="button" data-device="mobile" aria-pressed="false">Celular</button>
      </div>
@@ -318,5 +320,9 @@
 </dialog>
 <div id="toast" class="toast" role="status" hidden></div>
 <footer class="site-foot container"><span>Portal Prospect PRO · Portal Central IA</span></footer>
+<dialog id="fullSiteDialog" aria-labelledby="fullSiteTitle">
+ <header><strong id="fullSiteTitle">Prévia completa</strong><button type="button" class="button secondary" id="closeFullSite" autofocus>Voltar ao estúdio</button></header>
+ <iframe id="fullSiteFrame" title="Site completo" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"></iframe>
+</dialog>
 </body>
 </html>

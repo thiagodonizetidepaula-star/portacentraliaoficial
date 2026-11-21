@@ -7,7 +7,7 @@ const text=s=>String(s==null?'':s).trim();
 const slug=s=>String(s||'site').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,70)||'site';
 const palette=s=>/^#[0-9a-f]{6}$/i.test(String(s))?s:'#5a7399';
 const photo=s=>{try{const v=new URL(String(s));if(v.protocol!=='https:'||v.username||v.password)return '';return v.href.replace(/["'<>\\()]/g,c=>encodeURIComponent(c));}catch{return ''}};
-const phone=s=>{let n=String(s||'').replace(/\D/g,'');if(n.length===10||n.length===11)n='55'+n;return n.length>=12&&n.length<=13&&n.startsWith('55')?n:''};
+const {phoneNumber, whatsappNumber, whatsappLinkNumber}=window.ProspectLinks;
 function notify(message) {
  $('editorToast').hidden = true;
  $('toast').hidden = true;
@@ -49,7 +49,7 @@ document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>switchView(b.d
 $('filter').addEventListener('input',renderCatalog);
 $('category').addEventListener('change',renderCatalog);
 const editFields = {
- companyName: 'name', industryName: 'industry', cityName: 'city', phoneNumber: 'phone', whatsappNumber: 'whatsapp',
+ companyName: 'name', industryName: 'industry', cityName: 'city', phoneNumber: 'phone', whatsappNumber: 'whatsapp', phoneAsWhatsapp: 'whatsappUsePhone',
  addressName: 'address', companyWebsite: 'website', companyMapsUrl: 'mapsUrl', companyEmail: 'email',
  companyInstagram: 'instagram', companyHours: 'hours',
  headline: 'headline', summary: 'summary', aboutCopy: 'about', ctaCopy: 'cta', services: 'services',
@@ -74,7 +74,7 @@ function getDefault(t) {
  return {
   id: null, leadId: pendingLead?.id || null, templateId: t.id, name: pendingLead?.name || t.example,
   industry: t.label, city: (pendingLead?.city || '').slice(0, 90), address: pendingLead?.address || '',
-  phone: pendingLead?.phone || '', whatsapp: pendingLead?.whatsapp || '', website: pendingLead?.website || '',
+  phone: pendingLead?.phone || '', whatsapp: pendingLead?.whatsapp || whatsappLinkNumber(pendingLead?.website), whatsappUsePhone:pendingLead?.whatsappUsePhone!==false, website: pendingLead?.website || '',
   mapsUrl: pendingLead?.mapsUrl || '', email: '', instagram: '', hours: '',
   headline: t.headline, summary: t.summary, about: '', cta: '', services: (t.services || []).join('\n'),
   serviceDetails: '', faq: '', photo: t.photo, photoOrigin: t.photoOrigin || 'reference',
@@ -108,7 +108,7 @@ function reflectEditor() {
  $('undoEdit').disabled = editIndex === 0 && !pending;
  $('redoEdit').disabled = pending || editIndex >= edits.length - 1;
  $('editorTitle').textContent = text(selected.name) || 'Personalizar site';
- $('phoneAsWhatsapp').disabled = !text(selected.phone) || text(selected.phone) === text(selected.whatsapp);
+ $('phoneAsWhatsapp').disabled = !whatsappNumber({phone:selected.phone});
  const message = current !== savedSnapshot
   ? 'Alterações por salvar'
   : selected.id ? 'Projeto salvo' : 'Novo projeto';
@@ -144,7 +144,10 @@ function start(id, project) {
   templates.find(t => t.id === id) || templates[0];
  if (!template) return notify('Nenhum modelo disponível');
  selected = { ...getDefault(template), ...project };
- if (project && !Object.hasOwn(project, 'whatsapp')) selected.whatsapp = project.phone || '';
+ const preferred=selected.whatsapp||whatsappLinkNumber(selected.website);
+ const shared=whatsappNumber({phone:selected.phone});
+ selected.whatsappUsePhone=selected.whatsappUsePhone!==false && (!preferred || whatsappNumber({whatsapp:preferred})===shared);
+ selected.whatsapp=preferred || (selected.whatsappUsePhone && shared ? selected.phone : '');
  resetAssistant();
  setEditorTool(false);
  $('modelName').textContent = template.label;
@@ -181,6 +184,7 @@ function closeEditor(discard = false) {
  clearTimeout(editTimer);
  clearTimeout(renderTimer);
  resetAssistant();
+ $('websitePreview').removeAttribute('srcdoc');
  editor.close();
  document.body.style.overflow = '';
  selected = null;
@@ -224,6 +228,10 @@ for (const id of Object.keys(editFields)) {
  $(id).addEventListener('input', () => {
   if (!selected) return;
   if (id === 'photoUrl' && $('photoOrigin').value === 'generated') $('photoOrigin').value = 'reference';
+  if (id === 'whatsappNumber') $('phoneAsWhatsapp').checked=false;
+  if (id === 'phoneAsWhatsapp' || id === 'phoneNumber' && $('phoneAsWhatsapp').checked) {
+   $('whatsappNumber').value = $('phoneAsWhatsapp').checked && whatsappNumber({phone:$('phoneNumber').value}) ? $('phoneNumber').value : '';
+  }
   readFields();
   reflectEditor();
   clearTimeout(renderTimer);
@@ -243,22 +251,28 @@ function paint() {
  }
  const data = assistantPreview ? { ...selected, ...selectedChanges() } : selected;
  $('aiPreviewBadge').hidden = !assistantPreview;
- $('websitePreview').srcdoc = buildSite(data, template);
+ showInFrame($('websitePreview'),buildSite(data,template));
 }
+
+function showInFrame(frame,html) {
+ // Resolve local fragments in this sandbox instead of navigating back to the studio.
+ frame.srcdoc=html.replace('<head>','<head><base href="about:srcdoc">');
+}
+function fullPreview(html,name) {
+ $('fullSiteTitle').textContent=name;
+ showInFrame($('fullSiteFrame'),html);
+ $('fullSiteDialog').showModal();
+}
+$('closeFullSite').onclick=()=>$('fullSiteDialog').close();
+$('editorFullSite').onclick=()=>{
+ if(selected)fullPreview(buildSite(assistantPreview?{...selected,...selectedChanges()}:selected,template),selected.name);
+};
+$('fullSiteDialog').addEventListener('close',()=>{
+ $('fullSiteFrame').removeAttribute('srcdoc');
+});
 
 $('undoEdit').onclick = () => navigateEdits(-1);
 $('redoEdit').onclick = () => navigateEdits(1);
-$('phoneAsWhatsapp').onclick = () => {
- if (!selected || !phone(selected.phone)) {
-  $('phoneNumber').focus();
-  return notify('Informe um telefone com DDD válido.');
- }
- recordEdit();
- selected.whatsapp = selected.phone;
- writeFields();
- recordEdit();
- paint();
-};
 $('resetModel').onclick = () => {
  recordEdit();
  const defaults = getDefault(template);
@@ -803,16 +817,6 @@ function fieldPairs(value,limit) {
  });
 }
 
-function normalizedPhone(value) {
- const input=text(value);
- if(!/^[+()0-9 .-]+$/.test(input))return '';
- const digits=input.replace(/\D/g,'');
- if(input.startsWith('+'))return /^[1-9]\d{7,14}$/.test(digits)?'+'+digits:'';
- if(/^0(?:300|500|800|900)\d{7}$/.test(digits))return digits;
- if(/^[1-9]\d[2-9]\d{7,8}$/.test(digits))return '+55'+digits;
- return /^55[1-9]\d[2-9]\d{7,8}$/.test(digits)?'+'+digits:'';
-}
-
 function contactEmail(value) {
  const address=text(value);
  return /^[A-Z0-9._+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(address)?address:'';
@@ -843,8 +847,11 @@ function servicesMarkup(list,profile,info,isSuggested) {
   '<div class="section-lead"><h2 id="service-title">'+esc(profile.services)+'</h2>'+
   (isSuggested?'<p class="content-reference">Opções ilustrativas do segmento. Confirme a disponibilidade com a empresa.</p>':'')+
   '</div><ul class="service-list">'+list.map(service=>{
-   const description=supplied.get(normalize(service))||(Object.hasOwn(details,service)?details[service]:'');
-   return '<li class="service-card"><strong class="service-name">'+esc(service)+'</strong>'+
+   const value=supplied.get(normalize(service))||(Object.hasOwn(details,service)?details[service]:'');
+   const price=value.match(/\s*\|\s*(R\$\s?[\d.]+,\d{2})\s*$/);
+   const description=price?value.slice(0,price.index):value;
+   return '<li class="service-card"><div class="service-label"><strong class="service-name">'+esc(service)+'</strong>'+
+    (price?'<span class="service-price">'+esc(price[1])+'</span>':'')+'</div>'+
     (description?'<p class="service-detail">'+esc(description)+'</p>':'')+'</li>';
   }).join('')+'</ul></div></section>';
 }
@@ -852,7 +859,7 @@ function servicesMarkup(list,profile,info,isSuggested) {
 function storyMarkup(name,heading,copy,image,businessImage=false) {
  return '<section class="story section" id="sobre" aria-labelledby="story-title"><div class="container story-grid">'+
   '<div class="story-copy"><h2 id="story-title">'+esc(heading||'Conheça '+name)+'</h2>'+
-  (copy?'<p>'+esc(copy)+'</p>':'')+'</div>'+
+  fieldLines(copy,8).map(line=>'<p>'+esc(line)+'</p>').join('')+'</div>'+
   (image?'<figure class="story-image"><img loading="lazy" decoding="async" width="850" height="650" src="'+esc(image)+'" alt="">'+(businessImage?'':'<figcaption>Imagem ilustrativa</figcaption>')+'</figure>':'')+
   '</div></section>';
 }
@@ -973,23 +980,32 @@ function buildSite(info,t,{finalSite=false}={}) {
  const isSuggested=info.servicesSuggested===true||(!Object.hasOwn(info,'servicesSuggested')
   &&rawServices.join('\n')===(t.services||[]).join('\n'));
  const faq=fieldPairs(info.faq,8);
+ const demo=info.illustrativeBusiness===true;
+ const isMenu=['hamburgueria','restaurante','pizzaria','cafeteria','padaria'].includes(base?.id);
+ const serviceNav=isMenu?'Cardápio':'Serviços';
 
- const telephone=normalizedPhone(info.phone);
- const whatsappNumber=normalizedPhone(Object.hasOwn(info,'whatsapp')?info.whatsapp
-  :info.whatsappConfirmed===false?'':info.phone);
- const whatsapp=whatsappNumber.startsWith('+')?'https://wa.me/'+whatsappNumber.slice(1)+'?text='+encodeURIComponent(
+ const telephone=phoneNumber(info.phone);
+ const recipient=whatsappNumber(info);
+ const whatsapp=recipient?'https://wa.me/'+recipient+'?text='+encodeURIComponent(
   'Olá! Encontrei '+name+' pelo site. '+(profile.ask||'Gostaria de informações sobre o atendimento.')
  ):'';
  const email=contactEmail(info.email);
  const instagram=suppliedInstagram(info.instagram);
- const website=photo(info.website);
+ const website=whatsappLinkNumber(info.website)?'':photo(info.website);
  const hours=fieldLines(info.hours,10);
  const placeId=showLocation&&/^[A-Za-z0-9_-]{5,250}$/.test(text(info.googlePlaceId))?text(info.googlePlaceId):'';
  const query=[name,address,city].filter(Boolean).join(' ');
- const map=showLocation&&(suppliedMap(info.mapsUrl)||suppliedMap(info.googleMapsUrl)
+ const map=showLocation&&!demo&&(suppliedMap(info.mapsUrl)||suppliedMap(info.googleMapsUrl)
   ||(address||city||placeId?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query)
     +(placeId?'&query_place_id='+encodeURIComponent(placeId):''):''));
- const hasContact=!!(whatsapp||telephone||email||instagram||website||map||hours.length);
+ const hasContact=!!(whatsapp||telephone||email||instagram||website||map||hours.length||address||city);
+ if(!faq.length){
+  if(hasServices)faq.push([isMenu?'O que encontro no cardápio?':'Quais serviços posso consultar?',
+   (isSuggested?'As opções ilustrativas incluem ':'Nesta apresentação você encontra ')+rawServices.slice(0,4).join(', ')+'.']);
+  if(hours.length)faq.push(['Qual é o horário de atendimento?',hours.join(' · ')+'.']);
+  if(address||city)faq.push(['Onde fica a empresa?',[address,city].filter(Boolean).join(' · ')+'.']);
+  if(whatsapp)faq.push(['Como iniciar uma conversa?','Na aba Contato, toque em Abrir WhatsApp para revisar sua mensagem e conversar com '+name+'.']);
+ }
  const external=' target="_blank" rel="noopener noreferrer"';
  const heroAction=text(info.cta)||(whatsapp?profile.action:telephone?'Ligar para a empresa'
   :hasServices?profile.services:map?'Ver localização':hasContact?'Ver contatos':'Conheça a empresa');
@@ -1023,12 +1039,18 @@ function buildSite(info,t,{finalSite=false}={}) {
  const about=text(info.about);
  const profileStory=text(profile.story);
  const story=storyMarkup(name,about?'Conheça '+name:profile.planning,
-  about||(summary!==profileStory?profileStory:''),
+  about||[summary,profileStory!==summary?profileStory:''].filter(Boolean).join('\n'),
   direction==='pratico'?'':secondary,ownPhotos.length>0);
- const portfolio=ownPhotos.length>1?'<section class="brand-portfolio container" aria-label="Fotos da empresa"><details>'+
-  '<summary>Ver galeria de '+esc(name)+'</summary><div class="portfolio-strip">'+ownPhotos.map((src,i)=>
-   '<a href="'+esc(src)+'"'+external+' aria-label="Abrir foto '+(i+1)+' em tamanho original"><img src="'+esc(src)+'" alt="Foto '+(i+1)+' de '+esc(name)+'" width="720" height="540" loading="lazy"></a>'
-  ).join('')+'</div></details></section>':'';
+ const galleryPhotos=ownPhotos.length?ownPhotos:[...new Set([image,...(base?.photos||t.photos||[])].filter(Boolean))].slice(0,3);
+ const photoNames=Array.isArray(info.galleryCaptions)?info.galleryCaptions:[];
+ const portfolio=galleryPhotos.length?'<section id="galeria" class="brand-portfolio section" aria-labelledby="galeria-title"><div class="container">'+
+  '<h2 id="galeria-title">Galeria de fotos</h2><p>'+esc(ownPhotos.length?'Fotos de '+name:origin==='business'?'Foto principal da empresa e referências do segmento.':origin==='generated'?'Imagem principal gerada por IA e referências do segmento.':'Fotografias ilustrativas de '+kind.toLocaleLowerCase('pt-BR')+'.')+'</p>'+
+  '<div class="portfolio-strip">'+galleryPhotos.map((src,i)=>{
+   const caption=text(photoNames[i]);
+   const label=caption||((ownPhotos.length?'Foto de '+name:'Referência de '+kind)+' · '+(i+1));
+   return '<figure><a href="'+esc(src)+'"'+external+' aria-label="'+esc('Ampliar '+label)+'"><img src="'+esc(src)+'" alt="'+esc(label)+'" width="720" height="540" loading="lazy"></a>'+
+    (caption?'<figcaption>'+esc(caption)+'</figcaption>':'')+'</figure>';
+  }).join('')+'</div></div></section>':'';
  const sections=direction==='experiencia'||(!direction&&['catalog','artisan'].includes(layout))
   ?story+serviceSection
   :serviceSection+story;
@@ -1059,7 +1081,9 @@ function buildSite(info,t,{finalSite=false}={}) {
    '<div class="contact-heading"><h2 id="contact-title">'+esc(
     whatsapp||channelLinks.length?profile.contact||'Fale com '+name:'Informações para sua visita'
    )+'</h2>'+
-   (whatsapp?'<a class="cta-button" href="'+esc(whatsapp)+'"'+external+'>Abrir WhatsApp</a>':'')+'</div>'+
+   (whatsapp?'<a class="cta-button" href="'+esc(whatsapp)+'"'+external+'>Abrir WhatsApp</a>':
+    demo?'<a class="cta-button" href="https://wa.me/?text='+esc(encodeURIComponent('Olá! Vi o cardápio de demonstração da '+name+' e gostaria de consultar um pedido para retirada.'))+'"'+external+'>Testar mensagem no WhatsApp</a>':'')+'</div>'+
+   (demo?'<p class="demo-contact">Esta hamburgueria é fictícia. Para experimentar a mensagem, escolha uma conversa sua no WhatsApp.</p>':'')+
    (locationHtml||scheduleHtml||channelsHtml?'<div class="contact-details">'+locationHtml+scheduleHtml+channelsHtml+'</div>':'')+
    '</div></section>'
   :'';
@@ -1083,11 +1107,21 @@ function buildSite(info,t,{finalSite=false}={}) {
   (info.buttonStyle==='square'?'.hero-button,.cta-button,.nav-cta{border-radius:0!important}':'')+
   (info.motionStyle==='none'?'html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}':'')+
   (info.motionStyle==='strong'?'@media(prefers-reduced-motion:no-preference){.hero-text,.hero-image img{animation-duration:.52s!important}}':'');
- const portfolioCss='.brand-portfolio{padding-block:28px}.brand-portfolio summary{cursor:pointer;font:600 1.15rem system-ui;padding:.8em 0;border-block:1px solid var(--line)}.portfolio-strip{display:flex;overflow-x:auto;gap:16px;scroll-snap-type:x proximity;padding:16px 2px}.portfolio-strip a{scroll-snap-align:start;flex:1 0 min(72%,220px)}.portfolio-strip img{width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}.brand-portfolio :focus-visible{outline:3px solid currentColor;outline-offset:2px}';
+ const areas=[['inicio','Início'],...(hasServices?[['servicos',serviceNav]]:[]),['sobre','Sobre'],
+  ...(portfolio?[['galeria','Galeria']]:[]),...(faq.length?[['perguntas','Dúvidas']]:[]),...(hasContact?[['contato','Contato']]:[])];
+ const siteNav=areas.map(([id,label])=>'<a href="#'+id+'"'+(id==='contato'?' class="nav-cta"':'')+'>'+label+'</a>').join('');
+ const navigationCss=[
+  '.site-header.container{width:100%;max-width:none;padding:8px max(4vw,calc((100vw - 1160px)/2));background:var(--surface);color:var(--ink);height:auto;min-height:72px;position:sticky;top:0;z-index:5}.site-header .brand{overflow-wrap:anywhere}.site-header nav{flex-wrap:wrap;justify-content:flex-end}.site-header nav a,.site-header nav a:not(:last-child){display:inline-flex;align-items:center;min-height:42px;font-size:14px;white-space:nowrap}.site-header nav a:focus-visible{outline:2px solid currentColor;outline-offset:3px}',
+  'main,main>section[id]{scroll-margin-top:84px}main>section:target{min-height:calc(100svh - 170px)}@supports selector(main:has(>section:target)){main:has(>section:target)>section:not(:target){display:none}}',
+  areas.map(([id])=>'body:has(#'+id+':target) .site-header nav a[href="#'+id+'"]').join(',')+'{text-decoration:underline;text-underline-offset:5px}',
+  '.service-label{display:flex;flex-wrap:wrap;align-items:baseline;gap:7px 14px}.service-price{font-weight:750;white-space:nowrap}.brand-portfolio .portfolio-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));gap:18px}.portfolio-strip figure{margin:0}.portfolio-strip img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}.portfolio-strip figcaption{margin-top:8px;font-size:15px}.demo-contact{max-width:55ch;line-height:1.5}',
+  '@media(max-width:760px){.site-header.container{display:block;padding:8px 16px 4px}.site-header .brand{min-height:32px;display:flex;align-items:center}.site-header nav{justify-content:flex-start;gap:0 14px}.site-header nav a,.site-header nav a:not(:last-child){display:inline-flex;min-height:40px;font-size:14px}.site-header .nav-cta{background:transparent;color:inherit;padding:0;min-height:40px}.brand-logo{max-height:34px;width:auto}main,main>section[id]{scroll-margin-top:152px}}',
+  '@media print{main:has(>section:target)>section:not(:target){display:block}.site-header.container{position:static}.site-header nav{display:none}}'
+ ].join('');
  const pageStyle=font.rule+css+
   ':root{--accent:'+accent+';--surface:'+bg+';--ink:'+ink+';--dark:'+dark+
   ';--buttonInk:'+buttonInk+';--muted:'+muted+';--line:'+line+';--display:'+font.family+
-  ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+portfolioCss+designOverrides;
+  ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+navigationCss+designOverrides;
 
  const title=name+' | '+kind+(city?' em '+city:'');
  const meta=summary.slice(0,155);
@@ -1111,16 +1145,13 @@ function buildSite(info,t,{finalSite=false}={}) {
   '<a class="skip-link" href="#inicio">Ir para o conteúdo</a>'+
   '<header class="site-header container"><a class="brand" href="#inicio">'+
   (logo?'<img class="brand-logo" src="'+esc(logo)+'" width="52" height="52" alt="">':'')+
-  esc(name)+'</a><nav aria-label="Navegação principal">'+
-  (hasServices?'<a href="#servicos">'+esc(profile.services)+'</a>':'')+
-  '<a href="#sobre">Sobre</a>'+(faq.length?'<a href="#perguntas">Perguntas</a>':'')+
-  (hasContact?'<a class="nav-cta" href="#contato">Contato</a>':'')+'</nav></header>'+
+  esc(name)+'</a><nav aria-label="Navegação principal">'+siteNav+'</nav></header>'+
   '<main id="inicio">'+hero+sections+portfolio+(faq.length?faqMarkup(faq):'')+contactHtml+'</main>'+
   '<footer class="footer container"><span>© '+new Date().getFullYear()+' '+esc(name)+'</span>'+
   '<span>'+esc((direction&&!finalSite?'Proposta de site · ':'')+kind+(city?' em '+city:''))+'</span></footer></body></html>';
 }
 window.PortalSiteStudio={
- start,buildSite,getDefault,pendingLead,templates,renderProjects,save:saveSelected,
+ start,buildSite,getDefault,pendingLead,templates,renderProjects,showInFrame,fullPreview,save:saveSelected,
  otherCovers:(name,city)=>new Set(projects.filter(p=>slug(p.name)!==slug(name)||slug(p.city)!==slug(city)).map(p=>p.photo)),
  getCurrent:()=>{if(!selected||!template)return null;readFields();return {data:{...selected},template:{...template}};},
  updatePublished:(id, original, share)=>{

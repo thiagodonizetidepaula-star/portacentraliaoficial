@@ -35,6 +35,7 @@ function platformPage(host) {
 export function websiteMetadata(html, pageUrl) {
   const photos = new Set();
   const profiles = new Set();
+  const whatsappContacts = new Set();
   const meta = {};
   let logo = '', headerLogo = '', icon = '', script = null;
   function assetUrl(raw) {
@@ -65,7 +66,18 @@ export function websiteMetadata(html, pageUrl) {
         if (['og:site_name','og:description', 'description', 'theme-color'].includes(key)) meta[key] ||= attrs.content;
         if (key === 'og:image' || key === 'og:image:secure_url') addPhoto(attrs.content);
       }
-      if (tag === 'a') addProfile(attrs.href);
+      if (tag === 'a') {
+        addProfile(attrs.href);
+        const href=attrs.href||'';
+        if(whatsappContacts.size<5 && /^https?:\/\/(?:wa\.me|(?:api\.|web\.|www\.)?whatsapp\.com)\//i.test(href)){
+          try {
+            const url=new URL(href);
+            const digits=url.hostname==='wa.me'?/^\/(\d+)\/?$/.exec(url.pathname)?.[1]:
+              /^\/send\/?$/.test(url.pathname)?url.searchParams.get('phone'):'';
+            if(/^[1-9]\d{7,14}$/.test(digits||''))whatsappContacts.add('+'+digits);
+          } catch {}
+        }
+      }
       if (tag === 'img' && /(?:^|[\s/_-])logo(?:tipo)?(?:$|[\s/_.-])/i.test([attrs.alt,attrs.class,attrs.src].join(' '))) headerLogo ||= assetUrl(attrs.src);
       if (tag === 'link' && (attrs.rel || '').toLowerCase().split(/\s+/).includes('apple-touch-icon')) icon ||= assetUrl(attrs.href);
       if (tag === 'script' && /^application\/ld\+json(?:;|$)/i.test(attrs.type || '')) script = '';
@@ -83,7 +95,7 @@ export function websiteMetadata(html, pageUrl) {
   photos.delete(logo);
   const color = (meta['theme-color'] || '').trim();
   return {
-    source: pageUrl, name: (meta['og:site_name'] || '').slice(0,100), logo, photos: [...photos].slice(0, 3), profiles: [...profiles].slice(0, 5),
+    source: pageUrl, name: (meta['og:site_name'] || '').slice(0,100), logo, photos: [...photos].slice(0, 3), profiles: [...profiles].slice(0, 5), whatsappContacts:[...whatsappContacts],
     description: (meta['og:description'] || meta.description || '').trim().slice(0, 320),
     color: /^#[a-f\d]{6}$/i.test(color) ? color : ''
   };
