@@ -7,6 +7,7 @@ import {once} from 'node:events';
 import {readFile} from 'node:fs/promises';
 import {unzipSync, strFromU8} from 'fflate';
 import {createServer} from 'node:net';
+import {createServer as createHttpServer} from 'node:http';
 import {test} from 'node:test';
 import {setTimeout as delay} from 'node:timers/promises';
 import {fileURLToPath} from 'node:url';
@@ -28,7 +29,7 @@ async function availablePort() {
   return port;
 }
 
-async function startApp(t, providers, googleEnabled, {aiEnabled = false, metaEnabled = false, netlifyEnabled = false} = {}) {
+async function startApp(t, providers, googleEnabled, {aiEnabled = false, metaEnabled = false, previewOrigin = '', redirectOrigin = ''} = {}) {
   const port = await availablePort();
   const origin = 'http://127.0.0.1:' + port;
   const child = spawn(process.execPath, ['--import', guardPath, serverPath], {
@@ -36,7 +37,8 @@ async function startApp(t, providers, googleEnabled, {aiEnabled = false, metaEna
       NODE_ENV: 'test',
       PORT: String(port),
       PREVIEW_PUBLIC_ORIGIN: origin,
-      PROSPECT_PUBLICATION_ORIGIN: netlifyEnabled ? providers.origin : '',
+      PROSPECT_PUBLICATION_ORIGIN: previewOrigin,
+      PROSPECT_PUBLICATION_REDIRECT_ORIGIN: redirectOrigin,
       PROSPECT_PROVIDER_FIXTURE_ORIGIN: providers.origin,
       PROSPECT_PROVIDER_PUBLIC_ORIGIN: providers.publicOrigin,
       SUPABASE_URL: aiEnabled || metaEnabled ? providers.publicOrigin : providers.origin,
@@ -78,7 +80,7 @@ async function browserContext(browser, origin, providers, options = {}) {
       await route.fulfill({response});
       return;
     }
-    if ([origin, providers.origin].includes(url.origin)) {
+    if ([origin, providers.origin, providers.brandedOrigin].includes(url.origin)) {
       await route.continue();
       return;
     }
@@ -344,7 +346,16 @@ test('API protege a chave e bloqueia a 51ª consulta antes de chamar Google', {t
 test('Prospecção, três propostas, edição, publicação e confirmação de envio', {timeout: 65000}, async t => {
   const providers = await startProviders();
   t.after(providers.close);
-  const origin = await startApp(t, providers, true, {netlifyEnabled:true});
+  // Model the public Cloudflare redirect, which provides no CORS headers.
+  const redirect = createHttpServer((req, res) => {
+    const path = req.url === '/p/empresa-trocada' ? '/p/salao-aurora' : req.url;
+    res.writeHead(302, {Location: providers.origin + path});
+    res.end();
+  }).listen(0, '127.0.0.1');
+  await once(redirect, 'listening');
+  t.after(() => new Promise(resolve => { redirect.close(resolve); redirect.closeAllConnections(); }));
+  providers.brandedOrigin = 'http://127.0.0.1:' + redirect.address().port;
+  const origin = await startApp(t, providers, true, {previewOrigin: providers.brandedOrigin, redirectOrigin: providers.origin});
   const browser = await chromium.launch({executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium'});
   t.after(() => browser.close());
   const {context, openedUrls} = await browserContext(browser, origin, providers, {viewport: {width: 1440, height: 1000}});
@@ -486,8 +497,14 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   await page.locator('#confirmPublish').click();
   await page.locator('#publishResult').waitFor();
   const link = await page.locator('#publicLink').inputValue();
-  assert.equal(link, providers.origin + '/p/salao-aurora');
+  assert.equal(link, providers.brandedOrigin + '/p/salao-aurora');
+  const destination = providers.origin + '/p/salao-aurora';
   const record = [...providers.state.previews.values()][0];
+  const versionUrl = origin + '/api/publication-version/salao-aurora';
+  const verified = await fetch(versionUrl, {method:'HEAD'});
+  assert.equal(verified.headers.get('X-Prospect-Updated'), String(Date.parse(record.updated_at)));
+  assert.equal((await fetch(origin + '/api/publication-version/empresa-trocada', {method:'HEAD'})).status, 503);
+  assert.equal((await fetch(origin + '/api/publication-version/nao-publicado', {method:'HEAD'})).status, 404);
   const legacy = await fetch(origin + '/mvp/' + record.slug);
   assert.equal(legacy.status, 200);
   assert.ok((await legacy.text()).includes(customHeadline));
@@ -496,9 +513,9 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   const opened = context.waitForEvent('page');
   await page.locator('#openPublicLink').click();
   const publicPage = await opened;
-  await publicPage.waitForURL(link);
+  await publicPage.waitForURL(destination);
   await visibleText(publicPage.locator('h1'), customHeadline);
-  assert.equal(await publicPage.locator('meta[property="og:url"]').getAttribute('content'), link);
+  assert.equal(await publicPage.locator('meta[property="og:url"]').getAttribute('content'), destination);
   assert.match(await publicPage.locator('meta[property="og:image"]').getAttribute('content'), /^https:\/\//);
   assert.match(await publicPage.locator('meta[property="og:title"]').getAttribute('content'), /Salão Aurora/);
   await publicPage.setViewportSize({width: 375, height: 812});
@@ -538,7 +555,7 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   const updateButton = secondPage.getByRole('button', {name:'Atualizar link publicado'});
   // An old 200 from the CDN must not release the share button before this version arrives.
   let checks = 0;
-  await secondPage.route(link, async route => {
+  await secondPage.route(versionUrl, async route => {
     if (route.request().method() !== 'HEAD' || ++checks > 1) return route.continue();
     await route.fulfill({status:200, headers:{'Access-Control-Allow-Origin':'*','Access-Control-Expose-Headers':'X-Prospect-Updated','X-Prospect-Updated':'1'}});
   });

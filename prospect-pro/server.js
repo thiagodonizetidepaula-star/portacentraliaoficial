@@ -55,11 +55,45 @@ function publicationOrigin(value) {
  } catch { return ''; }
 }
 const previewOrigin = publicationOrigin(process.env.PROSPECT_PUBLICATION_ORIGIN);
+const redirectOrigin = publicationOrigin(process.env.PROSPECT_PUBLICATION_REDIRECT_ORIGIN);
+const versionPath = '/api/publication-version/';
+
+async function publicationVersion(res, slug) {
+ res.setHeader('Cache-Control', 'no-store');
+ if (!previewOrigin || !validSlug(slug)) {
+  res.writeHead(404);
+  return res.end();
+ }
+ const path = '/p/' + slug;
+ const options = {method: 'HEAD', redirect: 'manual', cache: 'no-store', signal: AbortSignal.timeout(7500)};
+ try {
+  let page = await fetch(previewOrigin + path, options);
+  // Follow only the configured host and preserve the exact client path.
+  if (redirectOrigin && [301, 302, 303, 307, 308].includes(page.status) &&
+      page.headers.get('location') === redirectOrigin + path) {
+   page = await fetch(redirectOrigin + path, options);
+  }
+  const updated = page.headers.get('X-Prospect-Updated');
+  if (page.status === 200 && /^\d{1,16}$/.test(updated || '')) {
+   res.writeHead(200, {'X-Prospect-Updated': updated});
+  } else {
+   res.writeHead([404, 410].includes(page.status) ? 404 : 503);
+  }
+ } catch {
+  res.writeHead(503);
+ }
+ res.end();
+}
 
 http.createServer(async(req,res)=>{
  const u=new URL(req.url,'http://localhost');
  if(u.pathname.startsWith('/api/studio/brand/'))return studioBrand(req,res,u.pathname);
  if(u.pathname.startsWith('/api/studio/ai/'))return studioAi(req,res,u.pathname);
+ if(u.pathname.startsWith(versionPath)){
+  if(req.method==='HEAD')return publicationVersion(res,u.pathname.slice(versionPath.length));
+  res.setHeader('Allow','HEAD');
+  return json(res,405,{error:'Método não permitido'});
+ }
  if(req.method!=='GET')return json(res,405,{error:'Método não permitido'});
  if(u.pathname==='/publication-config.js'){
   res.writeHead(200,{'Content-Type':'text/javascript; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});

@@ -377,12 +377,13 @@ async function writePreview(payload, user, publishingId, retry) {
  return row;
 }
 
-async function confirmPublicVersion(link, updatedAt) {
+async function confirmPublicVersion(slug, updatedAt) {
  const expected = Date.parse(updatedAt);
+ const url = '/api/publication-version/' + encodeURIComponent(slug);
  for (const wait of [0, 1500, 4000, 4000]) {
   if (wait) await new Promise(resolve => setTimeout(resolve, wait));
   try {
-   const response = await fetch(link, {method:'HEAD', cache:'no-store', credentials:'omit', signal:AbortSignal.timeout(5000)});
+   const response = await fetch(url, {method:'HEAD', cache:'no-store', credentials:'omit', signal:AbortSignal.timeout(9000)});
    const visible = response.headers.get('X-Prospect-Updated');
    if (response.ok && visible && Number(visible) >= expected) return;
   } catch { /* Retry until this version is visible at the public address. */ }
@@ -438,7 +439,7 @@ async function publish() {
   if (!link) throw Error('O endereço da prévia não foi confirmado.');
   if (window.ProspectLinks.externalPreviews) {
    status('Conferindo a versão que o cliente vai abrir…');
-   await confirmPublicVersion(link, row.updated_at);
+   await confirmPublicVersion(row.share_slug || row.slug, row.updated_at);
   }
   const result = lastPublic = { link, data: { ...data, name }, user, checking: Boolean(data.leadId) };
   $('publicLink').value = link;

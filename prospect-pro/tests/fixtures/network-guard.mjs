@@ -5,6 +5,7 @@ const publicOrigin = process.env.PROSPECT_PROVIDER_PUBLIC_ORIGIN;
 globalThis.fetch = (input, init) => {
   const url = new URL(typeof input === 'string' || input instanceof URL ? input : input.url);
   if (url.origin === fixtureOrigin) return fetchHttp(input, init);
+  if (url.hostname === '127.0.0.1' && url.origin === process.env.PROSPECT_PUBLICATION_ORIGIN) return fetchHttp(input, init);
   if (url.origin === publicOrigin) {
     return fetchHttp(new URL(url.pathname + url.search, fixtureOrigin), init);
   }
