@@ -51,7 +51,7 @@ $('category').addEventListener('change',renderCatalog);
 const editFields = {
  companyName: 'name', industryName: 'industry', cityName: 'city', phoneNumber: 'phone', whatsappNumber: 'whatsapp', phoneAsWhatsapp: 'whatsappUsePhone',
  addressName: 'address', companyWebsite: 'website', companyMapsUrl: 'mapsUrl', companyEmail: 'email',
- companyInstagram: 'instagram', companyHours: 'hours',
+ companyInstagram: 'instagram', companySocialLinks:'socialLinks', companyHours: 'hours',
  headline: 'headline', summary: 'summary', aboutCopy: 'about', ctaCopy: 'cta', services: 'services',
  serviceDetails: 'serviceDetails', faqCopy: 'faq', logoUrl: 'logo', brandGallery: 'brandGallery',
  photoUrl: 'photo', photoOrigin: 'photoOrigin', brandColor: 'color', layoutVariant: 'variant', headingFont: 'headingFont',
@@ -75,7 +75,7 @@ function getDefault(t) {
   id: null, leadId: pendingLead?.id || null, templateId: t.id, name: pendingLead?.name || t.example,
   industry: t.label, city: (pendingLead?.city || '').slice(0, 90), address: pendingLead?.address || '',
   phone: pendingLead?.phone || '', whatsapp: pendingLead?.whatsapp || whatsappLinkNumber(pendingLead?.website), whatsappUsePhone:pendingLead?.whatsappUsePhone!==false, website: pendingLead?.website || '',
-  mapsUrl: pendingLead?.mapsUrl || '', email: '', instagram: '', hours: '',
+  mapsUrl: pendingLead?.mapsUrl || '', email: '', instagram: '', socialLinks:'', hours: '',
   headline: t.headline, summary: t.summary, about: '', cta: '', services: (t.services || []).join('\n'),
   serviceDetails: '', faq: '', photo: t.photo, photoOrigin: t.photoOrigin || 'reference',
   logo: photo(t.logo), brandGallery: t.brandGallery || '', color: t.accent, variant: '0', headingFont: 'auto', headingSize: '1',
@@ -832,13 +832,6 @@ function suppliedMap(value) {
  return '';
 }
 
-function suppliedInstagram(value) {
- const safe=photo(value);
- if(!safe)return '';
- const {hostname,pathname}=new URL(safe);
- return ['instagram.com','www.instagram.com'].includes(hostname)&&pathname!=='/'?safe:'';
-}
-
 function servicesMarkup(list,profile,info,isSuggested) {
  const normalize=value=>text(value).toLocaleLowerCase('pt-BR');
  const supplied=new Map(fieldPairs(info.serviceDetails,8).map(([name,details])=>[normalize(name),details]));
@@ -856,9 +849,9 @@ function servicesMarkup(list,profile,info,isSuggested) {
   }).join('')+'</ul></div></section>';
 }
 
-function storyMarkup(name,heading,copy,image,businessImage=false) {
+function storyMarkup(heading,copy,image,businessImage=false) {
  return '<section class="story section" id="sobre" aria-labelledby="story-title"><div class="container story-grid">'+
-  '<div class="story-copy"><h2 id="story-title">'+esc(heading||'Conheça '+name)+'</h2>'+
+  '<div class="story-copy"><h2 id="story-title">'+esc(heading||'Sobre a empresa')+'</h2>'+
   fieldLines(copy,8).map(line=>'<p>'+esc(line)+'</p>').join('')+'</div>'+
   (image?'<figure class="story-image"><img loading="lazy" decoding="async" width="850" height="650" src="'+esc(image)+'" alt="">'+(businessImage?'':'<figcaption>Imagem ilustrativa</figcaption>')+'</figure>':'')+
   '</div></section>';
@@ -964,11 +957,49 @@ const premiumCss=[
  '@keyframes scene-rise{from{opacity:.65;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}@keyframes scene-focus{from{transform:scale(1.034)}to{transform:scale(1)}}',
  '@media(prefers-reduced-motion:no-preference){.hero-text{animation:scene-rise .58s ease-out both}.hero-image img,.catalog-gallery img{animation:none}.direction-experiencia .hero-text{animation:scene-rise .72s .09s cubic-bezier(.22,.7,.4,1) both}.direction-experiencia .hero-image img{animation:scene-focus 1.15s ease-out both}.direction-pratico .hero-text{animation:scene-rise .4s ease-out both}.direction-pratico .hero-image img{animation:none}.services .service-card{transition:none}.hero-button,.cta-button{transition:filter .16s ease}.hero-button:hover,.cta-button:hover{transform:none}}'
 ].join('');
+// Native motion also runs in the script-free public preview and in the downloadable site.
+const motionCss=`
+.site-header .brand-logo{width:auto;max-width:min(180px,42vw);max-height:52px;object-fit:contain}
+.gallery-social{display:inline-flex;align-items:center;min-height:44px;margin-top:16px;text-decoration:underline;text-underline-offset:.25em}
+.portfolio-strip figure a{display:block;overflow:hidden}
+body{--entry-distance:18px;--entry-scale:1.045;--entry-time:600ms;--panel-time:340ms;--curve:cubic-bezier(.16,.75,.22,1)}
+body.motion-strong{--entry-distance:36px;--entry-scale:1.11;--entry-time:950ms;--panel-time:560ms}
+@keyframes brand-headline{from{opacity:.24;transform:translateY(var(--entry-distance))}to{opacity:1;transform:translateY(0)}}
+@keyframes brand-photo{from{transform:scale(var(--entry-scale));filter:saturate(.72)}to{transform:scale(1);filter:saturate(1)}}
+@keyframes brand-tab{from{opacity:.46;transform:translateY(calc(var(--entry-distance)*.6))}to{opacity:1;transform:translateY(0)}}
+@keyframes brand-answer{from{opacity:.25;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+@keyframes brand-scroll{from{transform:translateY(12px) scale(.985)}to{transform:none}}
+@media(prefers-reduced-motion:no-preference){
+ body:not(.motion-none) .hero .hero-text{animation:none}
+ body:not(.motion-none) .hero h1{animation:brand-headline var(--entry-time) var(--curve) both}
+ body:not(.motion-none) .hero .hero-actions{animation:brand-headline var(--entry-time) 80ms var(--curve) backwards}
+ body:not(.motion-none) .hero .hero-image img,body:not(.motion-none) .hero .catalog-gallery img:first-child{animation:brand-photo calc(var(--entry-time) + 280ms) var(--curve) both}
+ body:not(.motion-none) main>section:target>.container{animation:brand-tab var(--panel-time) var(--curve) both}
+ body:not(.motion-none) .faq-items details[open]>p{animation:brand-answer 230ms var(--curve) both}
+ body:not(.motion-none) .site-header nav a{transition:color .18s ease}
+ body:not(.motion-none) :is(.hero-button,.cta-button,.gallery-social){transition:transform .19s var(--curve),box-shadow .19s ease}
+ body:not(.motion-none) :is(.hero-button,.cta-button,.gallery-social):active{transform:scale(.96)}
+ @media(hover:hover){body:not(.motion-none) .portfolio-strip a img{transition:transform .5s var(--curve)}body:not(.motion-none) .portfolio-strip a:hover img{transform:scale(1.055)}}
+ @supports(animation-timeline:view()){
+  body:not(.motion-none) main:not(:has(>section:target)) .portfolio-strip figure{animation:brand-scroll linear both;animation-timeline:view();animation-range:entry 0% entry 100%}
+ }
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation:none!important;transition:none!important}}
+@media(max-width:760px){.site-header .brand-logo{max-height:36px}}
+`;
+
 function buildSite(info,t,{finalSite=false}={}) {
  const name=text(info.name)||t.example,kind=text(info.industry)||t.label;
  const showLocation=info.showLocation!==false;
  const city=showLocation?text(info.city):'',address=showLocation?text(info.address):'';
- const headline=text(info.headline)||t.headline,summary=text(info.summary)||t.summary;
+ const proposedHeadline=text(info.headline)||t.headline;
+ const normal=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+ const duplicate=[name,'Conheça '+name,kind+' com '+name].some(s=>normal(s)===normal(proposedHeadline));
+ const firstService=fieldLines(info.services,1)[0];
+ const headline=duplicate?(firstService && normal(firstService)!==normal(name)?firstService:normal(kind)!==normal(name)?kind:'Conheça os serviços'):proposedHeadline;
+ const originalSummary=text(info.summary)||t.summary||'';
+ const oldIntro=name+' atua no segmento de '+kind.toLowerCase()+(city?' em '+city:'')+'.';
+ const summary=originalSummary.startsWith(oldIntro)?originalSummary.slice(oldIntro.length).trim():originalSummary;
  const base=templates.find(item=>item.id===String(t.id).split('-studio-')[0]);
  const profile=t.profile||base?.profile||{
   services:'Serviços',action:'Fale com a empresa',
@@ -990,15 +1021,16 @@ function buildSite(info,t,{finalSite=false}={}) {
   'Olá! Encontrei '+name+' pelo site. '+(profile.ask||'Gostaria de informações sobre o atendimento.')
  ):'';
  const email=contactEmail(info.email);
- const instagram=suppliedInstagram(info.instagram);
- const website=whatsappLinkNumber(info.website)?'':photo(info.website);
+ const networks=window.ProspectSocial.profiles([window.ProspectLinks.instagram(info.instagram),...fieldLines(info.socialLinks,12),info.website]);
+ const instagram=networks.find(item=>item.network==='instagram')?.url;
+ const website=whatsappLinkNumber(info.website)||window.ProspectSocial.profile(info.website)?'':photo(info.website);
  const hours=fieldLines(info.hours,10);
  const placeId=showLocation&&/^[A-Za-z0-9_-]{5,250}$/.test(text(info.googlePlaceId))?text(info.googlePlaceId):'';
  const query=[name,address,city].filter(Boolean).join(' ');
  const map=showLocation&&!demo&&(suppliedMap(info.mapsUrl)||suppliedMap(info.googleMapsUrl)
   ||(address||city||placeId?'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query)
     +(placeId?'&query_place_id='+encodeURIComponent(placeId):''):''));
- const hasContact=!!(whatsapp||telephone||email||instagram||website||map||hours.length||address||city);
+ const hasContact=!!(whatsapp||telephone||email||networks.length||website||map||hours.length||address||city);
  if(!faq.length){
   if(hasServices)faq.push([isMenu?'O que encontro no cardápio?':'Quais serviços posso consultar?',
    (isSuggested?'As opções ilustrativas incluem ':'Nesta apresentação você encontra ')+rawServices.slice(0,4).join(', ')+'.']);
@@ -1021,8 +1053,9 @@ function buildSite(info,t,{finalSite=false}={}) {
  const imageCaption=origin==='generated'?'Imagem gerada por IA':origin==='reference'?'Imagem ilustrativa':'';
  const figureCaption=caption=>caption?'<figcaption>'+esc(caption)+'</figcaption>':'';
  const mainPhoto=image?'<img src="'+esc(image)+'" width="1200" height="900" decoding="async" fetchpriority="high" alt="">':'';
- const heroBody='<div class="hero-text"><p class="eyebrow">'+esc(kind+(city?' em '+city:''))+'</p>'+
-  '<h1>'+esc(headline)+'</h1><p class="hero-summary">'+esc(summary)+'</p><div class="hero-actions">'+
+ const intro=[normal(kind)!==normal(headline)&&normal(kind)!==normal(name)?kind:'',city].filter(Boolean).join(' · ');
+ const heroBody='<div class="hero-text">'+(intro?'<p class="eyebrow">'+esc(intro)+'</p>':'')+
+  '<h1>'+esc(headline)+'</h1>'+(summary&&normal(summary)!==normal(headline)?'<p class="hero-summary">'+esc(summary)+'</p>':'')+'<div class="hero-actions">'+
   '<a class="hero-button" href="'+esc(heroHref)+'"'+(whatsapp?external:'')+'>'+esc(heroAction)+'</a></div></div>';
  const layout=['editorial','technical','immersive','serene','artisan','kinetic','corporate','catalog','directory'].includes(t.layout)?t.layout:'corporate';
  const supportingPhoto=src=>src?'<img src="'+esc(src)+'" width="600" height="600" decoding="async" loading="lazy" alt="">':'';
@@ -1038,19 +1071,19 @@ function buildSite(info,t,{finalSite=false}={}) {
  const serviceSection=hasServices?servicesMarkup(rawServices,profile,info,isSuggested):'';
  const about=text(info.about);
  const profileStory=text(profile.story);
- const story=storyMarkup(name,about?'Conheça '+name:profile.planning,
+ const story=storyMarkup(about?(isMenu?'Nossa cozinha':'Sobre a empresa'):profile.planning,
   about||[summary,profileStory!==summary?profileStory:''].filter(Boolean).join('\n'),
   direction==='pratico'?'':secondary,ownPhotos.length>0);
  const galleryPhotos=ownPhotos.length?ownPhotos:[...new Set([image,...(base?.photos||t.photos||[])].filter(Boolean))].slice(0,3);
  const photoNames=Array.isArray(info.galleryCaptions)?info.galleryCaptions:[];
  const portfolio=galleryPhotos.length?'<section id="galeria" class="brand-portfolio section" aria-labelledby="galeria-title"><div class="container">'+
-  '<h2 id="galeria-title">Galeria de fotos</h2><p>'+esc(ownPhotos.length?'Fotos de '+name:origin==='business'?'Foto principal da empresa e referências do segmento.':origin==='generated'?'Imagem principal gerada por IA e referências do segmento.':'Fotografias ilustrativas de '+kind.toLocaleLowerCase('pt-BR')+'.')+'</p>'+
+  '<h2 id="galeria-title">Galeria de fotos</h2><p>'+esc(ownPhotos.length?'Fotografias da empresa.':origin==='business'?'Foto principal da empresa e referências do segmento.':origin==='generated'?'Imagem principal gerada por IA e referências do segmento.':'Fotografias ilustrativas de '+kind.toLocaleLowerCase('pt-BR')+'.')+'</p>'+
   '<div class="portfolio-strip">'+galleryPhotos.map((src,i)=>{
-   const caption=text(photoNames[i]);
+   const caption=text(info.photoCaptions?.[src]||photoNames[i]);
    const label=caption||((ownPhotos.length?'Foto de '+name:'Referência de '+kind)+' · '+(i+1));
    return '<figure><a href="'+esc(src)+'"'+external+' aria-label="'+esc('Ampliar '+label)+'"><img src="'+esc(src)+'" alt="'+esc(label)+'" width="720" height="540" loading="lazy"></a>'+
     (caption?'<figcaption>'+esc(caption)+'</figcaption>':'')+'</figure>';
-  }).join('')+'</div></div></section>':'';
+  }).join('')+'</div>'+(instagram?'<a class="gallery-social" href="'+esc(instagram)+'"'+external+'>Ver mais no Instagram</a>':'')+'</div></section>':'';
  const sections=direction==='experiencia'||(!direction&&['catalog','artisan'].includes(layout))
   ?story+serviceSection
   :serviceSection+story;
@@ -1069,7 +1102,7 @@ function buildSite(info,t,{finalSite=false}={}) {
  const channelLinks=[
   telephone?'<a data-contact="phone" href="tel:'+esc(telephone)+'">'+esc(info.phone)+'</a>':'',
   email?'<a data-contact="email" href="mailto:'+esc(email.replaceAll('+','%2B'))+'">'+esc(email)+'</a>':'',
-  instagram?'<a data-contact="instagram" href="'+esc(instagram)+'"'+external+'>Instagram</a>':'',
+  ...networks.map(item=>'<a data-contact="'+item.network+'" href="'+esc(item.url)+'"'+external+'>'+item.label+'</a>'),
   website?'<a data-contact="website" href="'+esc(website)+'"'+external+'>Site da empresa</a>':''
  ].filter(Boolean);
  const channelsHtml=channelLinks.length
@@ -1105,8 +1138,7 @@ function buildSite(info,t,{finalSite=false}={}) {
    '@media(max-width:520px){.hero h1{font-size:clamp('+Math.round(35*factor)+'px,'+(10*factor).toFixed(2)+'vw,'+Math.round(54*factor)+'px)!important}}':'')+
   (info.buttonStyle==='pill'?'.hero-button,.cta-button,.nav-cta{border-radius:100px!important}':'')+
   (info.buttonStyle==='square'?'.hero-button,.cta-button,.nav-cta{border-radius:0!important}':'')+
-  (info.motionStyle==='none'?'html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}':'')+
-  (info.motionStyle==='strong'?'@media(prefers-reduced-motion:no-preference){.hero-text,.hero-image img{animation-duration:.52s!important}}':'');
+  (info.motionStyle==='none'?'html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}':'');
  const areas=[['inicio','Início'],...(hasServices?[['servicos',serviceNav]]:[]),['sobre','Sobre'],
   ...(portfolio?[['galeria','Galeria']]:[]),...(faq.length?[['perguntas','Dúvidas']]:[]),...(hasContact?[['contato','Contato']]:[])];
  const siteNav=areas.map(([id,label])=>'<a href="#'+id+'"'+(id==='contato'?' class="nav-cta"':'')+'>'+label+'</a>').join('');
@@ -1121,9 +1153,9 @@ function buildSite(info,t,{finalSite=false}={}) {
  const pageStyle=font.rule+css+
   ':root{--accent:'+accent+';--surface:'+bg+';--ink:'+ink+';--dark:'+dark+
   ';--buttonInk:'+buttonInk+';--muted:'+muted+';--line:'+line+';--display:'+font.family+
-  ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+navigationCss+designOverrides;
+  ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+navigationCss+motionCss+designOverrides;
 
- const title=name+' | '+kind+(city?' em '+city:'');
+ const title=(normal(name)===normal(kind)?name:name+' | '+kind)+(city?' em '+city:'');
  const meta=summary.slice(0,155);
  const social = finalSite ? '<meta property="og:type" content="website"><meta property="og:locale" content="pt_BR">'+
   '<meta property="og:site_name" content="'+esc(name)+'"><meta property="og:title" content="'+esc(title)+'">'+
@@ -1131,7 +1163,7 @@ function buildSite(info,t,{finalSite=false}={}) {
   (image?'<meta property="og:image" content="'+esc(image)+'"><meta name="twitter:card" content="summary_large_image">':'') : '';
  const schema={'@context':'https://schema.org','@type':'LocalBusiness',name,description:meta,
   ...(address||city?{address:{'@type':'PostalAddress',...(address?{streetAddress:address}:{}),...(city?{addressLocality:city}:{}),addressCountry:'BR'}}:{}),
-  ...(telephone?{telephone}:{}),...(email?{email}:{}),...(map?{hasMap:map}:{}),...(instagram?{sameAs:[instagram]}:{})};
+  ...(telephone?{telephone}:{}),...(email?{email}:{}),...(map?{hasMap:map}:{}),...(networks.length?{sameAs:networks.map(item=>item.url)}:{})};
  // User input in structured data must remain inert inside the script element.
  const schemaSafe=JSON.stringify(schema).replace(/</g,'\\u003c');
  const variant=['0','1','2'].includes(info.variant)?info.variant:'0';
@@ -1141,13 +1173,13 @@ function buildSite(info,t,{finalSite=false}={}) {
   '<meta name="theme-color" content="'+bg+'"><meta name="description" content="'+esc(meta)+'">'+
   '<title>'+esc(title)+'</title>'+social+
   '<script type="application/ld+json">'+schemaSafe+'</script><style>'+pageStyle+'</style></head>'+
-  '<body class="variant-'+variant+(direction?' direction-'+direction:'')+spacing+' art-'+art+'" data-direction="'+direction+'">'+
+  '<body class="variant-'+variant+(direction?' direction-'+direction:'')+spacing+' art-'+art+' motion-'+(['strong','none'].includes(info.motionStyle)?info.motionStyle:'soft')+'" data-direction="'+direction+'">'+
   '<a class="skip-link" href="#inicio">Ir para o conteúdo</a>'+
   '<header class="site-header container"><a class="brand" href="#inicio">'+
-  (logo?'<img class="brand-logo" src="'+esc(logo)+'" width="52" height="52" alt="">':'')+
-  esc(name)+'</a><nav aria-label="Navegação principal">'+siteNav+'</nav></header>'+
+  (logo?'<img class="brand-logo" src="'+esc(logo)+'" width="140" height="52" alt="'+esc(name)+'">':esc(name))+'</a><nav aria-label="Navegação principal">'+siteNav+'</nav></header>'+
   '<main id="inicio">'+hero+sections+portfolio+(faq.length?faqMarkup(faq):'')+contactHtml+'</main>'+
-  '<footer class="footer container"><span>© '+new Date().getFullYear()+' '+esc(name)+'</span>'+
+  '<footer class="footer container"><span>© '+new Date().getFullYear()+'</span>'+
+  (Array.isArray(info.brandSources)&&info.brandSources.includes('https://docs.overturemaps.org/guides/places/')?'<a href="https://docs.overturemaps.org/attribution/"'+external+'>Dados de locais · Overture Maps</a>':'')+
   '<span>'+esc((direction&&!finalSite?'Proposta de site · ':'')+kind+(city?' em '+city:''))+'</span></footer></body></html>';
 }
 window.PortalSiteStudio={

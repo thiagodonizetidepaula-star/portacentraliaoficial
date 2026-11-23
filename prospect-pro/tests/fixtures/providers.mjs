@@ -82,7 +82,7 @@ export async function startProviders() {
     if (pathname === '/fixtures/google' && method === 'POST') {
       assert.equal(request.headers['x-goog-api-key'], 'only_local_fixture_google_key');
       const fields='places.id,places.displayName,places.formattedAddress,places.websiteUri,places.internationalPhoneNumber,places.googleMapsUri';
-      assert.ok([fields,fields+',places.googleMapsLinks.photosUri,places.attributions'].includes(request.headers['x-goog-fieldmask']));
+      assert.ok([fields,fields+',places.googleMapsLinks.photosUri,places.attributions,places.regularOpeningHours.weekdayDescriptions'].includes(request.headers['x-goog-fieldmask']));
       const payload = await jsonBody(request);
       state.googleQueries.push(payload);
       const [status, body] = await googleHandler(payload);
@@ -97,6 +97,7 @@ export async function startProviders() {
     }
     if (pathname === '/fixtures/instagram') {
       assert.equal(request.headers.authorization,'Bearer only_local_fixture_meta');
+      if(!url.searchParams.get('fields').startsWith('business_discovery.username(salaoaurora)')){respond(response,400,{error:{message:'Perfil indisponível'}});return;}
       assert.match(url.searchParams.get('fields'),/^business_discovery\.username\(salaoaurora\)/);
       respond(response,200,{business_discovery:{username:'salaoaurora',name:'Salão Aurora',
         biography:'Cortes com hora marcada.',profile_picture_url:'https://scontent.cdninstagram.com/mark.webp',

@@ -523,9 +523,9 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   await publicPage.setViewportSize({width: 375, height: 812});
   assert.equal(await publicPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
   await visibleText(publicPage.locator('#contato address'), business.formattedAddress);
-  assert.notEqual(await publicPage.locator('.hero-text').evaluate(element => getComputedStyle(element).animationName), 'none');
+  assert.notEqual(await publicPage.locator('.hero h1').evaluate(element => getComputedStyle(element).animationName), 'none');
   await publicPage.emulateMedia({reducedMotion: 'reduce'});
-  assert.equal(await publicPage.locator('.hero-text').evaluate(element => getComputedStyle(element).animationName), 'none');
+  assert.equal(await publicPage.locator('.hero h1').evaluate(element => getComputedStyle(element).animationName), 'none');
   assert.equal(providers.state.previews.size, 1);
   await publicPage.close();
 
@@ -873,7 +873,11 @@ test('Página oficial, arquivos próprios e cor do logo funcionam sem geração 
   await page.evaluate(token=>sessionStorage.setItem('prospect_publisher_session_v1',JSON.stringify({access_token:token})),token);
   const source='https://atelier.example.com/';
   const sourceData=websiteMetadata('<meta property="og:image" content="/colecao.jpg"><img src="/logo.png" alt="Logo">'+
-    '<a href="https://www.instagram.com/atelieroficial/">Instagram</a><a href="https://wa.me/5511988880002?text=contato">WhatsApp</a>',source);
+    '<a href="https://www.instagram.com/atelieroficial/">Instagram</a><a href="https://facebook.com/atelie.amora">Facebook</a>'+
+    '<a href="https://tiktok.com/@atelieamora">TikTok</a><a href="https://wa.me/5511988880002?text=contato">WhatsApp</a>'+
+    '<section id="servicos"><h2>Serviços</h2><h3>Retratos de família</h3><h3>Álbuns</h3></section>'+
+    '<script type="application/ld+json">'+JSON.stringify({'@type':'LocalBusiness',openingHoursSpecification:[
+     {dayOfWeek:['https://schema.org/Tuesday','Thursday'],opens:'10:00',closes:'18:00'}]})+'</script>',source);
   let reads=0;
   await page.route('**/api/studio/brand/website',async route=>{
     assert.equal(route.request().postDataJSON().url,source); reads++;
@@ -888,6 +892,13 @@ test('Página oficial, arquivos próprios e cor do logo funcionam sem geração 
   await page.locator('[data-choose="2"]').waitFor();
   assert.equal(reads,1); assert.equal(await page.locator('#brandLogo').inputValue(),sourceData.logo);
   assert.equal(await page.locator('#studioWhatsApp').inputValue(),'+5511988880002');
+  assert.equal(await page.locator('#studioHours').inputValue(),'Terça, Quinta · 10:00 às 18:00');
+  const publicPreview=page.locator('.proposal-card').first().frameLocator('iframe');
+  assert.equal(await publicPreview.locator('[data-contact=facebook]').getAttribute('href'),'https://www.facebook.com/atelie.amora/');
+  assert.equal(await publicPreview.locator('[data-contact=tiktok]').getAttribute('href'),'https://www.tiktok.com/@atelieamora');
+  assert.match(await publicPreview.locator('#servicos').innerText(),/Retratos de família/);
+  assert.equal(await publicPreview.locator('.brand-logo').getAttribute('alt'),'Ateliê Amora');
+  assert.equal(await publicPreview.locator('.brand').innerText(),'');
   const png=await page.evaluate(()=>{
     const canvas=document.createElement('canvas'); canvas.width=canvas.height=20;
     const ctx=canvas.getContext('2d');ctx.fillStyle='#347a55';ctx.fillRect(0,0,20,20);
@@ -907,6 +918,58 @@ test('Página oficial, arquivos próprios e cor do logo funcionam sem geração 
   assert.equal(await page.locator('#brandEvidence a').count(),1);
   assert.ok((await page.locator('#logoUrl').inputValue()).startsWith(providers.publicOrigin));
   assert.equal(reads,1); assert.equal(providers.state.used,0);
+  const approved=await page.evaluate(()=>{const p=window.PortalSiteStudio.getCurrent(); return window.PortalSiteStudio.buildSite(p.data,p.template,{finalSite:true});});
+  assert.ok(approved.includes('https://www.tiktok.com/@atelieamora'));assert.ok(approved.includes('10:00 às 18:00'));
   assert.deepEqual(providers.state.aiTexts,[]); assert.deepEqual(providers.state.aiImages,[]);
   assert.deepEqual(providers.state.failures,[]);
+});
+
+
+test('Encontra a rede do comércio de Mauá sem site informado nem consulta ao Google', {timeout:30000}, async t=>{
+  const providers=await startProviders();t.after(providers.close);
+  const origin=await startApp(t,providers,true);
+  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});t.after(()=>browser.close());
+  const {context}=await browserContext(browser,origin,providers,{viewport:{width:390,height:844}});
+  await context.addInitScript(t=>sessionStorage.setItem('prospect_publisher_session_v1',JSON.stringify({access_token:t})),token);
+  const page=await context.newPage();
+  await page.goto(origin+'/studio');
+  assert.equal(await page.evaluate(()=>window.ProspectLinks.instagram('@Marca.Maua')),'https://www.instagram.com/marca.maua/');
+  assert.equal(await page.evaluate(()=>window.ProspectLinks.instagram('https://www.instagram.com/p/abc/')),'');
+  await page.locator('#studioCompany').fill('Mauá Plaza Shopping');
+  await page.locator('#studioSegment').fill('Shopping');
+  await page.locator('#studioCity').fill('Mauá, SP');
+  await page.locator('#generateThree').click();
+  const candidate=page.locator('#brandResults .brand-place').filter({hasText:'Mauá Plaza Shopping'});
+  const facebook=await candidate.getByRole('link',{name:'Abrir Facebook'}).getAttribute('href');
+  assert.match(facebook,/^https:\/\/www\.facebook\.com\//);
+  await candidate.getByRole('button',{name:'Conferir redes e horários'}).click();
+  await page.getByRole('button',{name:'Aplicar seleção autorizada'}).click();
+  await page.locator('[data-choose="2"]').waitFor();
+  for(const card of await page.locator('.proposal-card').all()){
+    const frame=card.frameLocator('iframe');
+    assert.equal(await frame.locator('[data-contact=facebook]').getAttribute('href'),facebook);
+    assert.equal(await frame.locator('footer a').getAttribute('href'),'https://docs.overturemaps.org/attribution/');
+  }
+  assert.equal(providers.state.used,0);
+  assert.equal(providers.state.messages.length,0);
+});
+
+test('O pacote do Instagram expõe apenas fotos de publicações selecionadas', {timeout:30000}, async t=>{
+  const providers=await startProviders();t.after(providers.close);
+  const origin=await startApp(t,providers,false,{metaEnabled:true});
+  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});t.after(()=>browser.close());
+  const {context}=await browserContext(browser,origin,providers,{viewport:{width:390,height:844}}),page=await context.newPage();
+  await page.goto(origin+'/studio');
+  await page.evaluate(t=>sessionStorage.setItem('prospect_publisher_session_v1',JSON.stringify({access_token:t})),token);
+  await page.locator('#studioCompany').fill('Estúdio de teste');await page.locator('#studioSegment').fill('Fotografia');
+  const encoded=await page.evaluate(()=>{const el=document.createElement('canvas');el.width=14;el.height=14;return el.toDataURL('image/png').split(',')[1];});
+  const {zipSync}=await import('fflate');const pixel=Buffer.from(encoded,'base64');
+  const zip=Buffer.from(zipSync({'media/posts/202611/foto.png':pixel,'your_instagram_activity/media/posts/202610/outro.png':pixel,'messages/inbox/cliente/media/posts/privado.png':pixel,'account/login.json':new Uint8Array()}));
+  await page.locator('.brand-materials summary').click();
+  await page.locator('#brandInstagramZip').setInputFiles({name:'publicacoes.zip',mimeType:'application/zip',buffer:zip});
+  const options=page.locator('#brandResults input[type=checkbox]');await options.first().waitFor();assert.equal(await options.count(),2);
+  await options.first().check();await page.getByRole('button',{name:'Usar fotos selecionadas'}).click();
+  await eventually(()=>providers.state.uploadedImages.size===1,'Uma única foto escolhida deve chegar ao armazenamento.');
+  await page.locator('#generateThree').click();const frame=page.locator('.proposal-card').first().frameLocator('iframe');
+  assert.equal(await frame.locator('.portfolio-strip img').count(),1);assert.ok((await frame.locator('.portfolio-strip img').getAttribute('src')).startsWith(providers.publicOrigin));
 });

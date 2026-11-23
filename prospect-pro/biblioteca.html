@@ -8,6 +8,7 @@
  <meta name="description" content="Crie, edite e publique demonstrações de sites para empresas no Portal Prospect PRO.">
  <link rel="stylesheet" href="/biblioteca.css">
  <script src="/publication-config.js" defer></script>
+ <script src="/social-profiles.js" defer></script>
  <script src="/prospect-links.js" defer></script>
  <script src="/biblioteca-data.js" defer></script>
  <script src="/biblioteca.js" defer></script>
@@ -70,9 +71,10 @@
        <button id="brandResearch" type="button" class="button secondary">Pesquisar identidade</button>
        <button id="brandReadSocial" hidden type="button" class="plain-btn">Consultar Instagram</button>
        <a id="brandMaps" hidden target="_blank" rel="noopener noreferrer">Ver no Maps</a>
-       <a id="brandFindSocial" hidden target="_blank" rel="noopener noreferrer">Localizar Instagram</a>
-       <button id="brandSearchAI" type="button" class="plain-btn" hidden>Buscar perfil com IA</button>
+       <a id="brandFindSocial" hidden target="_blank" rel="noopener noreferrer">Pesquisar nas redes</a>
+       <button id="brandSearchAI" type="button" class="plain-btn" hidden>Pesquisar redes com IA</button>
       </div>
+      <label class="control-check"><input type="checkbox" id="brandSocialAtGenerate" checked> Procurar redes e dados públicos ao gerar o site</label>
       <label id="brandGoogleOption" class="control-check" hidden><input type="checkbox" id="brandGoogleAtGenerate"> Pesquisar no Google ao gerar as propostas (1 das 50 buscas mensais)</label>
       <p id="brandStatus" class="field-hint" role="status"></p>
       <div id="brandResults"></div>
@@ -81,6 +83,7 @@
        <summary>Adicionar logo, fotos e cor da marca</summary>
        <div class="studio-brief-fields">
         <label>Link do logo autorizado<input id="brandLogo" type="url" maxlength="1800" placeholder="https://"></label>
+        <label>Pacote de fotos exportado pelo Instagram (.zip)<input id="brandInstagramZip" type="file" accept=".zip,application/zip"></label>
         <label>Cor da marca<input id="brandColorHex" type="text" maxlength="7" pattern="#[0-9a-fA-F]{6}" placeholder="#145B52"></label>
         <label class="studio-address">Links de até três fotos autorizadas, um por linha<textarea id="brandPhotos" rows="3" maxlength="5500" placeholder="https://"></textarea></label>
         <label>Arquivo do logo<input id="brandLogoFile" type="file" accept="image/png,image/jpeg,image/webp"></label>
@@ -103,7 +106,8 @@
      <div class="studio-brief-fields">
       <label>Horário de atendimento<textarea id="studioHours" rows="2" maxlength="250" placeholder="Segunda a sexta, 9h às 18h"></textarea></label>
       <label>E-mail da empresa<input id="studioEmail" type="email" maxlength="150" placeholder="contato@empresa.com.br"></label>
-      <label>Instagram<input id="studioInstagram" type="url" maxlength="500" placeholder="https://www.instagram.com/empresa/"></label>
+      <label>Outras redes oficiais, um link por linha<textarea id="studioSocialLinks" rows="2" maxlength="1800" placeholder="Facebook, TikTok, YouTube, LinkedIn ou Threads"></textarea></label>
+      <label>Instagram<input id="studioInstagram" type="text" inputmode="url" maxlength="500" placeholder="@empresa ou link do perfil"></label>
       <label>Link público do mapa<input id="studioGoogleMapsUrl" type="url" maxlength="500" placeholder="https://maps.google.com/"></label>
      </div>
     </details>
@@ -196,7 +200,8 @@
        <label>Site atual<input id="companyWebsite" type="url" maxlength="500" placeholder="https://"></label>
        <label>Link público do mapa<input id="companyMapsUrl" type="url" maxlength="500" placeholder="https://maps.google.com/"></label>
        <label>E-mail<input id="companyEmail" type="email" maxlength="150"></label>
-       <label>Instagram<input id="companyInstagram" type="url" maxlength="500" placeholder="https://"></label>
+       <label>Outras redes oficiais, uma por linha<textarea id="companySocialLinks" rows="2" maxlength="1800"></textarea></label>
+       <label>Instagram<input id="companyInstagram" type="text" inputmode="url" maxlength="500" placeholder="@empresa ou link do perfil"></label>
        <label>Horário de atendimento<textarea id="companyHours" rows="3" maxlength="250"></textarea></label>
       </div>
      </details>

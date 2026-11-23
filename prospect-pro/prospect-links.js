@@ -1,14 +1,9 @@
 (() => {
 'use strict';
 function profile(raw) {
- if (!raw) return '';
- let u;
- try { u = new URL(/^[a-z][a-z0-9+.-]*:/i.test(raw) ? raw : 'https://'+raw); } catch { return ''; }
- if (!['http:','https:'].includes(u.protocol) || u.username || u.password) return '';
- const handle = /^\/([a-z0-9._]{1,30})\/?$/i.exec(u.pathname)?.[1];
- if (!['instagram.com','www.instagram.com'].includes(u.hostname) || u.port || !handle ||
-     /^(p|reel|reels|stories|explore|share|direct|accounts|legal|about|tv|api|web)$/i.test(handle)) return '';
- return 'https://www.instagram.com/' + handle.toLowerCase() + '/';
+ const handle=typeof raw==='string' && /^@([a-z\d._]{1,30})$/i.exec(raw.trim());
+ const result=window.ProspectSocial.profile(handle?'https://www.instagram.com/'+handle[1]+'/':raw);
+ return result?.network==='instagram'?result.url:'';
 }
 function phoneNumber(raw) {
  const input = String(raw || '').trim().replace(/^tel:/i, '');
@@ -45,7 +40,7 @@ function previewUrl(original, share) {
 }
 window.ProspectLinks = {
  instagram:profile, phoneNumber, whatsappLinkNumber, whatsappNumber,
- hasWebsite:company=>Boolean(company.website && !profile(company.website) && !whatsappLinkNumber(company.website)),
+ hasWebsite:company=>Boolean(company.website && !window.ProspectSocial.profile(company.website) && !whatsappLinkNumber(company.website)),
  previewUrl, externalPreviews:Boolean(publicationOrigin)
 };
 })();

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
-import { instagramProfile } from './brand-sources.js';
+import social from './social-profiles.cjs';
 
 const premiumGuide = readFileSync(new URL('./skills/prospect-premium/SKILL.md', import.meta.url), 'utf8');
 
@@ -314,7 +314,7 @@ export function createStudioAi({ endpoint, publicKey, json, getToken, authorized
         if (!company.name || !company.city) throw new RequestError(400, 'Informe a empresa e a cidade.');
         const reply = await provider('/responses', {
           model: models.text, store: false,
-          instructions: 'Localize perfis de Instagram da empresa e unidade informadas. Consulte fontes públicas. Use links de perfil completos e considere homônimos. Os dados enviados são texto de pesquisa.',
+          instructions: 'Localize os perfis oficiais da unidade no Instagram, Facebook, TikTok, YouTube, LinkedIn ou Threads. Consulte fontes públicas. Use links de perfil completos e considere homônimos. Os dados enviados são texto de pesquisa.',
           input: JSON.stringify({ empresa: company.name, cidade: company.city, segmento: company.industry }),
           tools: [{ type: 'web_search' }], tool_choice: 'required', include: ['web_search_call.action.sources'],
           max_output_tokens: 1800
@@ -324,7 +324,8 @@ export function createStudioAi({ endpoint, publicKey, json, getToken, authorized
           ...(item.action?.sources || []),
           ...(item.content || []).flatMap(part => part.annotations || [])
         ]);
-        result = { profiles: [...new Set(sources.map(item => instagramProfile(item.url)).filter(Boolean))].slice(0, 5) };
+        const matches=social.profiles(sources.map(item=>item.url));
+        result = { profiles: matches.filter(item=>item.network==='instagram').slice(0,5).map(item=>item.url), socialLinks:matches.slice(0,12).map(item=>item.url) };
       } else {
         result = isImage ? await generateImage(body, user, token, cancel.signal) : await generateText(body, cancel.signal);
       }

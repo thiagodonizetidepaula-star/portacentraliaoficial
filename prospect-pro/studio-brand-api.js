@@ -1,5 +1,8 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { inspectWebsite, instagramProfile } from './brand-sources.js';
+import { findPublicIdentity } from './public-identity.js';
+import { bioFacts } from './business-facts.js';
+import social from './social-profiles.cjs';
 import { readPayload, RequestError } from './studio-ai.js';
 
 function metaImage(value) {
@@ -31,17 +34,26 @@ export function createStudioBrand({ json, getToken, authorizedOperator }) {
     const handle = new URL(source).pathname.split('/')[1];
     const url = new URL('https://graph.facebook.com/' + version + '/' + account);
     url.searchParams.set('fields', 'business_discovery.username(' + handle +
-      '){username,name,biography,profile_picture_url,media.limit(6){media_type,media_url,permalink}}');
+      '){username,name,biography,profile_picture_url,media.limit(6){caption,media_type,media_url,permalink,children{media_type,media_url}}}');
     const response = await fetch(url, { headers: { Authorization: 'Bearer ' + access }, redirect: 'error', signal });
     const data = (await response.json()).business_discovery;
     if (!response.ok || data?.username?.toLowerCase() !== handle) {
       throw new RequestError(422, 'A Meta não disponibilizou este perfil. Confira o usuário, o tipo de conta e a conexão.');
     }
-    const photos = (data.media?.data || []).filter(item => ['IMAGE', 'CAROUSEL_ALBUM'].includes(item.media_type))
-      .map(item => mediaItem(item.media_url, /^https:\/\/www\.instagram\.com\/p\/[A-Za-z0-9_-]+\/?$/.test(item.permalink) ? item.permalink : source, owner))
-      .filter(Boolean).slice(0, 3);
+    const photos=[],posts=data.media?.data||[];
+    for(const post of posts){
+      const assets=post.media_type==='CAROUSEL_ALBUM' && post.children?.data?.length?post.children.data:[post];
+      for(const child of assets){
+        if(!['IMAGE','CAROUSEL_ALBUM'].includes(child.media_type))continue;
+        const item=mediaItem(child.media_url,social.instagramPost(post.permalink)||source,owner);
+        if(item&&!photos.some(p=>p.url===item.url))photos.push({...item,caption:String(post.caption||'').split('\n')[0].slice(0,100)});
+        if(photos.length===3)break;
+      }
+      if(photos.length===3)break;
+    }
+    const facts=bioFacts(data.biography);
     return { source, name: String(data.name || '').slice(0, 100), description: String(data.biography || '').slice(0, 320),
-      logo: mediaItem(data.profile_picture_url, source, owner), photos, profiles: [source] };
+      ...facts,logo: mediaItem(data.profile_picture_url, source, owner), photos, profiles:[source],socialLinks:[source] };
   }
 
   async function media(ticket, owner, signal, res) {
@@ -70,7 +82,7 @@ export function createStudioBrand({ json, getToken, authorizedOperator }) {
       skill: 'prospect-premium', instagram, revision:process.env.RENDER_GIT_COMMIT?.slice(0,12),
       places: Boolean(process.env.GOOGLE_PLACES_API_KEY && process.env.SUPABASE_URL && process.env.SUPABASE_PUBLISHABLE_KEY)
     });
-    if (!['website', 'instagram', 'media'].some(action => path === '/api/studio/brand/' + action)) return json(res, 404, {error:'Fonte desconhecida.'});
+    if (!['website', 'instagram', 'media', 'directory'].some(action => path === '/api/studio/brand/' + action)) return json(res, 404, {error:'Fonte desconhecida.'});
     if (req.method !== 'POST') return json(res, 405, {error:'Método não permitido.'});
     const controller = new AbortController();
     res.once('close', () => { if (!res.writableEnded) controller.abort(); });
@@ -78,6 +90,7 @@ export function createStudioBrand({ json, getToken, authorizedOperator }) {
     try {
       const owner = await authorizedOperator(getToken(req), signal);
       const body = await readPayload(req);
+      if(path.endsWith('/directory'))return json(res,200,{candidates:await findPublicIdentity(body.name,body.city,signal)});
       if (path.endsWith('/media')) return await media(body.ticket, owner, signal, res);
       const result = path.endsWith('/instagram') ? await discover(body.url, owner, signal) : await inspectWebsite(body.url, signal);
       if (!res.destroyed) json(res, 200, result);

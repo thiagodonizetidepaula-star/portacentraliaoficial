@@ -125,7 +125,8 @@ function renderCard(business, index) {
  const street = escapeHtml(business.address || 'Endereço não informado');
  const phone = escapeHtml(business.phone || 'Telefone não informado');
  const site = hasWebsite(business);
- const status = site ? 'Site informado' : window.ProspectLinks.instagram(business.website) ? 'Apenas Instagram' : window.ProspectLinks.whatsappLinkNumber(business.website) ? 'Apenas WhatsApp' : 'Sem site informado';
+ const social=window.ProspectSocial.profile(business.website);
+ const status = site ? 'Site informado' : social ? 'Apenas '+social.label : window.ProspectLinks.whatsappLinkNumber(business.website) ? 'Apenas WhatsApp' : 'Sem site informado';
  return `<article class="opportunity-card">
   <div class="opp-head"><h4>${placeName}</h4><span class="opp-tag${site ? ' site' : ''}">${status}</span></div>
   <div class="opp-meta"><div>${street}</div><div>${phone}</div>

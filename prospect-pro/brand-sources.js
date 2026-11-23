@@ -4,17 +4,13 @@ import { isIP } from 'node:net';
 import { Parser } from 'htmlparser2';
 import ipaddr from 'ipaddr.js';
 
-const reservedProfiles = new Set(['about', 'accounts', 'api', 'developer', 'developers', 'direct', 'directory', 'emails', 'explore', 'legal', 'p', 'press', 'privacy', 'reel', 'reels', 'share', 'stories', 'terms', 'tv', 'web']);
-export function instagramProfile(value) {
-  try {
-    const url = new URL(value);
-    if (url.protocol !== 'https:' || url.username || url.password || url.port ||
-        !['www.instagram.com', 'instagram.com'].includes(url.hostname)) return '';
-    const handle = /^\/([a-z0-9._]{1,30})\/?$/i.exec(url.pathname)?.[1]?.toLowerCase();
-    return handle && !reservedProfiles.has(handle) ? 'https://www.instagram.com/' + handle + '/' : '';
-  } catch { return ''; }
-}
+import social from './social-profiles.cjs';
+import { bioFacts, catalog, schedule } from './business-facts.js';
 
+export const instagramProfile = value => {
+ const account=social.profile(value);
+ return account?.network==='instagram'?account.url:'';
+};
 function publicUrl(value, base) {
   if (typeof value !== 'string' || !value.trim() || value.length > 4096) return '';
   try {
@@ -29,7 +25,7 @@ function publicUrl(value, base) {
 }
 
 function platformPage(host) {
-  return /(?:^|\.)(?:instagram\.com|facebook\.com|fb\.com|fb\.me|threads\.(?:net|com)|whatsapp\.com|wa\.me|google\.[a-z.]+|goo\.gl|gstatic\.com|googleusercontent\.com|maps\.app\.goo\.gl)$/.test(host.replace(/\.$/, ''));
+  return /(?:^|\.)(?:instagram\.com|facebook\.com|fb\.com|fb\.me|threads\.(?:net|com)|whatsapp\.com|wa\.me|google\.[a-z.]+|goo\.gl|gstatic\.com|googleusercontent\.com|tiktok\.com|youtube\.com|youtu\.be|linkedin\.com|maps\.app\.goo\.gl)$/.test(host.replace(/\.$/, ''));
 }
 
 export function websiteMetadata(html, pageUrl) {
@@ -37,6 +33,11 @@ export function websiteMetadata(html, pageUrl) {
   const profiles = new Set();
   const whatsappContacts = new Set();
   const meta = {};
+  const hours = new Set(), services = new Set(), socials = new Set(), gallery = new Map();
+  let figure=0, line='', heading='', currentPost='', currentPhoto='', alt='', context='', markers=[];
+  const block = new Set(['h2','h3','h4','p','li','tr','address','figcaption','dt','dd','div','section','article']);
+  const append=(set,values)=>{ for(const value of values)if(value&&set.size<12)set.add(value); };
+
   let logo = '', headerLogo = '', icon = '', script = null;
   function assetUrl(raw) {
     const value = publicUrl(raw, pageUrl);
@@ -45,7 +46,12 @@ export function websiteMetadata(html, pageUrl) {
     return platformPage(host) || /(?:^|\.)(?:fbcdn\.net|cdninstagram\.com|ggpht\.com)$/.test(host) ? '' : value;
   }
   const addPhoto = raw => { const value = assetUrl(raw); if (value && photos.size < 12) photos.add(value); };
-  const addProfile = raw => { const value = instagramProfile(raw); if (value) profiles.add(value); };
+  const addProfile = raw => {
+    const account=social.profile(raw);
+    if(!account)return;
+    if (account.network==='instagram')profiles.add(account.url);
+    if (socials.size<20)socials.add(account.url);
+  };
   const links = value => (Array.isArray(value) ? value : [value]).map(item =>
     typeof item === 'string' ? item : item?.contentUrl || item?.url).filter(Boolean);
   function organization(record) {
@@ -56,11 +62,28 @@ export function websiteMetadata(html, pageUrl) {
     if (![].concat(record['@type'] || []).some(type =>
       /Organization|Business|Store|Restaurant|Bakery|Salon|Studio|Agency|Clinic|Service|Lodging|Dentist|Hotel|Automotive|School|Corporation/i.test(type))) return;
     logo ||= assetUrl(links(record.logo)[0]);
+    if(record.description && !meta.description)meta.description=String(record.description);
     links(record.image).forEach(addPhoto);
+    append(hours,schedule(record.openingHoursSpecification || record.openingHours));
+    for(const field of ['hasOfferCatalog','makesOffer','hasMenu','hasMenuSection','availableService'])append(services,catalog(record[field]));
     links(record.sameAs).forEach(addProfile);
   }
   const parser = new Parser({
     onopentag(tag, attrs) {
+      if (block.has(tag))line='';
+      if(tag==='figure')figure++;
+      if (tag==='section' || tag==='article' || tag==='div') {
+        const id=[attrs.id,attrs.class,attrs['aria-label'],attrs.itemprop].filter(Boolean).join(' ').toLowerCase();
+        markers.push(context);
+        if(/servi[cç]os|services|especialidades|card[aá]pio|offercatalog/.test(id)) context='services';
+        else if(/hor[aá]rios|openinghours|hours/.test(id))context='hours';
+        else if(/galeria|gallery|portfolio|portfólio/.test(id))context='gallery';
+      }
+      if(tag==='img' && (context==='gallery'||figure) && !/logo|avatar|ícone|icon|tracking|pixel/i.test([attrs.alt,attrs.class,attrs.src].join(' '))){
+        if((!attrs.width||parseInt(attrs.width)>=160)&&(!attrs.height||parseInt(attrs.height)>=100))addPhoto(attrs['data-src']||attrs.src);
+      }
+      if(tag==='a'){currentPost=social.instagramPost(attrs.href);currentPhoto='';alt='';}
+      if(tag==='img'&&currentPost){currentPhoto=assetUrl(attrs.src||attrs['data-src']);alt=String(attrs.alt||'').trim().slice(0,120);}
       if (tag === 'meta') {
         const key = (attrs.property || attrs.name || '').toLowerCase();
         if (['og:site_name','og:description', 'description', 'theme-color'].includes(key)) meta[key] ||= attrs.content;
@@ -82,8 +105,25 @@ export function websiteMetadata(html, pageUrl) {
       if (tag === 'link' && (attrs.rel || '').toLowerCase().split(/\s+/).includes('apple-touch-icon')) icon ||= assetUrl(attrs.href);
       if (tag === 'script' && /^application\/ld\+json(?:;|$)/i.test(attrs.type || '')) script = '';
     },
-    ontext(value) { if (script !== null) script += value; },
+    ontext(value) {
+      if(script!==null)script+=value;
+      else if(line.length<400)line+=value;
+    },
     onclosetag(tag) {
+      if(tag==='figure')figure=Math.max(0,figure-1);
+      if(tag==='a'&&currentPost) {
+        if(currentPhoto && gallery.size<3){gallery.set(currentPhoto,{url:currentPhoto,source:currentPost,caption:alt});addPhoto(currentPhoto);}
+        currentPost=''; currentPhoto='';
+      }
+      const words=line.replace(/\s+/g,' ').trim();
+      if(block.has(tag)&&words&&words.length<=165) {
+        const info=bioFacts(words);append(hours,info.hours);append(services,info.services);
+        if((context==='services' || heading==='services') && ['h3','h4','li'].includes(tag) && words.length<=80)append(services,[words]);
+        if((context==='hours'||heading==='hours')&&/\d(?:h|:\d)|fechad/i.test(words)&&['p','li','tr','dd'].includes(tag))append(hours,[words]);
+        if (tag==='h2')heading=/^(?:serviços|nossos serviços|especialidades|cardápio)$/i.test(words)?'services':/^horários?/i.test(words)?'hours':'';
+        line='';
+      }
+      if(tag==='section'||tag==='article'||tag==='div')context=markers.pop()||'';
       if (tag === 'script' && script !== null) {
         try { organization(JSON.parse(script)); } catch {}
         script = null;
@@ -95,7 +135,7 @@ export function websiteMetadata(html, pageUrl) {
   photos.delete(logo);
   const color = (meta['theme-color'] || '').trim();
   return {
-    source: pageUrl, name: (meta['og:site_name'] || '').slice(0,100), logo, photos: [...photos].slice(0, 3), profiles: [...profiles].slice(0, 5), whatsappContacts:[...whatsappContacts],
+    source: pageUrl, name: (meta['og:site_name'] || '').slice(0,100), logo, photos:[...new Set([...gallery.keys(),...photos])].filter(url=>url!==logo).slice(0,3).map(url=>gallery.get(url)||url), socialLinks:[...socials], hours:[...hours].slice(0,10), services:[...services].slice(0,8), profiles: [...profiles].slice(0, 5), whatsappContacts:[...whatsappContacts],
     description: (meta['og:description'] || meta.description || '').trim().slice(0, 320),
     color: /^#[a-f\d]{6}$/i.test(color) ? color : ''
   };

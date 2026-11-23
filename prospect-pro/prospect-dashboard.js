@@ -130,7 +130,8 @@ function renderOverview() {
 
 function websiteTag(lead) {
   if (window.ProspectLinks.whatsappLinkNumber(lead.website)) return '<span class="tag no">Apenas WhatsApp</span>';
-  if (window.ProspectLinks.instagram(lead.website)) return '<span class="tag no">Apenas Instagram</span>';
+  const social=window.ProspectSocial.profile(lead.website);
+  if (social) return '<span class="tag no">Apenas '+social.label+'</span>';
   return window.ProspectLinks.hasWebsite(lead) ? '<span class="tag yes">Com site</span>' : '<span class="tag no">Não informado</span>';
 }
 

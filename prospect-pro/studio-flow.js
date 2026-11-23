@@ -86,6 +86,7 @@ function fillClient(company) {
   studioGoogleMapsUrl:company?.mapsUrl||company?.maps,
   studioHours:company?.hours,
   studioEmail:company?.email,
+  studioSocialLinks:company?.socialLinks||((window.ProspectSocial.profile(company?.website)?.network!=='instagram' && window.ProspectSocial.profile(company?.website)?.url)||''),
   studioInstagram:company?.instagram||window.ProspectLinks.instagram(company?.website)
  };
  for(const [id,value] of Object.entries(values))$(id).value=value||'';
@@ -140,21 +141,19 @@ function makeProposals(client) {
  const match=matchTemplate(client.category)||matchTemplate(client.name);
  const base=match||app.templates.find(template=>template.id==='consultoria');
  const category=client.category;
- const location=client.city?' em '+client.city:'';
  const profile=match?base.profile:{
-  experience:'Conheça '+client.name+'.',practical:category+' com '+client.name,
+  experience:'Como funciona o atendimento',practical:'Serviços e atendimento',
   services:'Serviços',action:'Falar com a empresa',contact:'Entre em contato',
   planning:'Prepare seu primeiro contato',ask:'Gostaria de saber como funciona o atendimento.',
   story:'Informe o que você procura para conversar sobre as opções e os próximos passos.'
  };
- const headlines=[match?base.headline:client.name,profile.experience,profile.practical];
- const identity=client.name+' atua no segmento de '+category.toLowerCase()+location+'.';
- const next=client.whatsapp||client.phone||client.email?' Use os canais de contato desta página para consultar o atendimento.':'';
- const summaries=[
-  client.summary||[identity,match?.summary||next.trim()].filter(Boolean).join(' '),
-  client.summary||[identity,profile.story].filter(Boolean).join(' '),
-  [identity,client.summary||next.trim()].filter(Boolean).join(' ')
- ];
+ const headlines=[match?base.headline:(client.services[0]?.split('|')[0].trim()||category),profile.experience,profile.practical];
+ const identity=category+(client.city?' em '+client.city:'');
+ const firstServices=client.services.slice(0,3).map(line=>line.split('|')[0].trim()).filter(Boolean);
+ const overview=firstServices.length?firstServices.join(' · '):'';
+ const next=client.whatsapp||client.phone||client.email?'Consulte os canais de atendimento.':'';
+ const summaries=[client.summary||overview||match?.summary||identity,
+  client.summary||profile.story||overview||identity,client.summary||overview||next||identity];
  const suggested=!client.services.length;
  const services=suggested?match?.services||[]:client.services.map(item=>item.split('|')[0].trim()).filter(Boolean);
  const serviceDetails=client.services.filter(item=>item.includes('|')).join('\n');
@@ -167,12 +166,12 @@ function makeProposals(client) {
  const recent=app.otherCovers(client.name,client.city);
  const rotated=base.photos.map((_,i)=>base.photos[(i+seed%base.photos.length)%base.photos.length]);
  const pictures=ownPhotos.length ? ownPhotos : [...rotated.filter(url=>!recent.has(url)),...rotated.filter(url=>recent.has(url))];
- const about=client.about||[identity,profile.story||next.trim()].filter(Boolean).join(' ');
+ const about=client.about||[profile.story!==summaries[0]?profile.story:'',overview].filter(Boolean).join('\n')||identity;
  return visualDirections.map((direction,index)=>{
   const template={
    id:base.id+'-studio-'+index,
    label:category,category:base.category,example:client.name,profile,
-   direction:direction.id,layout:direction.layout(base),...direction.colors(brand.color?{...base,accent:brand.color}:base),
+   direction:direction.id,motionStyle:direction.id==='experiencia'?'strong':'soft',layout:direction.layout(base),...direction.colors(brand.color?{...base,accent:brand.color}:base),
    headline:headlines[index],summary:summaries[index].slice(0,320),services,
    photo:pictures[index%pictures.length],
    detailPhoto:ownPhotos.length?'':pictures[(index+1)%pictures.length],
@@ -183,9 +182,9 @@ function makeProposals(client) {
    ...app.getDefault(template),
    name:client.name,industry:category,city:client.city,address:client.address,
    phone:client.phone,whatsapp:client.whatsapp,whatsappUsePhone:client.whatsappUsePhone,website:client.website,
-   hours:client.hours,email:client.email,instagram:client.instagram,mapsUrl:client.mapsUrl,googlePlaceId,
+   hours:client.hours,email:client.email,instagram:client.instagram,socialLinks:client.socialLinks,mapsUrl:client.mapsUrl,googlePlaceId,
    about,serviceDetails,servicesSuggested:suggested,photoOrigin:template.photoOrigin,
-   logo:brand.logo,brandGallery:ownPhotos.join('\n'),brandSources:brand.sources,
+   logo:brand.logo,brandGallery:ownPhotos.join('\n'),brandSources:brand.sources,photoCaptions:brand.captions,
    variant:String((seed+index)%3),
    companyFacts:{summary:client.summary,about:client.about,services:client.services},
    leadId,templateSnapshot:template
@@ -233,13 +232,15 @@ function readClient(brand){
  const phone=formValue('studioPhone');
  const explicit=formValue('studioWhatsApp');
  const website=normalizeWebsite(formValue('studioWebsite'));
- const profile=window.ProspectLinks.instagram(website);
+ const account=window.ProspectSocial.profile(website);
+ const profile=account?.network==='instagram'?account.url:'';
+ const networks=window.ProspectSocial.profiles([...formValue('studioSocialLinks').split(/\s+/),account?.url]).filter(v=>v.network!=='instagram');
  return {
   name:formValue('studioCompany'),category:formValue('studioSegment'),city:formValue('studioCity'),
   phone,whatsapp:explicit,whatsappUsePhone:$('studioWhatsAppConfirmed').checked,
-  address:formValue('studioAddress'),website:profile||window.ProspectLinks.whatsappLinkNumber(website)?'':website,
+  address:formValue('studioAddress'),website:account||window.ProspectLinks.whatsappLinkNumber(website)?'':website,
   mapsUrl:formValue('studioGoogleMapsUrl'),hours:formValue('studioHours'),
-  email:formValue('studioEmail'),instagram:formValue('studioInstagram')||profile,
+  email:formValue('studioEmail'),instagram:window.ProspectLinks.instagram(formValue('studioInstagram'))||profile,socialLinks:networks.map(v=>v.url).join('\n'),
   summary:formValue('studioSummary'),about:formValue('studioAbout'),brand,
   services:formValue('studioServices').split(/\r?\n/).map(service=>service.trim()).filter(Boolean).slice(0,8)
  };
@@ -372,10 +373,15 @@ form.addEventListener('input',event=>{
 });
 $('publishOverlay').addEventListener('close',reflectOptions);
 
+function openLeadProposals(){
+ previewThree();
+ if(!sessionToken()||!$('brandSocialAtGenerate').checked)return;
+ brandPanel.prepare().then(ready=>{if(!ready)status.textContent='Confira os dados encontrados em Identidade da empresa. A seleção será aplicada às propostas.';}).catch(error=>{status.textContent=error.message;});
+}
 fillClient(lead);
 if(lead){
  if(!$('studioSegment').value)$('studioSegment').value='Serviços profissionais';
- previewThree();
+ openLeadProposals();
 }else if(leadKey){
  status.textContent='Recuperando empresa salva no CRM…';
  (async()=>{
@@ -401,7 +407,7 @@ if(lead){
    if(formChanged)return;
    fillClient(lead);
    if(!$('studioSegment').value)$('studioSegment').value='Serviços profissionais';
-   previewThree();
+   openLeadProposals();
   }catch(error){
    if(!formChanged)status.textContent=error.message||'Informe a empresa manualmente para gerar propostas.';
   }
