@@ -96,21 +96,7 @@ function fillClient(company) {
  brandPanel.refresh();
 }
 
-function matchTemplate(value) {
- const query=norm(value);
- if(!query)return null;
- let best=null,bestScore=0;
- for(const template of app.templates){
-  const label=norm(template.label);
-  if(query===label)return template;
-  for(const alias of [label,...template.aliases.map(norm)]){
-   if(!(' '+query).includes(' '+alias))continue;
-   const score=query===alias?100+alias.length:alias.length;
-   if(score>bestScore){best=template;bestScore=score;}
-  }
- }
- return best;
-}
+function matchTemplate(value) { return window.ProspectMatchSegment?.(value)||null; }
 
 function blend(color, other, weight) {
  const parts=[1,3,5].map(index=>{
@@ -139,7 +125,7 @@ const visualDirections=[
 
 function makeProposals(client) {
  const match=matchTemplate(client.category)||matchTemplate(client.name);
- const base=match||app.templates.find(template=>template.id==='consultoria');
+ const base=match||{id:'generico',category:'Outros',layout:'directory',accent:'#50677d',bg:'#f7f8fa',ink:'#172533',photo:'',photos:[]};
  const category=client.category;
  const profile=match?base.profile:{
   experience:'Como funciona o atendimento',practical:'Serviços e atendimento',
@@ -175,7 +161,7 @@ function makeProposals(client) {
    headline:headlines[index],summary:summaries[index].slice(0,320),services,
    photo:pictures[index%pictures.length]||base.photo,
    photos:ownPhotos.length?ownPhotos:stock.map((_,i)=>stock[(i+index)%stock.length]),
-   detailPhoto:ownPhotos.length?'':pictures[(index+1)%pictures.length],
+   detailPhoto:ownPhotos.length?'':(pictures[(index+1)%pictures.length]||''),
    photoOrigin:ownPhotos.length?'business':'reference',brandColor:brand.color||'',
    logo:brand.logo,brandGallery:ownPhotos.join('\n')
   };

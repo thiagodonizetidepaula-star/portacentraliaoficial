@@ -144,6 +144,21 @@ function start(id, project) {
   templates.find(t => t.id === id) || templates[0];
  if (!template) return notify('Nenhum modelo disponível');
  selected = { ...getDefault(template), ...project };
+ const detected=window.ProspectMatchSegment?.(selected.industry)||window.ProspectMatchSegment?.(selected.name);
+ const currentSegment=String(template.id).split('-studio-')[0];
+ if(detected&&detected.id!==currentSegment&&['consultoria','generico'].includes(currentSegment)){
+  const old=template,direction=old.direction,index=direction==='experiencia'?1:direction==='pratico'?2:0;
+  const stock=window.ProspectImageLibrary.select(detected.id,selected.name+' '+selected.city,new Set(),12);
+  const isStock=window.ProspectImageLibrary.owners(selected.photo).length>0||selected.photo===old.photo;
+  template={...detected,id:detected.id+'-studio-'+index,direction,layout:direction==='pratico'?'directory':direction==='experiencia'?(detected.layout==='immersive'?'artisan':'immersive'):detected.layout,photo:stock[index%stock.length]||detected.photo,photos:stock,detailPhoto:stock[(index+1)%stock.length]||'',motionStyle:old.motionStyle};
+  selected.templateId=template.id;
+  if(selected.photoOrigin!=='business'&&selected.photoOrigin!=='generated'&&(!selected.photo||isStock)){selected.photo=template.photo;selected.photoOrigin='reference';}
+  const generic=value=>!value||String(value).trim().toLowerCase()===String(selected.industry).trim().toLowerCase()||value===old.headline||value===old.summary||value===old.profile?.story;
+  if(generic(selected.headline))selected.headline=detected.headline;
+  if(generic(selected.summary))selected.summary=detected.summary;
+  if(generic(selected.about))selected.about=detected.profile.story;
+  if(!selected.color||selected.color===old.accent)selected.color=detected.accent;
+ }
  const preferred=selected.whatsapp||whatsappLinkNumber(selected.website);
  const shared=whatsappNumber({phone:selected.phone});
  selected.whatsappUsePhone=selected.whatsappUsePhone!==false && (!preferred || whatsappNumber({whatsapp:preferred})===shared);
@@ -1042,8 +1057,10 @@ function buildSite(info,t,{finalSite=false}={}) {
  const petCategory=/pet\s*shop|veterin|animal|banho\s*e\s*tosa|\bpet\b/.test(normal(kind));
  const genericPet=/^conte o que seu pet precisa para saber quais servicos estao disponiveis e como funciona o atendimento$/.test(normal(summary));
  if(petCategory&&genericPet)summary='Conheça '+name+(city?' em '+city:'')+' e encontre o canal de atendimento para cuidar do seu pet.';
- const base=templates.find(item=>item.id===String(t.id).split('-studio-')[0]);
- const profile=t.profile||base?.profile||{
+ const templateSegment=String(t.id).split('-studio-')[0];
+ const detected=window.ProspectMatchSegment?.(kind)||window.ProspectMatchSegment?.(name);
+ const base=detected||templates.find(item=>item.id===templateSegment);
+ const profile=(detected&&detected.id!==templateSegment?detected.profile:t.profile)||base?.profile||{
   services:'Serviços',action:'Fale com a empresa',
   story:'Consulte as opções de atendimento e esclareça suas dúvidas.'
  };
@@ -1086,16 +1103,19 @@ function buildSite(info,t,{finalSite=false}={}) {
   :hasServices?profile.services:map?'Ver localização':hasContact?'Ver contatos':'Conheça a empresa');
  const heroHref=whatsapp||(telephone?'tel:'+telephone:hasServices?'#servicos':hasContact?'#contato':'#sobre');
 
- const selectedImage=photo(info.photo),image=selectedImage||photo(t.photo),logo=photo(info.logo);
+ const library=window.ProspectImageLibrary;
+ const selectedImage=photo(info.photo),logo=photo(info.logo);
  const ownPhotos=[...new Set(fieldLines(info.brandGallery,12).map(photo).filter(Boolean))];
- const sameSegment=window.ProspectImageLibrary?.select(base?.id||t.id,name+' '+city,new Set([image]),12)||[];
- const stock=[...new Set([...(sameSegment.length?sameSegment:(t.photos||[]))].map(photo).filter(Boolean))];
+ const sameSegment=library?.select(base?.id||t.id,name+' '+city,new Set([selectedImage]),12)||[];
+ const stock=[...new Set(sameSegment.map(photo).filter(Boolean))];
+ const owners=library?.owners(selectedImage)||[];
+ const wrongStock=info.photoOrigin!=='business'&&info.photoOrigin!=='generated'&&owners.length&&(!base||!owners.includes(base.id));
+ const image=(!wrongStock&&selectedImage)||ownPhotos[0]||stock[0]||'';
  const supportDetail=photo(t.detailPhoto);
  const allowedDetail=ownPhotos.includes(supportDetail)||stock.some(url=>url.split('?')[0]===supportDetail.split('?')[0])?supportDetail:'';
  const supporting=[...new Set([...ownPhotos,allowedDetail,...stock].map(photo).filter(Boolean))].filter(url=>url!==image);
  const [secondary,tertiary]=supporting;
- const origin=selectedImage&&['generated','business','reference'].includes(info.photoOrigin)
-  ?info.photoOrigin:image===photo(t.photo)?'reference':'business';
+ const origin=ownPhotos.includes(image)?'business':image===selectedImage&&['generated','business','reference'].includes(info.photoOrigin)?info.photoOrigin:'reference';
  const imageCaption=origin==='generated'?'Imagem gerada por IA':origin==='reference'?'Imagem ilustrativa':'';
  const figureCaption=caption=>caption?'<figcaption>'+esc(caption)+'</figcaption>':'';
  const mainPhoto=image?'<img src="'+esc(image)+'" width="1200" height="900" decoding="async" fetchpriority="high" alt="'+esc(origin==='business'?'Foto de '+name:'Imagem ilustrativa de '+kind)+'">':'';
@@ -1110,7 +1130,7 @@ function buildSite(info,t,{finalSite=false}={}) {
  const heroImage=layout==='catalog'
   ?'<figure class="catalog-gallery">'+mainPhoto+supportingPhoto(secondary)+supportingPhoto(tertiary)+figureCaption(galleryCaption)+'</figure>'
   :'<figure class="hero-image">'+mainPhoto+figureCaption(imageCaption)+'</figure>';
- const hero='<section class="hero '+(layout==='catalog'?'catalog-hero':layout)+'">'+heroBody+heroImage+'</section>';
+ const hero='<section class="hero '+(layout==='catalog'?'catalog-hero':layout)+(image?'':' no-stock-photo')+'">'+heroBody+(image?heroImage:'')+'</section>';
 
  const serviceSection=hasServices?servicesMarkup(rawServices,profile,info,isSuggested):'';
  const about=text(info.about);
@@ -1202,7 +1222,7 @@ function buildSite(info,t,{finalSite=false}={}) {
  const pageStyle=font.rule+css+
   ':root{--accent:'+accent+';--surface:'+bg+';--ink:'+ink+';--dark:'+dark+
   ';--buttonInk:'+buttonInk+';--muted:'+muted+';--line:'+line+';--display:'+font.family+
-  ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+navigationCss+motionCss+qualityCss+motionEnhancements+designOverrides;
+  ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+navigationCss+motionCss+qualityCss+motionEnhancements+'.hero.no-stock-photo{display:block!important;height:auto!important;min-height:0!important;background:var(--surface);color:var(--ink);padding:0}.hero.no-stock-photo::after{display:none}.hero.no-stock-photo .hero-text{position:relative!important;inset:auto!important;padding:clamp(28px,7vw,90px);max-width:100%;text-align:left}'+designOverrides;
 
  const title=name;
  const brandLogo=brandImage(logo);

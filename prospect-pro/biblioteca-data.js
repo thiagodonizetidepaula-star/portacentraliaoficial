@@ -282,7 +282,8 @@ const serviceGuidance = {
 
 // Catálogo interno de referências Pexels, sem interface pública de acervo.
  // IDs de páginas de fotografias consultadas; uso em sites, não revenda de fotos.
- const stockPexels={"petshop":[16395150,35711491,28852102,14770947,6816850,19145883,6131162,4432261,12928244,6130995,6131568],"veterinaria":[7469216,7469234,6604130,6235648,6235226,6235120],"salao":[7440054,4783340,13714794,10318038,12275480,8834028],"barbearia":[7518731,13138585,6599044,6599032],"oficina":[33814735,8985917,33814734,24407415,8985455],"hamburgueria":[6896009,11812583,20652782,9268664,15388329,7497246,1137473],"pizzaria":[35759998,30512710,9685272,5056621,29021745,3343627],"cafeteria":[40025142,34337602,30218902,5864216,8936947,11145283,36729734],"contabilidade":[8297220,33175669,8296948,7651738,6694492,4476375],"logistica":[13532504,14688876,5498230,5156696,6170405,34585120],"restaurante":[15098824,11689797,14646769,20184726,7243889,33991139]};
+ const extraSegmentAliases={"salao":["salões de beleza","salões","cabeleireiros","cabeleireiras","beauty salon","beauty salons","hairdresser","hair studio","beauty studio","beauty"],"barbearia":["barbearias","barbershop","barber shop"],"petshop":["pet shops","petshops","pet store","pet center","lojas de animais"],"veterinaria":["veterinários","clínicas veterinárias","vet clinic"],"oficina":["oficinas mecânicas","oficinas","mecânicos","auto repair"],"esteticaauto":["estéticas automotivas","estética automotiva","car detailing"],"estetica":["clínicas de estética","centro de estética"],"odontologia":["clínicas odontológicas","dentistas"],"clinica":["clínicas médicas"],"farmacia":["farmácias","drogarias"],"restaurante":["restaurantes","restaurants"],"hamburgueria":["hamburguerias"],"pizzaria":["pizzarias"],"cafeteria":["cafeterias","coffee shops"],"padaria":["padarias"],"imobiliaria":["imobiliárias"],"construcao":["construtoras","construções"],"contabilidade":["escritórios de contabilidade","serviços contábeis"],"advocacia":["escritórios de advocacia","advogados"],"logistica":["transportadoras","transportes"],"academia":["academias"],"educacao":["escolas","colégios"],"moda":["lojas de roupas","lojas de vestuário"],"floricultura":["floriculturas"],"hotelaria":["hotéis","pousadas"],"fotografia":["fotógrafos","estúdios fotográficos"],"eventos":["buffets"],"moveis":["lojas de móveis"],"tecnologia":["empresas de tecnologia"],"consultoria":["consultorias"]};
+ const stockPexels={"petshop":[16395150,35711491,28852102,14770947,6816850,19145883,6131162,4432261,12928244,6130995,6131568],"veterinaria":[7469216,7469234,6604130,6235648,6235226,6235120],"salao":[7440054,4783340,29498301,8834077,3993462,7447128,2799609,36587244,8834095],"barbearia":[7518731,13138585,6599044,6599032],"oficina":[33814735,8985917,33814734,24407415,8985455],"hamburgueria":[6896009,11812583,20652782,9268664,15388329,7497246,1137473],"pizzaria":[35759998,30512710,9685272,5056621,29021745,3343627],"cafeteria":[40025142,34337602,30218902,5864216,8936947,11145283,36729734],"contabilidade":[8297220,33175669,8296948,7651738,6694492,4476375],"logistica":[13532504,14688876,5498230,5156696,6170405,34585120],"restaurante":[15098824,11689797,14646769,20184726,7243889,33991139]};
  const pexelsUrl=id=>'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?auto=compress&cs=tinysrgb&w=1400';
  const stockUrl=id=>'https://images.unsplash.com/'+id+'?auto=format&fit=crop&w=1400&q=78';
  const photoKey=url=>String(url||'').split('?')[0];
@@ -298,17 +299,32 @@ const serviceGuidance = {
    const previous=new Set([...used].map(photoKey));
    return [...rotate.filter(url=>!previous.has(photoKey(url))),...rotate.filter(url=>previous.has(photoKey(url)))].slice(0,count);
   },
-  count:id=>(stockPools[id]||[]).length
+  count:id=>(stockPools[id]||[]).length,
+  owners(url){const key=photoKey(url);return Object.keys(stockPools).filter(id=>stockPools[id].some(photo=>photoKey(photo)===key));}
  });
  window.SITE_TEMPLATES = source.map(([id,label,category,layout,example,headline,summary,serviceList,mainPhoto,accent,bg,ink])=>{
  const services=serviceList.split('|');
  const photos=stockPools[id].slice();
  return {
   id,label,category,layout,example,headline,summary,services,
-  photo:photos[0],photos,accent,bg,ink,aliases:segmentAliases[id]||[],
+  photo:photos[0],photos,accent,bg,ink,aliases:[...(segmentAliases[id]||[]),...(extraSegmentAliases[id]||[])],
   profile:{
    ...sectorCopy[category],...sectorEditorial[category],...segmentCopy[id],...segmentEditorial[id],
    serviceDescriptions:Object.fromEntries(services.map((service,index)=>[service,serviceGuidance[id]?.[index]||'']))
   }
  };
 });
+
+ window.ProspectMatchSegment=function(value){
+  const normalize=v=>String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+  const query=normalize(value);if(!query)return null;
+  let best=null,score=0;
+  for(const t of window.SITE_TEMPLATES)for(const term of [t.label,...t.aliases]){
+    const a=normalize(term);if(!a)continue;
+    const exact=query===a,whole=(' '+query+' ').includes(' '+a+' '),prefix=a.length>=5&&!a.includes(' ')&&query.split(' ').some(word=>word.startsWith(a));
+    if(!exact&&!whole&&!prefix)continue;
+    const rank=(exact?1000:whole?100:10)+a.length;
+    if(rank>score){score=rank;best=t;}
+  }
+  return best;
+ };
