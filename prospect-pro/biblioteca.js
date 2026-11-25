@@ -657,7 +657,9 @@ function renderProjects() {
     esc(date.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })) + '</p>';
   const url = window.ProspectLinks.previewUrl(project.publicSlug, project.publicShareSlug);
   const publicLink = url
-   ? '<a class="button secondary" href="' + esc(url) + '" target="_blank" rel="noopener">Abrir prévia</a>'
+   ? '<a class="button secondary" href="' + esc(url) + '" target="_blank" rel="noopener">Visualizar site</a>' +
+    '<button type="button" class="button secondary" data-copy-link="' + esc(project.id) + '">Copiar link</button>' +
+    '<button type="button" class="button secondary" data-republish="' + esc(project.id) + '">Atualizar publicação</button>'
    : '';
   const historyButton = project.cloudOwned
    ? '<button type="button" class="button secondary" data-versions="' + esc(project.id) + '">Versões</button>'
@@ -665,7 +667,7 @@ function renderProjects() {
   return '<article class="project-row"><span class="project-state">' + (project.publicSlug ? 'Prévia publicada' : 'Rascunho') +
    '</span><h2>' + esc(project.name || 'Projeto sem nome') + '</h2><p>' + details + '</p>' + updated +
    '<div class="project-actions"><button type="button" class="button accent" data-load="' + esc(project.id) +
-   '">Continuar editando</button>' + publicLink + historyButton + '<button type="button" class="plain-btn" data-remove="' +
+   '">Editar site</button>' + publicLink + historyButton + '<button type="button" class="plain-btn" data-remove="' +
    esc(project.id) + '">Excluir projeto</button></div></article>';
  }).join('') || (query
   ? '<p class="project-empty">Nenhum projeto corresponde à busca.</p>'
@@ -675,6 +677,21 @@ function renderProjects() {
   button.onclick = () => {
    const project = projects.find(item => item.id === button.dataset.load);
    if (project) start(project.templateId, project);
+  };
+ }
+ for (const button of $('projectsList').querySelectorAll('[data-copy-link]')) {
+  button.onclick = async () => {
+   const project = projects.find(item => item.id === button.dataset.copyLink);
+   const link = project && window.ProspectLinks.previewUrl(project.publicSlug, project.publicShareSlug);
+   if (!link) return;
+   try { await navigator.clipboard.writeText(link); notify('Link do site copiado.'); }
+   catch { window.prompt('Copie o endereço do site:', link); }
+  };
+ }
+ for (const button of $('projectsList').querySelectorAll('[data-republish]')) {
+  button.onclick = () => {
+   const project = projects.find(item => item.id === button.dataset.republish);
+   if (project) { start(project.templateId, project); $('publishPreview').click(); }
   };
  }
  for (const button of $('projectsList').querySelectorAll('[data-versions]')) {
@@ -1007,9 +1024,9 @@ function buildSite(info,t,{finalSite=false}={}) {
  };
  const direction=['assinatura','experiencia','pratico'].includes(t.direction)?t.direction:'';
  const rawServices=typeof info.services==='string'?fieldLines(info.services,8):t.services||[];
- const hasServices=info.showServices!==false&&rawServices.length>0;
  const isSuggested=info.servicesSuggested===true||(!Object.hasOwn(info,'servicesSuggested')
   &&rawServices.join('\n')===(t.services||[]).join('\n'));
+ const hasServices=info.showServices!==false&&rawServices.length>0&&(!finalSite||!isSuggested);
  const faq=fieldPairs(info.faq,8);
  const demo=info.illustrativeBusiness===true;
  const isMenu=['hamburgueria','restaurante','pizzaria','cafeteria','padaria'].includes(base?.id);
@@ -1071,9 +1088,10 @@ function buildSite(info,t,{finalSite=false}={}) {
  const serviceSection=hasServices?servicesMarkup(rawServices,profile,info,isSuggested):'';
  const about=text(info.about);
  const profileStory=text(profile.story);
- const story=storyMarkup(about?(isMenu?'Nossa cozinha':'Sobre a empresa'):profile.planning,
-  about||[summary,profileStory!==summary?profileStory:''].filter(Boolean).join('\n'),
-  direction==='pratico'?'':secondary,ownPhotos.length>0);
+ const storyCopy=about||[summary,profileStory!==summary&&!finalSite?profileStory:'',address&&finalSite?'Endereço: '+address:'',hours.length&&finalSite?'Atendimento: '+hours.join(' · '):''].filter(Boolean).join('\n');
+ const story=storyMarkup(isMenu?'Nossa cozinha':'Sobre a empresa',
+  storyCopy||'Entre em contato para conhecer o atendimento de '+name+'.',
+  ownPhotos.find(src=>src!==image)||ownPhotos[0]||secondary||(origin==='business'?image:''),ownPhotos.length>0||(!secondary&&origin==='business'));
  const galleryPhotos=ownPhotos.length?ownPhotos:[...new Set([image,...(base?.photos||t.photos||[])].filter(Boolean))].slice(0,3);
  const photoNames=Array.isArray(info.galleryCaptions)?info.galleryCaptions:[];
  const portfolio=galleryPhotos.length?'<section id="galeria" class="brand-portfolio section" aria-labelledby="galeria-title"><div class="container">'+
@@ -1144,7 +1162,7 @@ function buildSite(info,t,{finalSite=false}={}) {
  const siteNav=areas.map(([id,label])=>'<a href="#'+id+'"'+(id==='contato'?' class="nav-cta"':'')+'>'+label+'</a>').join('');
  const navigationCss=[
   '.site-header.container{width:100%;max-width:none;padding:8px max(4vw,calc((100vw - 1160px)/2));background:var(--surface);color:var(--ink);height:auto;min-height:72px;position:sticky;top:0;z-index:5}.site-header .brand{overflow-wrap:anywhere}.site-header nav{flex-wrap:wrap;justify-content:flex-end}.site-header nav a,.site-header nav a:not(:last-child){display:inline-flex;align-items:center;min-height:42px;font-size:14px;white-space:nowrap}.site-header nav a:focus-visible{outline:2px solid currentColor;outline-offset:3px}',
-  'main,main>section[id]{scroll-margin-top:84px}main>section:target{min-height:calc(100svh - 170px)}@supports selector(main:has(>section:target)){main:has(>section:target)>section:not(:target){display:none}}',
+  'main,main>section[id]{scroll-margin-top:84px}main>section:target{min-height:0}@supports selector(main:has(>section:target)){main:has(>section:target)>section:not(:target){display:none}}',
   areas.map(([id])=>'body:has(#'+id+':target) .site-header nav a[href="#'+id+'"]').join(',')+'{text-decoration:underline;text-underline-offset:5px}',
   '.service-label{display:flex;flex-wrap:wrap;align-items:baseline;gap:7px 14px}.service-price{font-weight:750;white-space:nowrap}.brand-portfolio .portfolio-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));gap:18px}.portfolio-strip figure{margin:0}.portfolio-strip img{display:block;width:100%;height:auto;aspect-ratio:4/3;object-fit:cover}.portfolio-strip figcaption{margin-top:8px;font-size:15px}.demo-contact{max-width:55ch;line-height:1.5}',
   '@media(max-width:760px){.site-header.container{display:block;padding:8px 16px 4px}.site-header .brand{min-height:32px;display:flex;align-items:center}.site-header nav{justify-content:flex-start;gap:0 14px}.site-header nav a,.site-header nav a:not(:last-child){display:inline-flex;min-height:40px;font-size:14px}.site-header .nav-cta{background:transparent;color:inherit;padding:0;min-height:40px}.brand-logo{max-height:34px;width:auto}main,main>section[id]{scroll-margin-top:152px}}',
@@ -1178,9 +1196,9 @@ function buildSite(info,t,{finalSite=false}={}) {
   '<header class="site-header container"><a class="brand" href="#inicio">'+
   (logo?'<img class="brand-logo" src="'+esc(logo)+'" width="140" height="52" alt="'+esc(name)+'">':esc(name))+'</a><nav aria-label="Navegação principal">'+siteNav+'</nav></header>'+
   '<main id="inicio">'+hero+sections+portfolio+(faq.length?faqMarkup(faq):'')+contactHtml+'</main>'+
-  '<footer class="footer container"><span>© '+new Date().getFullYear()+'</span>'+
+  '<footer class="footer container"><span>© '+new Date().getFullYear()+' '+esc(name)+' — Todos os direitos reservados.</span>'+
   (Array.isArray(info.brandSources)&&info.brandSources.includes('https://docs.overturemaps.org/guides/places/')?'<a href="https://docs.overturemaps.org/attribution/"'+external+'>Dados de locais · Overture Maps</a>':'')+
-  '<span>'+esc((direction&&!finalSite?'Proposta de site · ':'')+kind+(city?' em '+city:''))+'</span></footer></body></html>';
+  '</footer></body></html>';
 }
 window.PortalSiteStudio={
  start,buildSite,getDefault,pendingLead,templates,renderProjects,showInFrame,fullPreview,save:saveSelected,

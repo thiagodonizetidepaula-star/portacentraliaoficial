@@ -423,7 +423,7 @@ async function publish() {
    template_id: String(template.id || '').slice(0, 120),
    variant: String(data.variant || '0'),
    design: { templateId: template.id, color: data.color, variant: data.variant },
-   html: engine.buildSite(data, template),
+   html: engine.buildSite(data, template, {finalSite:true}),
    status: 'published',
    published_at: timestamp,
    updated_at: timestamp

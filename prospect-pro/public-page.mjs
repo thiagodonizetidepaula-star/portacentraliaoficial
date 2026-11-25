@@ -23,15 +23,21 @@ export async function readPublication(endpoint, key, slug, prefer = 'slug', fetc
 export function publicationHtml(row, canonical) {
   const raw = row.html;
   if (typeof raw !== 'string' || raw.length > 280000 || !/<\/head>/i.test(raw)) throw new Error('HTML indisponível');
-  const title = String(row.business_name || 'Site demonstrativo').slice(0,90) + ' | Demonstração Portal Central IA';
+  const title = String(row.business_name || 'Empresa').slice(0,90);
   const fields = {
-    'og:type': 'website', 'og:locale': 'pt_BR', 'og:site_name': 'Portal Central IA · Demonstração',
-    'og:title': title, 'og:description': String(row.description || 'Uma proposta de site criada para esta empresa.').slice(0,160),
+    'og:type': 'website', 'og:locale': 'pt_BR', 'og:site_name': title,
+    'og:title': title, 'og:description': String(row.description || title).slice(0,160),
     'og:url': canonical
   };
   if (typeof row.cover_image === 'string' && /^https:\/\/[^<>"'\s]+$/.test(row.cover_image)) fields['og:image'] = row.cover_image;
   const tags = Object.entries(fields).map(([name, value]) => '<meta property="' + name + '" content="' + escape(value) + '">');
   if (fields['og:image']) tags.push('<meta name="twitter:card" content="summary_large_image">');
   tags.push('<meta name="robots" content="noindex,nofollow">');
-  return raw.replace(/<\/head>/i, () => tags.join('') + '</head>');
+  // Remove only the old administrative footer line, including from previously saved HTML.
+  const cleaned = raw.replace(/<footer\b[^>]*>[\s\S]*?<\/footer>/gi, footer =>
+    footer.replace(/<span\b[^>]*>\s*Proposta de site\s*(?:·|&middot;)[\s\S]*?<\/span>/gi, ''));
+  // The public renderer owns the social metadata (avoid duplicate tags from final-site HTML).
+  return cleaned.replace(/<head\b[^>]*>[\s\S]*?<\/head>/i, head => head
+    .replace(/<meta\s+(?:property="og:[^"]+"|name="twitter:card")[^>]*>/gi,'')
+    .replace(/<\/head>/i, () => tags.join('') + '</head>'));
 }
