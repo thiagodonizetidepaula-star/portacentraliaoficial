@@ -1005,6 +1005,26 @@ body.motion-strong{--entry-distance:36px;--entry-scale:1.11;--entry-time:950ms;-
 @media(max-width:760px){.site-header .brand-logo{max-height:36px}}
 `;
 
+function brandImage(value) {
+ const s=String(value||'');
+ if(!/^https:\/\/[^<>"'\s\\]+$/i.test(s)||s.length>2000)return '';
+ try {
+  const u=new URL(s);
+  if(u.username||u.password||/(^|\.)portalcentralia\.com\.br$|(^|\.)resonant-puffpuff-6de5a0\.netlify\.app$|(^|\.)portal-prospect-pro\.onrender\.com$/i.test(u.hostname))return '';
+  return u.href.replace(/[()]/g,c=>encodeURIComponent(c));
+ }catch{return ''}
+}
+function brandIconSvg(name,category) {
+ const k=String(category||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+ const pet=/pet\s*shop|veterin|animal|banho\s*e\s*tosa|\bpet\b/.test(k);
+ const food=/restaur|pizz|hamburg|padaria|cafeter|gastronom/.test(k);
+ const auto=/automotiv|oficina|mecanica|veiculo/.test(k);
+ const beauty=/beleza|estetic|salao|barbear|manicure/.test(k);
+ const initial=String(name||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().match(/[A-Z0-9]/)?.[0]||'•';
+ const art=pet?'<g fill="#fff"><ellipse cx="17" cy="24" rx="5" ry="7" transform="rotate(-25 17 24)"/><ellipse cx="27" cy="16" rx="5" ry="7"/><ellipse cx="39" cy="16" rx="5" ry="7"/><ellipse cx="49" cy="24" rx="5" ry="7" transform="rotate(25 49 24)"/><path d="M32 28c-7 0-9 7-15 12-7 7-2 15 6 13 4-1 6-3 9-3s5 2 9 3c8 2 13-6 6-13-6-5-8-12-15-12Z"/></g>':food?'<path d="M17 12v15m6-15v15m6-15v15q0 9-6 9v16m24-40q-10 7-10 19h10v21" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>':auto?'<g fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round"><path d="m15 30 5-13h24l5 13 5 5v12H10V35z"/><path d="M16 47v5m32-5v5M16 30h32M16 38h7m18 0h7"/></g>':beauty?'<path d="M32 10q3 17 20 22-17 4-20 22-4-18-20-22 16-5 20-22Z" fill="#fff"/>':'<text x="32" y="44" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="36" fill="#fff">'+initial+'</text>';
+ return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="'+(pet?'#16766c':food?'#9a552d':auto?'#334155':beauty?'#85557c':'#344d68')+'"/>'+art+'</svg>';
+}
+
 function buildSite(info,t,{finalSite=false}={}) {
  const name=text(info.name)||t.example,kind=text(info.industry)||t.label;
  const showLocation=info.showLocation!==false;
@@ -1173,12 +1193,16 @@ function buildSite(info,t,{finalSite=false}={}) {
   ';--buttonInk:'+buttonInk+';--muted:'+muted+';--line:'+line+';--display:'+font.family+
   ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+navigationCss+motionCss+designOverrides;
 
- const title=(normal(name)===normal(kind)?name:name+' | '+kind)+(city?' em '+city:'');
- const meta=summary.slice(0,155);
+ const title=name;
+ const brandLogo=brandImage(logo);
+ const iconHref=brandLogo||'data:image/svg+xml,'+encodeURIComponent(brandIconSvg(name,kind));
+ const favicon='<link rel="icon"'+(brandLogo?'':' type="image/svg+xml"')+' href="'+esc(iconHref)+'">'+(brandLogo?'<link rel="apple-touch-icon" href="'+esc(brandLogo)+'">':'');
+ const socialImage=(origin==='business'?brandImage(image):'')||brandLogo||brandImage(image);
+ const meta=(summary||[kind,city].filter(Boolean).join(' em ')||name).slice(0,155);
  const social = finalSite ? '<meta property="og:type" content="website"><meta property="og:locale" content="pt_BR">'+
   '<meta property="og:site_name" content="'+esc(name)+'"><meta property="og:title" content="'+esc(title)+'">'+
   '<meta property="og:description" content="'+esc(meta)+'">'+
-  (image?'<meta property="og:image" content="'+esc(image)+'"><meta name="twitter:card" content="summary_large_image">':'') : '';
+  (socialImage?'<meta property="og:image" content="'+esc(socialImage)+'"><meta property="og:image:alt" content="'+esc(socialImage===brandLogo?'Logo de '+name:origin==='business'?'Foto de '+name:'Imagem ilustrativa do segmento')+'"><meta name="twitter:card" content="summary_large_image">':'') : '';
  const schema={'@context':'https://schema.org','@type':'LocalBusiness',name,description:meta,
   ...(address||city?{address:{'@type':'PostalAddress',...(address?{streetAddress:address}:{}),...(city?{addressLocality:city}:{}),addressCountry:'BR'}}:{}),
   ...(telephone?{telephone}:{}),...(email?{email}:{}),...(map?{hasMap:map}:{}),...(networks.length?{sameAs:networks.map(item=>item.url)}:{})};
@@ -1189,7 +1213,7 @@ function buildSite(info,t,{finalSite=false}={}) {
 
  return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
   '<meta name="theme-color" content="'+bg+'"><meta name="description" content="'+esc(meta)+'">'+
-  '<title>'+esc(title)+'</title>'+social+
+  '<title>'+esc(title)+'</title>'+favicon+social+
   '<script type="application/ld+json">'+schemaSafe+'</script><style>'+pageStyle+'</style></head>'+
   '<body class="variant-'+variant+(direction?' direction-'+direction:'')+spacing+' art-'+art+' motion-'+(['strong','none'].includes(info.motionStyle)?info.motionStyle:'soft')+'" data-direction="'+direction+'">'+
   '<a class="skip-link" href="#inicio">Ir para o conteúdo</a>'+

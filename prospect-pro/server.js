@@ -1,5 +1,5 @@
 import http from 'node:http';
-import {publicationHtml, readPublication, validSlug, previewPolicy} from './public-page.mjs';
+import {publicationHtml, publicationIcon, readPublication, validSlug, previewPolicy} from './public-page.mjs';
 import {readFile} from 'node:fs/promises';
 import {createStudioAi, studioOperator} from './studio-ai.js';
 import {createStudioBrand} from './studio-brand-api.js';
@@ -102,13 +102,15 @@ http.createServer(async(req,res)=>{
  if(u.pathname==='/health')return json(res,200,{ok:true});
  if(u.pathname==='/api/public-config')return json(res,200,{supabaseUrl:endpoint,publishableKey:publicKey,configured:!!endpoint&&!!publicKey});
  if(u.pathname.startsWith('/mvp/')){
-  const slug=u.pathname.slice(5);
+  const iconRequest=u.pathname.endsWith('/favicon.svg');
+  const slug=u.pathname.slice(5,iconRequest?-12:undefined);
   if(!validSlug(slug))return json(res,404,{error:'Prévia não encontrada'});
   try{
    const p=await readPublication(endpoint,publicKey,slug);
    if(!p)return json(res,404,{error:'Demonstração indisponível ou não publicada'});
    const base=process.env.PREVIEW_PUBLIC_ORIGIN||'https://portal-prospect-pro.onrender.com';
    const url=base+'/mvp/'+slug;
+   if(iconRequest){res.writeHead(200,{'Content-Type':'image/svg+xml; charset=utf-8','Cache-Control':'public, max-age=60','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'"});return res.end(publicationIcon(p))}
    const html=publicationHtml(p,url);
    res.writeHead(200,{'Content-Type':'text/html; charset=utf-8','Cache-Control':'public, max-age=60','X-Content-Type-Options':'nosniff','X-Frame-Options':'SAMEORIGIN','Referrer-Policy':'strict-origin-when-cross-origin','Content-Security-Policy':previewPolicy});
    return res.end(html);
