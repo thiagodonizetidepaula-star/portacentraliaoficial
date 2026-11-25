@@ -1,4 +1,4 @@
-import { publicationHtml, readPublication, validSlug, previewPolicy } from '../../prospect-pro/public-page.mjs';
+import { publicationHtml, publicationIcon, readPublication, validSlug, previewPolicy } from '../../prospect-pro/public-page.mjs';
 
 // This is the same public project configuration provided to visitors by the studio.
 // Anonymous database access is restricted by its published-only row policy.
@@ -14,7 +14,8 @@ const commonHeaders = {
 
 export default async function handler(request) {
   const url = new URL(request.url);
-  const slug = /^\/p\/([^/]+)\/?$/.exec(url.pathname)?.[1];
+  const match = /^\/p\/([^/]+)(\/favicon\.svg|\/)?$/.exec(url.pathname);
+  const slug=match?.[1], iconRequest=match?.[2]==='/favicon.svg';
   const message = (status, body) => new Response(request.method === 'HEAD' ? null : body, {
     status, headers: {...commonHeaders, 'Content-Type':'text/plain; charset=utf-8'}
   });
@@ -27,7 +28,8 @@ export default async function handler(request) {
     const row = await readPublication(project, publishableKey, slug, 'share_slug');
     if (!row) return message(404, 'Esta prévia não está publicada.');
     const canonical = url.origin + '/p/' + row.share_slug;
-    if (row.share_slug !== slug) return new Response(null, {status: 302, headers: {...commonHeaders, Location: canonical}});
+    if (row.share_slug !== slug) return new Response(null, {status: 302, headers: {...commonHeaders, Location: canonical+(iconRequest?'/favicon.svg':'')}});
+    if (iconRequest) return new Response(request.method==='HEAD'?null:publicationIcon(row),{headers:{...commonHeaders,'Content-Type':'image/svg+xml; charset=utf-8','Content-Security-Policy':"default-src 'none'"}});
     const html = publicationHtml(row, canonical);
     return new Response(request.method === 'HEAD' ? null : html, {headers: {
       ...commonHeaders, 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': previewPolicy,
