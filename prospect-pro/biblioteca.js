@@ -1025,6 +1025,7 @@ function brandIconSvg(name,category) {
  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="'+(pet?'#16766c':food?'#9a552d':auto?'#334155':beauty?'#85557c':'#344d68')+'"/>'+art+'</svg>';
 }
 
+const qualityCss="/* prospect-design-quality-v1 */\n.site-header.container{gap:clamp(12px,3vw,36px);min-height:70px;border-bottom:1px solid color-mix(in srgb,var(--ink) 14%,transparent);padding-block:10px}\n.site-header .brand{font-size:clamp(17px,2vw,23px);font-weight:750;letter-spacing:-.035em;line-height:1.2}\n.site-header nav{gap:clamp(8px,1.7vw,24px);font-weight:600}\n.site-header nav a,.site-header nav a:not(:last-child){border:0!important;box-shadow:none!important;min-height:44px;padding:0 4px;font-size:14px;font-weight:600;line-height:1.2}\n.site-header nav a.nav-cta{background:var(--accent);color:var(--buttonInk,var(--ink));border-radius:999px!important;padding-inline:19px;text-decoration:none}\n.site-header nav a:focus-visible{outline:2px solid currentColor;outline-offset:4px}\n.site-header nav a:hover{text-underline-offset:5px}\n.hero h1{overflow-wrap:break-word;text-wrap:balance;line-height:1.07;letter-spacing:-.04em}\n.hero .hero-summary{line-height:1.6;max-width:52ch;text-wrap:pretty}\n.hero-button,.cta-button{min-height:48px;line-height:1.35;font-size:clamp(14px,1.3vw,16px)}\n.story-copy p+p{margin-top:1em}\n.brand-portfolio .portfolio-strip img{border-radius:12px}\n.footer{border-top:1px solid color-mix(in srgb,var(--ink) 14%,transparent)}\n@media(max-width:850px){\n .site-header.container{display:block;padding:12px 20px 5px}\n .site-header .brand{display:inline-flex;min-height:28px;max-width:100%}\n .site-header nav{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:0 15px;margin-top:3px}\n .site-header nav a,.site-header nav a:not(:last-child){display:inline-flex;min-height:44px;padding:0;font-size:13px}\n .site-header nav a.nav-cta{background:transparent;color:inherit;padding:0;border-radius:0!important}\n .site-header nav a.nav-cta:hover{text-decoration:underline}\n main,main>section[id]{scroll-margin-top:148px}\n body .hero.immersive{height:auto;min-height:clamp(460px,72svh,620px);display:flex;align-items:flex-end}\n body .hero.immersive .hero-text{position:relative;inset:auto;padding:clamp(26px,5vw,48px);width:100%}\n body .hero.immersive .hero-image{position:absolute;inset:0}\n body .hero.immersive::after{background:linear-gradient(0deg,rgba(0,0,0,.79),rgba(0,0,0,.34) 58%,rgba(0,0,0,.12))}\n body .hero.immersive h1{max-width:18ch}\n .art-pet .hero.immersive{display:flex;flex-direction:column;align-items:stretch;min-height:0;height:auto;background:var(--surface);color:var(--ink)}\n .art-pet .hero.immersive::after{display:none}\n .art-pet .hero.immersive .hero-image{position:relative;inset:auto;order:-1;height:clamp(180px,54vw,320px);margin:14px 20px 0;border-radius:18px;overflow:hidden}\n .art-pet .hero.immersive .hero-image img{height:100%;object-fit:cover;object-position:center 42%;filter:none}\n .art-pet .hero.immersive .hero-text{padding:22px 20px 32px;text-align:left}\n .art-pet .hero.immersive .hero-text h1,.art-pet .hero.immersive .hero-text p{margin-inline-start:0}\n .art-pet .hero.immersive .hero-actions{justify-content:flex-start}\n .art-pet .hero h1{text-transform:none}\n}\n@media(max-width:520px){\n .site-header.container{padding-inline:16px}\n .site-header nav{gap:0 12px}\n .site-header nav a,.site-header nav a:not(:last-child){font-size:13px}\n body .hero h1{font-size:clamp(32px,9vw,45px)!important;line-height:1.09;letter-spacing:-.04em;margin:12px 0 14px}\n body .hero .hero-summary{font-size:15px;line-height:1.55;margin:0}\n body .hero .hero-actions{margin-top:17px}\n body .hero .hero-button{margin-top:0;padding:12px 19px}\n body .hero:not(.immersive):not(.serene) .hero-text{padding:30px 20px}\n body .art-pet .hero.immersive .hero-text{padding:22px 20px 32px}\n .art-pet .hero.immersive .hero-image{margin-inline:16px}\n .section{padding-block:42px}\n .section h2,.contact h2{font-size:clamp(27px,8vw,36px);line-height:1.12}\n .story-grid,.faq-grid{grid-template-columns:minmax(0,1fr)!important;gap:22px}\n .contact{padding-block:44px}\n .hero-image figcaption,.story-image figcaption,.catalog-gallery figcaption{font-size:10px;padding:4px 6px;border-radius:6px;opacity:.86}\n}\n@media(max-width:360px){.site-header nav{gap:0 9px}.site-header nav a,.site-header nav a:not(:last-child){font-size:12px}}\n@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}}";
 function buildSite(info,t,{finalSite=false}={}) {
  const name=text(info.name)||t.example,kind=text(info.industry)||t.label;
  const showLocation=info.showLocation!==false;
@@ -1036,7 +1037,10 @@ function buildSite(info,t,{finalSite=false}={}) {
  const headline=duplicate?(firstService && normal(firstService)!==normal(name)?firstService:normal(kind)!==normal(name)?kind:'Conheça os serviços'):proposedHeadline;
  const originalSummary=text(info.summary)||t.summary||'';
  const oldIntro=name+' atua no segmento de '+kind.toLowerCase()+(city?' em '+city:'')+'.';
- const summary=originalSummary.startsWith(oldIntro)?originalSummary.slice(oldIntro.length).trim():originalSummary;
+ let summary=originalSummary.startsWith(oldIntro)?originalSummary.slice(oldIntro.length).trim():originalSummary;
+ const petCategory=/pet\s*shop|veterin|animal|banho\s*e\s*tosa|\bpet\b/.test(normal(kind));
+ const genericPet=/^conte o que seu pet precisa para saber quais servicos estao disponiveis e como funciona o atendimento$/.test(normal(summary));
+ if(petCategory&&genericPet)summary='Conheça '+name+(city?' em '+city:'')+' e encontre o canal de atendimento para cuidar do seu pet.';
  const base=templates.find(item=>item.id===String(t.id).split('-studio-')[0]);
  const profile=t.profile||base?.profile||{
   services:'Serviços',action:'Fale com a empresa',
@@ -1076,7 +1080,8 @@ function buildSite(info,t,{finalSite=false}={}) {
   if(whatsapp)faq.push(['Como iniciar uma conversa?','Na aba Contato, toque em Abrir WhatsApp para revisar sua mensagem e conversar com '+name+'.']);
  }
  const external=' target="_blank" rel="noopener noreferrer"';
- const heroAction=text(info.cta)||(whatsapp?profile.action:telephone?'Ligar para a empresa'
+ const requestedAction=text(info.cta);
+ const heroAction=(!whatsapp&&!telephone&&/consultar disponibilidade|agendar|reservar/i.test(requestedAction)?'':requestedAction)||(whatsapp?profile.action:telephone?'Ligar para a empresa'
   :hasServices?profile.services:map?'Ver localização':hasContact?'Ver contatos':'Conheça a empresa');
  const heroHref=whatsapp||(telephone?'tel:'+telephone:hasServices?'#servicos':hasContact?'#contato':'#sobre');
 
@@ -1089,7 +1094,7 @@ function buildSite(info,t,{finalSite=false}={}) {
   ?info.photoOrigin:image===photo(t.photo)?'reference':'business';
  const imageCaption=origin==='generated'?'Imagem gerada por IA':origin==='reference'?'Imagem ilustrativa':'';
  const figureCaption=caption=>caption?'<figcaption>'+esc(caption)+'</figcaption>':'';
- const mainPhoto=image?'<img src="'+esc(image)+'" width="1200" height="900" decoding="async" fetchpriority="high" alt="">':'';
+ const mainPhoto=image?'<img src="'+esc(image)+'" width="1200" height="900" decoding="async" fetchpriority="high" alt="'+esc(origin==='business'?'Foto de '+name:'Imagem ilustrativa de '+kind)+'">':'';
  const intro=[normal(kind)!==normal(headline)&&normal(kind)!==normal(name)?kind:'',city].filter(Boolean).join(' · ');
  const heroBody='<div class="hero-text">'+(intro?'<p class="eyebrow">'+esc(intro)+'</p>':'')+
   '<h1>'+esc(headline)+'</h1>'+(summary&&normal(summary)!==normal(headline)?'<p class="hero-summary">'+esc(summary)+'</p>':'')+'<div class="hero-actions">'+
@@ -1191,7 +1196,7 @@ function buildSite(info,t,{finalSite=false}={}) {
  const pageStyle=font.rule+css+
   ':root{--accent:'+accent+';--surface:'+bg+';--ink:'+ink+';--dark:'+dark+
   ';--buttonInk:'+buttonInk+';--muted:'+muted+';--line:'+line+';--display:'+font.family+
-  ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+navigationCss+motionCss+designOverrides;
+  ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+navigationCss+motionCss+qualityCss+designOverrides;
 
  const title=name;
  const brandLogo=brandImage(logo);
