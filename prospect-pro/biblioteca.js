@@ -1089,8 +1089,10 @@ function buildSite(info,t,{finalSite=false}={}) {
  const selectedImage=photo(info.photo),image=selectedImage||photo(t.photo),logo=photo(info.logo);
  const ownPhotos=[...new Set(fieldLines(info.brandGallery,12).map(photo).filter(Boolean))];
  const sameSegment=window.ProspectImageLibrary?.select(base?.id||t.id,name+' '+city,new Set([image]),12)||[];
- const stock=[...new Set([...(t.photos||[]),...sameSegment].map(photo).filter(Boolean))];
- const supporting=[...new Set([...ownPhotos, t.detailPhoto,...stock].map(photo).filter(Boolean))].filter(url=>url!==image);
+ const stock=[...new Set([...(sameSegment.length?sameSegment:(t.photos||[]))].map(photo).filter(Boolean))];
+ const supportDetail=photo(t.detailPhoto);
+ const allowedDetail=ownPhotos.includes(supportDetail)||stock.some(url=>url.split('?')[0]===supportDetail.split('?')[0])?supportDetail:'';
+ const supporting=[...new Set([...ownPhotos,allowedDetail,...stock].map(photo).filter(Boolean))].filter(url=>url!==image);
  const [secondary,tertiary]=supporting;
  const origin=selectedImage&&['generated','business','reference'].includes(info.photoOrigin)
   ?info.photoOrigin:image===photo(t.photo)?'reference':'business';
@@ -1103,10 +1105,8 @@ function buildSite(info,t,{finalSite=false}={}) {
   '<a class="hero-button" href="'+esc(heroHref)+'"'+(whatsapp?external:'')+'>'+esc(heroAction)+'</a></div></div>';
  const layout=['editorial','technical','immersive','serene','artisan','kinetic','corporate','catalog','directory'].includes(t.layout)?t.layout:'corporate';
  const supportingPhoto=src=>src?'<img src="'+esc(src)+'" width="600" height="600" decoding="async" loading="lazy" alt="">':'';
- const galleryCaption=ownPhotos.length ? imageCaption : secondary||tertiary
-  ?origin==='generated'?'Imagem principal gerada por IA. Imagens de apoio ilustrativas.'
-    :origin==='business'?'Imagens de apoio ilustrativas.':'Imagens ilustrativas'
-  :imageCaption;
+ const supportIsIllustrative=[secondary,tertiary].filter(Boolean).some(src=>!ownPhotos.includes(src));
+ const galleryCaption=supportIsIllustrative?(origin==='business'?'Fotos da empresa e imagens ilustrativas.':origin==='generated'?'Imagem principal gerada por IA e imagens ilustrativas.':'Imagens ilustrativas.'):imageCaption;
  const heroImage=layout==='catalog'
   ?'<figure class="catalog-gallery">'+mainPhoto+supportingPhoto(secondary)+supportingPhoto(tertiary)+figureCaption(galleryCaption)+'</figure>'
   :'<figure class="hero-image">'+mainPhoto+figureCaption(imageCaption)+'</figure>';
@@ -1116,9 +1116,10 @@ function buildSite(info,t,{finalSite=false}={}) {
  const about=text(info.about);
  const profileStory=text(profile.story);
  const storyCopy=about||[summary,profileStory!==summary&&!finalSite?profileStory:'',address&&finalSite?'Endereço: '+address:'',hours.length&&finalSite?'Atendimento: '+hours.join(' · '):''].filter(Boolean).join('\n');
+ const storyPhoto=ownPhotos.find(src=>src!==image)||ownPhotos[0]||secondary||(origin==='business'?image:'');
  const story=storyMarkup(isMenu?'Nossa cozinha':'Sobre a empresa',
   storyCopy||'Entre em contato para conhecer o atendimento de '+name+'.',
-  ownPhotos.find(src=>src!==image)||ownPhotos[0]||secondary||(origin==='business'?image:''),ownPhotos.length>0||(!secondary&&origin==='business'));
+  storyPhoto,ownPhotos.includes(storyPhoto)||(origin==='business'&&storyPhoto===image));
  const galleryPhotos=[...new Set([...ownPhotos,...(origin==='business'?[image]:[]),...supporting,...(origin!=='business'?[image]:[])].filter(Boolean))].slice(0,9);
  const realGallery=new Set([...ownPhotos,...(origin==='business'?[image]:[])]);
  const photoNames=Array.isArray(info.galleryCaptions)?info.galleryCaptions:[];
