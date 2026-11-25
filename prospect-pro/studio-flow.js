@@ -164,8 +164,8 @@ function makeProposals(client) {
  const seed=Array.from(norm(client.name+' '+client.city)).reduce((hash,c)=>(Math.imul(hash,31)+c.charCodeAt(0))>>>0,0);
  const ownPhotos=brand.photos;
  const recent=app.otherCovers(client.name,client.city);
- const rotated=base.photos.map((_,i)=>base.photos[(i+seed%base.photos.length)%base.photos.length]);
- const pictures=ownPhotos.length ? ownPhotos : [...rotated.filter(url=>!recent.has(url)),...rotated.filter(url=>recent.has(url))];
+ const stock=window.ProspectImageLibrary?.select(base.id,client.name+' '+client.city,recent,12)||base.photos;
+ const pictures=ownPhotos.length ? ownPhotos : stock;
  const about=client.about||[profile.story!==summaries[0]?profile.story:'',overview].filter(Boolean).join('\n')||identity;
  return visualDirections.map((direction,index)=>{
   const template={
@@ -173,7 +173,8 @@ function makeProposals(client) {
    label:category,category:base.category,example:client.name,profile,
    direction:direction.id,motionStyle:direction.id==='experiencia'?'strong':'soft',layout:direction.layout(base),...direction.colors(brand.color?{...base,accent:brand.color}:base),
    headline:headlines[index],summary:summaries[index].slice(0,320),services,
-   photo:pictures[index%pictures.length],
+   photo:pictures[index%pictures.length]||base.photo,
+   photos:ownPhotos.length?ownPhotos:stock.map((_,i)=>stock[(i+index)%stock.length]),
    detailPhoto:ownPhotos.length?'':pictures[(index+1)%pictures.length],
    photoOrigin:ownPhotos.length?'business':'reference',brandColor:brand.color||'',
    logo:brand.logo,brandGallery:ownPhotos.join('\n')

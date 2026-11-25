@@ -280,11 +280,29 @@ const serviceGuidance = {
  farmacia:['Consulte disponibilidade, apresentação e condições para compra.','Pergunte pelas categorias e pelos produtos de higiene disponíveis.','Confirme horários, canais de atendimento e informações para sua visita.']
 };
 
-window.SITE_TEMPLATES = source.map(([id,label,category,layout,example,headline,summary,serviceList,mainPhoto,accent,bg,ink])=>{
- const related=source.filter(row=>row[2]===category&&row[0]!==id).map(row=>row[8]);
+// Catálogo interno de referências Pexels, sem interface pública de acervo.
+ // IDs de páginas de fotografias consultadas; uso em sites, não revenda de fotos.
+ const stockPexels={"petshop":[16395150,35711491,28852102,14770947,6816850,19145883,6131162,4432261,12928244,6130995,6131568],"veterinaria":[7469216,7469234,6604130,6235648,6235226,6235120],"salao":[7440054,4783340,13714794,10318038,12275480,8834028],"barbearia":[7518731,13138585,6599044,6599032],"oficina":[33814735,8985917,33814734,24407415,8985455],"hamburgueria":[6896009,11812583,20652782,9268664,15388329,7497246,1137473],"pizzaria":[35759998,30512710,9685272,5056621,29021745,3343627],"cafeteria":[40025142,34337602,30218902,5864216,8936947,11145283,36729734],"contabilidade":[8297220,33175669,8296948,7651738,6694492,4476375],"logistica":[13532504,14688876,5498230,5156696,6170405,34585120],"restaurante":[15098824,11689797,14646769,20184726,7243889,33991139]};
+ const pexelsUrl=id=>'https://images.pexels.com/photos/'+id+'/pexels-photo-'+id+'.jpeg?auto=compress&cs=tinysrgb&w=1400';
+ const stockUrl=id=>'https://images.unsplash.com/'+id+'?auto=format&fit=crop&w=1400&q=78';
+ const photoKey=url=>String(url||'').split('?')[0];
+ const uniquePhotos=urls=>[...new Map(urls.filter(Boolean).map(url=>[photoKey(url),url])).values()];
+ const stockPools=Object.fromEntries(source.map(row=>[row[0],uniquePhotos([
+ stockUrl(row[8]),...(stockPexels[row[0]]||[]).map(pexelsUrl),...(referencePhotos[row[0]]||[]).map(stockUrl)
+ ])]));
+ window.ProspectImageLibrary=Object.freeze({
+  select(id,identity='',used=new Set(),count=12){
+   const pool=stockPools[id]||[];
+   const hash=Array.from(String(identity).normalize('NFD').toLowerCase()).reduce((h,c)=>(Math.imul(h,31)+c.charCodeAt(0))>>>0,0);
+   const rotate=pool.length?pool.map((_,i)=>pool[(i+hash%pool.length)%pool.length]):[];
+   const previous=new Set([...used].map(photoKey));
+   return [...rotate.filter(url=>!previous.has(photoKey(url))),...rotate.filter(url=>previous.has(photoKey(url)))].slice(0,count);
+  },
+  count:id=>(stockPools[id]||[]).length
+ });
+ window.SITE_TEMPLATES = source.map(([id,label,category,layout,example,headline,summary,serviceList,mainPhoto,accent,bg,ink])=>{
  const services=serviceList.split('|');
- const photos=[...new Set([mainPhoto,...(referencePhotos[id]||[]),...related])]
-  .slice(0,3).map(photo=>`https://images.unsplash.com/${photo}?auto=format&fit=crop&w=1600&q=82`);
+ const photos=stockPools[id].slice();
  return {
   id,label,category,layout,example,headline,summary,services,
   photo:photos[0],photos,accent,bg,ink,aliases:segmentAliases[id]||[],
