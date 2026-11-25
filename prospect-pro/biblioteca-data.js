@@ -299,6 +299,23 @@ const serviceGuidance = {
    const previous=new Set([...used].map(photoKey));
    return [...rotate.filter(url=>!previous.has(photoKey(url))),...rotate.filter(url=>previous.has(photoKey(url)))].slice(0,count);
   },
+  // Partition once for all three proposals. No automatic reuse, even if stock is scarce.
+  allocate(id,identity='',real=[],used=new Set()){
+   const actual=uniquePhotos(real);
+   const actualKeys=new Set(actual.map(photoKey));
+   const available=(stockPools[id]||[]).filter(url=>!actualKeys.has(photoKey(url)));
+   const hash=Array.from(String(identity).normalize('NFD').toLowerCase()).reduce((h,c)=>(Math.imul(h,31)+c.charCodeAt(0))>>>0,0);
+   const rotated=available.length?available.map((_,i)=>available[(i+hash%available.length)%available.length]):[];
+   const previous=new Set([...used].map(photoKey));
+   const stock=[...rotated.filter(url=>!previous.has(photoKey(url))),...rotated.filter(url=>previous.has(photoKey(url)))];
+   const groups=Array.from({length:3},()=>({real:[],stock:[]}));
+   actual.forEach((url,i)=>groups[i%3].real.push(url));
+   stock.forEach(url=>{
+    const index=groups.reduce((best,g,i)=>g.real.length+g.stock.length<groups[best].real.length+groups[best].stock.length?i:best,0);
+    groups[index].stock.push(url);
+   });
+   return groups.map(g=>({...g,photos:[...g.real,...g.stock],cover:g.real[0]||g.stock[0]||''}));
+  },
   count:id=>(stockPools[id]||[]).length,
   owners(url){const key=photoKey(url);return Object.keys(stockPools).filter(id=>stockPools[id].some(photo=>photoKey(photo)===key));}
  });

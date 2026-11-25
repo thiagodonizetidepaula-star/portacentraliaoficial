@@ -109,7 +109,7 @@ function blend(color, other, weight) {
 const visualDirections=[
  {
   id:'assinatura',title:'Identidade',description:'Apresentação da empresa, com espaço para a marca e os serviços.',
-  layout:base=>base.layout,colors:base=>({bg:base.bg,ink:base.ink,accent:base.accent})
+  layout:base=>base.layout==='directory'?'editorial':base.layout,colors:base=>({bg:base.bg,ink:base.ink,accent:base.accent})
  },
  {
   id:'experiencia',title:'Experiência',description:'Fotografia em destaque e conteúdo que convida a conhecer o negócio.',
@@ -150,20 +150,21 @@ function makeProposals(client) {
  const seed=Array.from(norm(client.name+' '+client.city)).reduce((hash,c)=>(Math.imul(hash,31)+c.charCodeAt(0))>>>0,0);
  const ownPhotos=brand.photos;
  const recent=app.otherCovers(client.name,client.city);
- const stock=window.ProspectImageLibrary?.select(base.id,client.name+' '+client.city,recent,12)||base.photos;
- const pictures=ownPhotos.length ? ownPhotos : stock;
+ const groups=window.ProspectImageLibrary.allocate(base.id,client.name+' '+client.city,ownPhotos,recent);
  const about=client.about||[profile.story!==summaries[0]?profile.story:'',overview].filter(Boolean).join('\n')||identity;
  return visualDirections.map((direction,index)=>{
+  const group=groups[index], cover=group.cover;
+  const signatureLayout=visualDirections[0].layout(base);
+  const layout=index===1?(signatureLayout==='immersive'?'artisan':'immersive'):direction.layout(base);
   const template={
    id:base.id+'-studio-'+index,
    label:category,category:base.category,example:client.name,profile,
-   direction:direction.id,motionStyle:direction.id==='experiencia'?'strong':'soft',layout:direction.layout(base),...direction.colors(brand.color?{...base,accent:brand.color}:base),
+   direction:direction.id,motionStyle:direction.id==='experiencia'?'strong':'soft',layout,...direction.colors(brand.color?{...base,accent:brand.color}:base),
    headline:headlines[index],summary:summaries[index].slice(0,320),services,
-   photo:pictures[index%pictures.length]||base.photo,
-   photos:ownPhotos.length?ownPhotos:stock.map((_,i)=>stock[(i+index)%stock.length]),
-   detailPhoto:ownPhotos.length?'':(pictures[(index+1)%pictures.length]||''),
-   photoOrigin:ownPhotos.length?'business':'reference',brandColor:brand.color||'',
-   logo:brand.logo,brandGallery:ownPhotos.join('\n')
+   photo:cover,photos:group.photos,exclusivePhotos:true,stockPhotos:group.stock,
+   detailPhoto:group.photos[1]||'',
+   photoOrigin:group.real.includes(cover)?'business':'reference',brandColor:brand.color||'',
+   logo:brand.logo,brandGallery:group.real.join('\n')
   };
   const data={
    ...app.getDefault(template),
@@ -171,7 +172,7 @@ function makeProposals(client) {
    phone:client.phone,whatsapp:client.whatsapp,whatsappUsePhone:client.whatsappUsePhone,website:client.website,
    hours:client.hours,email:client.email,instagram:client.instagram,socialLinks:client.socialLinks,mapsUrl:client.mapsUrl,googlePlaceId,
    about,serviceDetails,servicesSuggested:suggested,photoOrigin:template.photoOrigin,
-   logo:brand.logo,brandGallery:ownPhotos.join('\n'),brandSources:brand.sources,photoCaptions:brand.captions,
+   logo:brand.logo,brandGallery:group.real.join('\n'),brandSources:brand.sources,photoCaptions:brand.captions,
    variant:String((seed+index)%3),
    companyFacts:{summary:client.summary,about:client.about,services:client.services},
    leadId,templateSnapshot:template
@@ -212,7 +213,8 @@ function refreshCard(proposal,index){
 function showProposalsStatus(client,proposals){
  const suggestion=proposals[0].data.servicesSuggested&&proposals[0].template.services.length
   ?' Confira as opções sugeridas antes de publicar.':'';
- status.textContent='Três propostas para '+client.name+'. Escolha uma para personalizar.'+suggestion;
+ const limited=proposals.some(p=>p.template.photos.length<3)?' Acervo limitado: algumas propostas terão menos fotos, sem repetir imagens entre modelos.':'';
+ status.textContent='Três identidades visuais para '+client.name+', com conjuntos de fotos independentes. Escolha uma para personalizar.'+limited+suggestion;
 }
 
 function readClient(brand){
