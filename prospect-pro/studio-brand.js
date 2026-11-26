@@ -56,7 +56,7 @@ async function imageFile(file, logo) {
 
 window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
  const form = $('studioClientForm'), results = $('brandResults'), feedback = $('brandStatus');
- let caps = {places:false,instagram:false};
+ let caps = {places:false,instagram:false,facebook:false};
  let selectedPlace = '', sources = [], job = null, ambiguous = false, checked = false, waiting = false;
  const appliedFields = new Map(), photoCaptions=new Map();
  let archiveUrls=[];
@@ -64,7 +64,8 @@ window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
  const setMessage = message => { feedback.textContent = message; };
  const social = () => profile(value('studioInstagram')) || profile(value('studioWebsite'));
  const official = () => !window.ProspectSocial.profile(value('studioWebsite')) && !window.ProspectLinks.whatsappLinkNumber(value('studioWebsite')) && https(value('studioWebsite'));
- const sourceTarget=()=>official()||social()||window.ProspectSocial.profile(value('studioWebsite'))?.url;
+ const facebook=()=>window.ProspectSocial.profiles([value('studioWebsite'),...value('studioSocialLinks').split(/\s+/)]).filter(p=>p.network==='facebook')[0]?.url;
+ const sourceTarget=()=>official()||social()||facebook()||window.ProspectSocial.profile(value('studioWebsite'))?.url;
  const key = () => [value('studioCompany'),value('studioCity')].join('\n');
  const fieldChange = () => form.dispatchEvent(new Event('input',{bubbles:true}));
  function refresh() {
@@ -188,6 +189,9 @@ window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
   }
   if (data.color) choice('color','Cor sugerida '+data.color,data.color);
   if (data.description) choice('description',data.description,data.description);
+  if(data.phone&&!value('studioPhone'))choice('phone','Telefone · '+data.phone,data.phone);
+  if(data.address&&!value('studioAddress'))choice('address','Endereço · '+data.address,data.address);
+  if(data.mediaLimited)panel.append(node('p','A Meta liberou parte dos dados, mas não disponibilizou a galeria desta página.'));
   if(data.alternativeHours)panel.append(node('p','As fontes informam horários diferentes. Confira com a empresa e escolha uma opção.'));
   if(data.hours?.length)choice('hours','Horários da fonte consultada · '+data.hours.join(' / '),data.hours.join('\n'));
   if(data.alternativeHours)choice('hours','Horários no Instagram · '+data.alternativeHours.lines.join(' / '),data.alternativeHours.lines.join('\n'));
@@ -217,6 +221,8 @@ window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
       if (kind==='photo') { photos.push(saved.url); if(item?.caption)photoCaptions.set(saved.url,item.caption); }
       if (kind==='color') $('brandColorHex').value=val;
       if (kind==='description') acceptField('studioSummary',val);
+      if (kind==='phone'&&!value('studioPhone'))acceptField('studioPhone',val);
+      if (kind==='address'&&!value('studioAddress'))acceptField('studioAddress',val);
       if (kind==='whatsapp') { $('studioWhatsAppConfirmed').checked=false; acceptField('studioWhatsApp',val); }
       if (kind==='hours')acceptField('studioHours',val);
       if (kind==='service')acceptField('studioServices',[...new Set([...value('studioServices').split('\n').filter(Boolean),val])].slice(0,8).join('\n'));
@@ -251,10 +257,31 @@ window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
     else if(!data.hours?.length)data.hours=extra.hours;
    }
   }
+  const fb=accounts.filter(p=>p.network==='facebook');
+  if(caps.facebook&&fb.length===1&&!data.facebookChecked){
+   try{
+    const extra=await request('/api/studio/brand/facebook',{url:fb[0].url},signal);
+    if(!active())return;
+    data.photos=[...(data.photos||[]),...(extra.photos||[])].slice(0,9);
+    data.logo||=extra.logo;data.description||=extra.description;data.phone||=extra.phone;data.address||=extra.address;
+    if(!data.hours?.length)data.hours=extra.hours;
+    data.services=[...new Set([...(data.services||[]),...(extra.services||[])])].slice(0,8);
+    data.otherSources=[...(data.otherSources||[]),extra.source];
+   }catch{}
+  }
   if(active())review(data);
  }
  async function readSource(url,signal,active,directoryItem) {
   const account=window.ProspectSocial.profile(url);
+  if(account?.network==='facebook'){
+   if(!caps.facebook){review({source:account.url,socialLinks:[account.url]});setMessage('Facebook localizado. A importação de fotos e informações depende da autorização da Meta.');return;}
+   setMessage('Consultando a página comercial no Facebook…');
+   try {
+    const data=await request('/api/studio/brand/facebook',{url:account.url},signal);
+    if(active())review(data);
+   } catch(e){if(active()){review({source:account.url,socialLinks:[account.url]});setMessage(e.message+' O link pode ser mantido.');}}
+   return;
+  }
   if(account&&account.network!=='instagram'){review({source:account.url,socialLinks:[account.url]});return;}
   const instagram = profile(url);
   if (instagram && !caps.instagram) {
@@ -304,7 +331,7 @@ window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
     refresh(); fieldChange();
     $('brandSkip').hidden=!waiting;
     results.replaceChildren();
-    const target=(!whatsapp&&https(place.website)) || social() || official();
+    const target=(!whatsapp&&https(place.website)) || social() || official() || facebook();
     if (target) {
      await readSource(target,signal,active);
      if (active() && waiting) $('brandSkip').hidden=false;
@@ -431,7 +458,7 @@ window.createProspectBrand = ({sessionToken, getPlaceId, aiAvailable}) => {
   if (ambiguous) throw Error('Escolha a unidade correta nos resultados do Google.');
   if (waiting) { setMessage('Confira o material encontrado ou continue com os dados já confirmados.'); return false; }
   if (checked) return true;
-  const autoSource=sessionToken() && $('brandSocialAtGenerate').checked && (official() || (social() && caps.instagram) || (!sourceTarget() && value('studioCity') && !value('studioSocialLinks')));
+  const autoSource=sessionToken() && $('brandSocialAtGenerate').checked && (official() || (social() && caps.instagram) || (facebook() && caps.facebook) || (!sourceTarget() && value('studioCity') && !value('studioSocialLinks')));
   const useGoogle=!official()&&!social() && caps.places && $('brandGoogleAtGenerate').checked;
   if (!autoSource && !useGoogle) return true;
   if (!login()) return false;
