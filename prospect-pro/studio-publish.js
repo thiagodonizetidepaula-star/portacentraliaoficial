@@ -6,7 +6,7 @@ const engine = window.PortalSiteStudio;
 const dialog = $('publishOverlay');
 const authKey = 'prospect_publisher_session_v1';
 const leadKey = 'prospect_pro_leads';
-const leadFields = 'id,phone,opted_out,proposal_sent_at,message_opened_at,stage';
+const leadFields = 'id,phone,opted_out,proposal_sent_at,message_opened_at,stage,archived_at';
 let configCache;
 let session;
 let userCheck;
@@ -309,6 +309,7 @@ async function checkLead(id, user) {
   known: Boolean(cloud || local),
   phone: cloud?.phone || local?.phone || '',
   optedOut: Boolean(cloud?.opted_out || local?.optedOut || cloud?.stage === 'Não contatar' || local?.stage === 'Não contatar'),
+  archived: Boolean(cloud?.archived_at || local?.archivedAt || cloud?.stage === 'Arquivado' || local?.stage === 'Arquivado'),
   proposalSentAt: cloud?.proposal_sent_at || local?.proposalSentAt,
   messageOpenedAt: cloud?.message_opened_at || local?.messageOpenedAt,
   stage: cloud?.stage || local?.stage
@@ -339,11 +340,12 @@ function reflectContact() {
  const item = lastPublic;
  const control = $('openBusinessWhatsapp');
  const duplicate = Boolean(item?.lead?.proposalSentAt || item?.lead?.messageOpenedAt);
- const permitted = item && !item.checking && (!item.data.leadId || item.lead?.known) && !item.lead?.optedOut;
+ const permitted = item && !item.checking && item.lead?.cloud && !item.lead.optedOut && !item.lead.archived;
+ const consent = $('publishConsent').checked;
  const number = draftWhatsApp(item?.data);
  $('publishDuplicate').hidden = !permitted || !number || !duplicate;
- control.disabled = !permitted || !number || (duplicate && !$('publishRepeat').checked);
- $('copyPublicMessage').disabled = !permitted;
+ control.disabled = !permitted || !number || !consent || (duplicate && !$('publishRepeat').checked);
+ $('copyPublicMessage').disabled = !permitted || !consent;
  const message = item?.checking ? 'Verificando o histórico de contato…'
   : !permitted ? item?.lead?.optedOut
     ? 'Esta empresa foi marcada para não receber novas propostas.'
@@ -440,6 +442,7 @@ async function publish() {
   const result = lastPublic = { link, data: { ...data, name }, user, checking: Boolean(data.leadId) };
   $('publicLink').value = link;
   $('publicMessage').value = businessMessage(result.data, link);
+  $('publishConsent').checked = false;
   $('publishRepeat').checked = false;
   $('reviewOpportunity').hidden = !data.leadId;
   showPanel('result');
@@ -496,9 +499,18 @@ $('copyPublicLink').onclick = () => copy('publicLink', 'Link copiado.');
 $('openPublicLink').onclick = () => {
  if (lastPublic) window.open(lastPublic.link, '_blank', 'noopener');
 };
-$('copyPublicMessage').onclick = () => copy('publicMessage', 'Mensagem copiada.');
+$('publishConsent').onchange = reflectContact;
+$('copyPublicMessage').onclick = async () => {
+ const item = lastPublic;
+ if (!item || $('copyPublicMessage').disabled) return;
+ try {
+  item.lead = await checkLead(item.data.leadId, item.user);
+  reflectContact();
+  if (lastPublic === item && !$('copyPublicMessage').disabled) await copy('publicMessage', 'Mensagem copiada.');
+ } catch { status('Não foi possível verificar se a empresa pode receber contato.'); }
+};
 $('publishRepeat').onchange = reflectContact;
-$('openBusinessWhatsapp').onclick = () => {
+$('openBusinessWhatsapp').onclick = async () => {
  const item = lastPublic;
  if (!item || $('openBusinessWhatsapp').disabled) return;
  const message = $('publicMessage').value.trim();
@@ -509,6 +521,14 @@ $('openBusinessWhatsapp').onclick = () => {
  }
  const number = draftWhatsApp(item.data);
  if (!number) return;
+ try {
+  item.lead = await checkLead(item.data.leadId, item.user);
+ } catch {
+  status('Não foi possível verificar se a empresa pode receber contato.');
+  return;
+ }
+ reflectContact();
+ if (lastPublic !== item || $('openBusinessWhatsapp').disabled) return;
  window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(message), '_blank', 'noopener');
  status('WhatsApp aberto. Após enviar a mensagem, confirme o envio em Oportunidades.');
  if (!item.data.leadId) return;

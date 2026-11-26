@@ -134,7 +134,9 @@ p { margin: .55rem 0; color: var(--muted); line-height: 1.55; }
 .dashboard-grid > .panel > label { display: block; margin-top: .75rem; font-weight: 650; }
 .dashboard-grid textarea { width: 100%; }
 .dashboard-grid .panel .btn { margin-top: 5px; }
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 13px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+.commercial-metrics { min-width: 0; }
+.metrics-status { min-height: 1.4em; margin: 0 0 10px; font-size: .87rem; }
 .stat-card {
   display: flex;
   flex-direction: column;
@@ -148,12 +150,13 @@ p { margin: .55rem 0; color: var(--muted); line-height: 1.55; }
   background: #fff;
   text-decoration: none;
   color: var(--muted);
-  font-size: .83rem;
+  font-size: .9rem;
   font-weight: 660;
   overflow-wrap: anywhere;
 }
-.stat-card:hover { border-color: #8f7fde; color: var(--accent-dark); }
+a.stat-card:hover { border-color: #8f7fde; color: var(--accent-dark); }
 .stat-card strong { color: var(--ink); font-size: clamp(1.5rem, 4vw, 2.5rem); line-height: 1; letter-spacing: -.06em; font-variant-numeric: tabular-nums; }
+.stat-card small { font-size: .79rem; line-height: 1.4; font-weight: 400; }
 .funnel { display: grid; gap: 12px; margin-top: 16px; }
 .funnel .flex { font-size: .86rem; }
 .track { height: 7px; margin-top: 5px; border-radius: 99px; background: #e9eef9; overflow: hidden; }

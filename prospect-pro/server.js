@@ -3,6 +3,7 @@ import {publicationHtml, publicationIcon, readPublication, validSlug, previewPol
 import {readFile} from 'node:fs/promises';
 import {createStudioAi, studioOperator} from './studio-ai.js';
 import {createStudioBrand} from './studio-brand-api.js';
+import {createPrivateProposals} from './private-proposals.mjs';
 const port=process.env.PORT||3000;
 const LIMIT=50;
 // Cota persistente e atômica no Supabase, só para o operador autorizado.
@@ -32,6 +33,10 @@ const publicKey=process.env.SUPABASE_PUBLISHABLE_KEY||'';
 const authorizedOperator=studioOperator(endpoint,publicKey);
 const studioAi=createStudioAi({endpoint,publicKey,json,getToken,authorizedOperator});
 const studioBrand=createStudioBrand({json,getToken,authorizedOperator});
+const privateProposals=createPrivateProposals({
+ endpoint,serviceKey:process.env.SUPABASE_SECRET_KEY||process.env.SUPABASE_SERVICE_ROLE_KEY||'',
+ authorizedOperator,getToken
+});
 function queryPlaces({placeId,term,city,identity}) {
  const fields=['id','displayName','formattedAddress','websiteUri','internationalPhoneNumber','googleMapsUri'];
  if(identity)fields.push('googleMapsLinks.photosUri','attributions','regularOpeningHours.weekdayDescriptions');
@@ -87,6 +92,10 @@ async function publicationVersion(res, slug) {
 
 http.createServer(async(req,res)=>{
  const u=new URL(req.url,'http://localhost');
+ if(u.pathname==='/proposta'||u.pathname.startsWith('/proposta/')||
+   u.pathname==='/api/studio/proposals'||u.pathname.startsWith('/api/studio/proposals/')){
+  return privateProposals(req,res,u.pathname);
+ }
  if(u.pathname.startsWith('/api/studio/brand/'))return studioBrand(req,res,u.pathname);
  if(u.pathname.startsWith('/api/studio/ai/'))return studioAi(req,res,u.pathname);
  if(u.pathname.startsWith(versionPath)){
@@ -129,9 +138,11 @@ http.createServer(async(req,res)=>{
   '/biblioteca.css':['./biblioteca.css','text/css; charset=utf-8'],
   '/biblioteca.js':['./biblioteca.js','text/javascript; charset=utf-8'],
   '/biblioteca-data.js':['./biblioteca-data.js','text/javascript; charset=utf-8'],
+  '/studio-composition.js':['./studio-composition.js','text/javascript; charset=utf-8'],
   '/studio-flow.js':['./studio-flow.js','text/javascript; charset=utf-8'],
   '/studio-brand.js':['./studio-brand.js','text/javascript; charset=utf-8'],
   '/studio-publish.js':['./studio-publish.js','text/javascript; charset=utf-8'],
+  '/studio-private.js':['./studio-private.js','text/javascript; charset=utf-8'],
   '/studio-projects.js':['./studio-projects.js','text/javascript; charset=utf-8'],
   '/prospect-dashboard.css':['./prospect-dashboard.css','text/css; charset=utf-8'],
   '/instagram-archive.mjs':['./instagram-archive.mjs','text/javascript; charset=utf-8'],

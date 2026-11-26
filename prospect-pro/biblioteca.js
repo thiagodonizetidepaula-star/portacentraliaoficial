@@ -152,11 +152,13 @@ function start(id, project) {
   const isStock=window.ProspectImageLibrary.owners(selected.photo).length>0||selected.photo===old.photo;
   template={...detected,id:detected.id+'-studio-'+index,direction,layout:direction==='pratico'?'directory':direction==='experiencia'?(detected.layout==='immersive'?'artisan':'immersive'):detected.layout,photo:stock[index%stock.length]||detected.photo,photos:stock,detailPhoto:stock[(index+1)%stock.length]||'',motionStyle:old.motionStyle};
   selected.templateId=template.id;
-  if(selected.photoOrigin!=='business'&&selected.photoOrigin!=='generated'&&(!selected.photo||isStock)){selected.photo=template.photo;selected.photoOrigin='reference';}
+  if(!selected.sourcesOnly&&selected.photoOrigin!=='business'&&selected.photoOrigin!=='generated'&&(!selected.photo||isStock)){selected.photo=template.photo;selected.photoOrigin='reference';}
   const generic=value=>!value||String(value).trim().toLowerCase()===String(selected.industry).trim().toLowerCase()||value===old.headline||value===old.summary||value===old.profile?.story;
-  if(generic(selected.headline))selected.headline=detected.headline;
-  if(generic(selected.summary))selected.summary=detected.summary;
-  if(generic(selected.about))selected.about=detected.profile.story;
+  if(!selected.sourcesOnly){
+   if(generic(selected.headline))selected.headline=detected.headline;
+   if(generic(selected.summary))selected.summary=detected.summary;
+   if(generic(selected.about))selected.about=detected.profile.story;
+  }
   if(!selected.color||selected.color===old.accent)selected.color=detected.accent;
  }
  const preferred=selected.whatsapp||whatsappLinkNumber(selected.website);
@@ -867,7 +869,7 @@ function suppliedMap(value) {
 function servicesMarkup(list,profile,info,isSuggested) {
  const normalize=value=>text(value).toLocaleLowerCase('pt-BR');
  const supplied=new Map(fieldPairs(info.serviceDetails,8).map(([name,details])=>[normalize(name),details]));
- const details=profile.serviceDescriptions||{};
+ const details=info.sourcesOnly?{}:profile.serviceDescriptions||{};
  return '<section class="services section" id="servicos" aria-labelledby="service-title"><div class="container">'+
   '<div class="section-lead"><h2 id="service-title">'+esc(profile.services)+'</h2>'+
   (isSuggested?'<p class="content-reference">Opções ilustrativas do segmento. Confirme a disponibilidade com a empresa.</p>':'')+
@@ -1045,13 +1047,14 @@ const motionEnhancements="/* prospect-motion-v2 */\n@keyframes prospect-reveal{f
 const distinctCss="/* prospect-distinct-directions-v1 */\nbody.direction-assinatura .hero-button{border-radius:6px}\nbody.direction-assinatura .portfolio-strip{grid-template-columns:repeat(2,minmax(0,1fr))}\nbody.direction-assinatura .portfolio-strip img{border-radius:2px}\nbody.direction-assinatura .story-image{border-radius:2px}\nbody.direction-experiencia .hero-button{border-radius:100px}\nbody.direction-experiencia .portfolio-strip{grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(12px,2vw,28px)}\nbody.direction-experiencia .portfolio-strip img{border-radius:18px;aspect-ratio:4/5}\nbody.direction-pratico .hero-button{border-radius:10px}\nbody.direction-pratico .portfolio-strip{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}\nbody.direction-pratico .portfolio-strip img{border-radius:8px;aspect-ratio:5/3}\nbody.direction-pratico .hero.directory .hero-image{border-radius:12px}\n@keyframes distinct-editorial{from{opacity:.45;transform:translateY(16px)}to{opacity:1;transform:none}}\n@keyframes distinct-experience{from{opacity:.35;transform:scale(1.07)}to{opacity:1;transform:none}}\n@keyframes distinct-practical{from{opacity:.5;transform:translateX(-12px)}to{opacity:1;transform:none}}\n@media(prefers-reduced-motion:no-preference){\n body.direction-assinatura:not(.motion-none) .hero h1{animation:distinct-editorial .7s ease-out both}\n body.direction-experiencia:not(.motion-none) .hero h1{animation:distinct-experience .85s cubic-bezier(.16,.75,.22,1) both}\n body.direction-pratico:not(.motion-none) .hero h1{animation:distinct-practical .42s ease-out both}\n}\n@media(max-width:520px){body.direction-experiencia .portfolio-strip,body.direction-pratico .portfolio-strip{grid-template-columns:repeat(2,minmax(0,1fr))}}";
 function buildSite(info,t,{finalSite=false}={}) {
  const name=text(info.name)||t.example,kind=text(info.industry)||t.label;
+ const sourcesOnly=info.sourcesOnly===true;
  const showLocation=info.showLocation!==false;
  const city=showLocation?text(info.city):'',address=showLocation?text(info.address):'';
  const proposedHeadline=text(info.headline)||t.headline;
  const normal=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
  const duplicate=[name,'Conheça '+name,kind+' com '+name].some(s=>normal(s)===normal(proposedHeadline));
  const firstService=fieldLines(info.services,1)[0];
- const headline=duplicate?(firstService && normal(firstService)!==normal(name)?firstService:normal(kind)!==normal(name)?kind:'Conheça os serviços'):proposedHeadline;
+ const headline=sourcesOnly?(proposedHeadline||name):duplicate?(firstService && normal(firstService)!==normal(name)?firstService:normal(kind)!==normal(name)?kind:'Conheça os serviços'):proposedHeadline;
  const originalSummary=text(info.summary)||t.summary||'';
  const oldIntro=name+' atua no segmento de '+kind.toLowerCase()+(city?' em '+city:'')+'.';
  let summary=originalSummary.startsWith(oldIntro)?originalSummary.slice(oldIntro.length).trim():originalSummary;
@@ -1099,16 +1102,24 @@ function buildSite(info,t,{finalSite=false}={}) {
   if(whatsapp)faq.push(['Como iniciar uma conversa?','Na aba Contato, toque em Abrir WhatsApp para revisar sua mensagem e conversar com '+name+'.']);
  }
  const external=' target="_blank" rel="noopener noreferrer"';
- const requestedAction=text(info.cta);
- const heroAction=(!whatsapp&&!telephone&&/consultar disponibilidade|agendar|reservar/i.test(requestedAction)?'':requestedAction)||(whatsapp?profile.action:telephone?'Ligar para a empresa'
+ const customAction=text(info.cta);
+ const requestedAction=!whatsapp&&!telephone&&/consultar disponibilidade|agendar|reservar/i.test(customAction)?'':customAction;
+ const heroAction=requestedAction||(whatsapp?profile.action:telephone?'Ligar para a empresa'
   :hasServices?profile.services:map?'Ver localização':hasContact?'Ver contatos':'Conheça a empresa');
- const heroHref=whatsapp||(telephone?'tel:'+telephone:hasServices?'#servicos':hasContact?'#contato':'#sobre');
+ const defaultHeroHref=whatsapp||(telephone?'tel:'+telephone:hasServices?'#servicos':hasContact?'#contato':!sourcesOnly||text(info.about)?'#sobre':'');
+ const locationFirst=sourcesOnly&&direction==='pratico'&&map;
+ const servicesFirst=sourcesOnly&&direction==='assinatura'&&hasServices;
+ const heroHref=locationFirst?map:servicesFirst?'#servicos':defaultHeroHref;
+ const actionLabel=requestedAction||(
+  locationFirst?'Abrir no Google Maps':servicesFirst?'Conhecer '+serviceNav.toLocaleLowerCase('pt-BR'):
+  sourcesOnly&&heroHref===whatsapp&&whatsapp?'Falar no WhatsApp':heroAction
+ );
 
  const library=window.ProspectImageLibrary;
  const selectedImage=photo(info.photo),logo=photo(info.logo);
  const ownPhotos=[...new Set(fieldLines(info.brandGallery,12).map(photo).filter(Boolean))];
  const exclusive=t.exclusivePhotos===true;
- const sameSegment=exclusive?(Array.isArray(t.stockPhotos)?t.stockPhotos:[]):library?.select(base?.id||t.id,name+' '+city,new Set([selectedImage]),12)||[];
+ const sameSegment=sourcesOnly?[]:exclusive?(Array.isArray(t.stockPhotos)?t.stockPhotos:[]):library?.select(base?.id||t.id,name+' '+city,new Set([selectedImage]),12)||[];
  const stock=[...new Set(sameSegment.map(photo).filter(Boolean))];
  const owners=library?.owners(selectedImage)||[];
  const wrongStock=info.photoOrigin!=='business'&&info.photoOrigin!=='generated'&&owners.length&&(!base||!owners.includes(base.id));
@@ -1124,8 +1135,8 @@ function buildSite(info,t,{finalSite=false}={}) {
  const mainPhoto=image?'<img src="'+esc(image)+'" width="1200" height="900" decoding="async" fetchpriority="high" alt="'+esc(origin==='business'?'Foto de '+name:'Imagem ilustrativa de '+kind)+'">':'';
  const intro=[normal(kind)!==normal(headline)&&normal(kind)!==normal(name)?kind:'',city].filter(Boolean).join(' · ');
  const heroBody='<div class="hero-text">'+(intro?'<p class="eyebrow">'+esc(intro)+'</p>':'')+
-  '<h1>'+esc(headline)+'</h1>'+(summary&&normal(summary)!==normal(headline)?'<p class="hero-summary">'+esc(summary)+'</p>':'')+'<div class="hero-actions">'+
-  '<a class="hero-button" href="'+esc(heroHref)+'"'+(whatsapp?external:'')+'>'+esc(heroAction)+'</a></div></div>';
+  '<h1>'+esc(headline)+'</h1>'+(summary&&normal(summary)!==normal(headline)?'<p class="hero-summary">'+esc(summary)+'</p>':'')+
+  (heroHref?'<div class="hero-actions"><a class="hero-button" href="'+esc(heroHref)+'"'+(heroHref.startsWith('https://')?external:'')+'>'+esc(actionLabel)+'</a></div>':'')+'</div>';
  const layout=['editorial','technical','immersive','serene','artisan','kinetic','corporate','catalog','directory'].includes(t.layout)?t.layout:'corporate';
  const supportingPhoto=src=>src?'<img src="'+esc(src)+'" width="600" height="600" decoding="async" loading="lazy" alt="">':'';
  const supportIsIllustrative=[secondary,tertiary].filter(Boolean).some(src=>!ownPhotos.includes(src));
@@ -1133,14 +1144,16 @@ function buildSite(info,t,{finalSite=false}={}) {
  const heroImage=layout==='catalog'
   ?'<figure class="catalog-gallery">'+mainPhoto+supportingPhoto(secondary)+supportingPhoto(tertiary)+figureCaption(galleryCaption)+'</figure>'
   :'<figure class="hero-image">'+mainPhoto+figureCaption(imageCaption)+'</figure>';
- const hero='<section class="hero '+(layout==='catalog'?'catalog-hero':layout)+(image?'':' no-stock-photo')+'">'+heroBody+(image?heroImage:'')+'</section>';
+ const graphicHero=sourcesOnly&&!image&&direction;
+ const hero=graphicHero?'<section class="hero composition-hero">'+heroBody+window.ProspectComposition.graphic(direction)+'</section>':
+  '<section class="hero '+(layout==='catalog'?'catalog-hero':layout)+(image?'':' no-stock-photo')+'">'+heroBody+(image?heroImage:'')+'</section>';
 
  const serviceSection=hasServices?servicesMarkup(rawServices,profile,info,isSuggested):'';
  const about=text(info.about);
  const profileStory=text(profile.story);
  const storyCopy=about||[summary,profileStory!==summary&&!finalSite?profileStory:'',address&&finalSite?'Endereço: '+address:'',hours.length&&finalSite?'Atendimento: '+hours.join(' · '):''].filter(Boolean).join('\n');
  const storyPhoto=exclusive?(layout==='catalog'?supporting[2]:supporting[0])||'':ownPhotos.find(src=>src!==image)||ownPhotos[0]||secondary||(origin==='business'?image:'');
- const story=storyMarkup(isMenu?'Nossa cozinha':'Sobre a empresa',
+ const story=sourcesOnly&&!about?'':storyMarkup(isMenu?'Nossa cozinha':'Sobre a empresa',
   storyCopy||'Entre em contato para conhecer o atendimento de '+name+'.',
   storyPhoto,ownPhotos.includes(storyPhoto)||(origin==='business'&&storyPhoto===image));
  const galleryCandidates=[...new Map([...ownPhotos,...supporting,image].filter(Boolean).map(url=>[imageKey(url),url])).values()];
@@ -1183,7 +1196,7 @@ function buildSite(info,t,{finalSite=false}={}) {
    channelLinks.map(link=>'<li>'+link+'</li>').join('')+'</ul></div>'
   :'';
  const contactHtml=hasContact
-  ?'<section class="contact" id="contato" aria-labelledby="contact-title"><div class="container">'+
+  ?'<section class="contact'+(sourcesOnly&&direction==='pratico'?' composition-contact-compact':'')+'" id="contato" aria-labelledby="contact-title"><div class="container">'+
    '<div class="contact-heading"><h2 id="contact-title">'+esc(
     whatsapp||channelLinks.length?profile.contact||'Fale com '+name:'Informações para sua visita'
    )+'</h2>'+
@@ -1212,7 +1225,7 @@ function buildSite(info,t,{finalSite=false}={}) {
   (info.buttonStyle==='pill'?'.hero-button,.cta-button,.nav-cta{border-radius:100px!important}':'')+
   (info.buttonStyle==='square'?'.hero-button,.cta-button,.nav-cta{border-radius:0!important}':'')+
   (info.motionStyle==='none'?'html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}':'');
- const areas=[['inicio','Início'],...(hasServices?[['servicos',serviceNav]]:[]),['sobre','Sobre'],
+ const areas=[['inicio','Início'],...(hasServices?[['servicos',serviceNav]]:[]),...(story?[['sobre','Sobre']]:[]),
   ...(portfolio?[['galeria','Galeria']]:[]),...(faq.length?[['perguntas','Dúvidas']]:[]),...(hasContact?[['contato','Contato']]:[])];
  const siteNav=areas.map(([id,label])=>'<a href="#'+id+'"'+(id==='contato'?' class="nav-cta"':'')+'>'+label+'</a>').join('');
  const navigationCss=[
@@ -1223,10 +1236,11 @@ function buildSite(info,t,{finalSite=false}={}) {
   '@media(max-width:760px){.site-header.container{display:block;padding:8px 16px 4px}.site-header .brand{min-height:32px;display:flex;align-items:center}.site-header nav{justify-content:flex-start;gap:0 14px}.site-header nav a,.site-header nav a:not(:last-child){display:inline-flex;min-height:40px;font-size:14px}.site-header .nav-cta{background:transparent;color:inherit;padding:0;min-height:40px}.brand-logo{max-height:34px;width:auto}main,main>section[id]{scroll-margin-top:152px}}',
   '@media print{main:has(>section:target)>section:not(:target){display:block}.site-header.container{position:static}.site-header nav{display:none}}'
  ].join('');
- const pageStyle=font.rule+css+
+ const pageStyle=(graphicHero?'':font.rule)+css+
   ':root{--accent:'+accent+';--surface:'+bg+';--ink:'+ink+';--dark:'+dark+
-  ';--buttonInk:'+buttonInk+';--muted:'+muted+';--line:'+line+';--display:'+font.family+
-  ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+navigationCss+motionCss +qualityCss+motionEnhancements+distinctCss+'.hero.no-stock-photo{display:block!important;height:auto!important;min-height:0!important;background:var(--surface);color:var(--ink);padding:0}.hero.no-stock-photo::after{display:none}.hero.no-stock-photo .hero-text{position:relative!important;inset:auto!important;padding:clamp(28px,7vw,90px);max-width:100%;text-align:left}'+designOverrides;
+  ';--buttonInk:'+buttonInk+';--muted:'+muted+';--line:'+line+';--display:'+(graphicHero?'system-ui,sans-serif':font.family)+
+  ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+navigationCss+motionCss +qualityCss+motionEnhancements+distinctCss+'.hero.no-stock-photo{display:block!important;height:auto!important;min-height:0!important;background:var(--surface);color:var(--ink);padding:0}.hero.no-stock-photo::after{display:none}.hero.no-stock-photo .hero-text{position:relative!important;inset:auto!important;padding:clamp(28px,7vw,90px);max-width:100%;text-align:left}'+
+  (sourcesOnly?window.ProspectComposition.styles:'')+designOverrides;
 
  const title=name;
  const brandLogo=brandImage(logo);
@@ -1248,14 +1262,16 @@ function buildSite(info,t,{finalSite=false}={}) {
 
  return '<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'+
   '<meta name="theme-color" content="'+bg+'"><meta name="description" content="'+esc(meta)+'">'+
+  (sourcesOnly&&!finalSite?'<meta name="robots" content="noindex,nofollow,noarchive">':'')+
   '<title>'+esc(title)+'</title>'+favicon+social+
   '<script type="application/ld+json">'+schemaSafe+'</script><style>'+pageStyle+'</style></head>'+
-  '<body class="variant-'+variant+(direction?' direction-'+direction:'')+spacing+' art-'+art+' motion-'+(['strong','none'].includes(info.motionStyle)?info.motionStyle:'soft')+'" data-direction="'+direction+'">'+
+  '<body class="variant-'+variant+(direction?' direction-'+direction:'')+spacing+' art-'+art+(sourcesOnly?' composition composition-'+art:'')+' motion-'+(['strong','none'].includes(info.motionStyle)?info.motionStyle:'soft')+'" data-direction="'+direction+'">'+
   '<a class="skip-link" href="#inicio">Ir para o conteúdo</a>'+
   '<header class="site-header container"><a class="brand" href="#inicio">'+
   (logo?'<img class="brand-logo" src="'+esc(logo)+'" width="140" height="52" alt="'+esc(name)+'">':esc(name))+'</a><nav aria-label="Navegação principal">'+siteNav+'</nav></header>'+
-  '<main id="inicio">'+hero+sections+portfolio+(faq.length?faqMarkup(faq):'')+contactHtml+'</main>'+
-  '<footer class="footer container"><span>© '+new Date().getFullYear()+' '+esc(name)+' — Todos os direitos reservados.</span>'+
+  '<main id="inicio">'+hero+(sourcesOnly&&direction==='pratico'?contactHtml+sections:sections)+portfolio+(faq.length?faqMarkup(faq):'')+(sourcesOnly&&direction==='pratico'?'':contactHtml)+'</main>'+
+  '<footer class="footer container"><span>'+(sourcesOnly?esc(name):'© '+new Date().getFullYear()+' '+esc(name)+' — Todos os direitos reservados.')+'</span>'+
+  (sourcesOnly&&!finalSite?'<span class="site-footer-label">Prévia de design</span>':'')+
   (Array.isArray(info.brandSources)&&info.brandSources.includes('https://docs.overturemaps.org/guides/places/')?'<a href="https://docs.overturemaps.org/attribution/"'+external+'>Dados de locais · Overture Maps</a>':'')+
   '</footer></body></html>';
 }

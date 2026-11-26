@@ -21,6 +21,11 @@ const templateKey = 'prospect_pro_template';
 const sessionKey = 'prospect_publisher_session_v1';
 const defaultTemplate = $('#tpl').value;
 let leads = readList(leadsKey);
+let proposalMetrics = null;
+let cloudProjectIds = null;
+let savedSearchIds = [];
+const sessionSearchIds = new Set();
+const percent = new Intl.NumberFormat('pt-BR', { style: 'percent', maximumFractionDigits: 1 });
 let currentScreen;
 let onConfirm;
 let modalOpener;
@@ -82,6 +87,7 @@ function page(name, { push = true, focus = true } = {}) {
   document.title = heading + ' | Portal Prospect PRO';
   setMenuOpen(false);
   render();
+  if (screen === 'dashboard') void window.PortalCRM?.refreshMetrics();
   if (focus) {
     window.scrollTo(0, 0);
     $('#title').focus({ preventScroll: true });
@@ -96,20 +102,57 @@ function progressRow(label, count, total) {
   </div>`;
 }
 
+function hasPrivateProposal(id) {
+  return Boolean(proposalMetrics?.some(item => String(item.lead_id) === String(id)));
+}
+
+function activePrivateProposal(id) {
+  const now = Date.now();
+  // The server returns the newest proposals first.
+  return proposalMetrics?.find(item => String(item.lead_id) === String(id)
+    && !item.revoked_at && !item.refused_at && Date.parse(item.expires_at) > now);
+}
+
+function contactRefused(lead) {
+  return Boolean(lead.privateProposalRefusedAt
+    || proposalMetrics?.some(item => item.refused_at && String(item.lead_id) === String(lead.id)));
+}
+
+function contactBlocked(lead) {
+  return !lead || lead.optedOut || lead.archivedAt || ['Não contatar', 'Arquivado'].includes(lead.stage) || contactRefused(lead);
+}
+
 function renderOverview() {
   const noWebsite = leads.filter(lead => !window.ProspectLinks.hasWebsite(lead)).length;
-  const sent = leads.filter(lead => lead.proposalSentAt).length;
-  const won = leads.filter(lead => lead.stage === 'Fechado').length;
+  const sentLeads = leads.filter(lead => lead.proposalSentAt);
+  const wonLeads = leads.filter(lead => lead.stage === 'Fechado');
+  const projects = new Set([
+    ...(cloudProjectIds || []),
+    ...readList('prospect_library_projects').map(project => project.id).filter(Boolean)
+  ]);
+  const found = new Set([...savedSearchIds, ...sessionSearchIds]);
+  const now = Date.now();
+  const countProposals = predicate => proposalMetrics?.filter(predicate).length ?? '—';
+  const interested = proposalMetrics && new Set(proposalMetrics.filter(item => item.interested_at && !item.refused_at)
+    .map(item => item.lead_id)).size;
+  const conversion = sentLeads.length ? percent.format(sentLeads.filter(lead => lead.stage === 'Fechado').length / sentLeads.length) : '—';
   const metrics = [
-    [leads.length, 'Empresas cadastradas', 'leads'],
-    [noWebsite, 'Sem site informado', 'leads', 'no'],
-    [sent, 'Propostas enviadas', 'sent'],
-    [won, 'Negócios fechados', 'pipeline']
+    [found.size, 'Empresas encontradas', 'search', 'Resultados únicos desta sessão e das últimas 30 buscas salvas.'],
+    [projects.size, 'Sites criados', '/studio?view=projects', cloudProjectIds ? 'Projetos salvos no Studio.' : 'Projetos salvos neste navegador.'],
+    [sentLeads.length, 'Propostas enviadas', 'sent', 'Envios confirmados no CRM, um por empresa.'],
+    [countProposals(item => item.viewed_at), 'Propostas visualizadas', null, 'Links privados abertos ao menos uma vez.'],
+    [interested ?? '—', 'Clientes interessados', null, 'Empresas que escolheram prosseguir.'],
+    [countProposals(item => item.refused_at), 'Propostas recusadas', null, 'Recusas registradas pelo link privado.'],
+    [countProposals(item => !item.refused_at && !item.revoked_at && Date.parse(item.expires_at) <= now), 'Propostas expiradas', null, 'Links privados que chegaram ao fim da validade.'],
+    [wonLeads.length, 'Vendas realizadas', 'pipeline', 'Empresas na etapa Fechado.'],
+    [conversion, 'Taxa de conversão', null, 'Empresas fechadas entre as que receberam uma proposta.']
   ];
-  $('#stats').innerHTML = metrics.map(([count, label, target, filter]) => `
-    <a class="stat-card" href="${screenHref(target)}" data-go="${target}" ${filter ? 'data-filter="' + filter + '"' : ''}>
-      <span>${label}</span><strong>${count}</strong>
-    </a>`).join('');
+  $('#stats').innerHTML = metrics.map(([count, label, target, description]) => {
+    const content = `<span>${label}</span><strong>${count}</strong><small>${description}</small>`;
+    if (!target) return `<div class="stat-card">${content}</div>`;
+    if (target.startsWith('/')) return `<a class="stat-card" href="${target}">${content}</a>`;
+    return `<a class="stat-card" href="${screenHref(target)}" data-go="${target}">${content}</a>`;
+  }).join('');
   $('#radar').innerHTML = progressRow('Sem site informado', noWebsite, leads.length)
     + progressRow('Com site informado', leads.length - noWebsite, leads.length);
 
@@ -161,8 +204,10 @@ function renderLeadRows() {
     const id = esc(lead.id);
     const name = esc(lead.name);
     const previewUrl = window.ProspectLinks.previewUrl(lead.previewSlug || localSlugs.get(String(lead.id)));
-    const canContact = lead.stage !== 'Arquivado' && lead.stage !== 'Não contatar' && !lead.optedOut;
-    const editableStages = stages.filter(stage => stage !== 'Proposta enviada' || lead.proposalSentAt || lead.stage === stage);
+    const refusalRecorded = contactRefused(lead);
+    const editableStages = refusalRecorded
+      ? ['Não contatar']
+      : stages.filter(stage => stage !== 'Proposta enviada' || lead.proposalSentAt || lead.stage === stage);
     const options = editableStages.map(stage => `<option${(lead.stage || 'Novo') === stage ? ' selected' : ''}>${stage}</option>`).join('');
     const details = [lead.category, lead.address || lead.city].filter(Boolean).map(esc).join(' · ');
     const whatsapp=window.ProspectLinks.whatsappNumber(lead);
@@ -171,12 +216,12 @@ function renderLeadRows() {
       <td><strong>${name}</strong>${details ? '<div class="lead-meta muted">' + details + '</div>' : ''}</td>
       <td data-label="Contato">${esc(lead.phone || (whatsapp ? '' : '—'))}${contactLine}</td>
       <td data-label="Site">${websiteTag(lead)}</td>
-      <td data-label="Etapa"><select data-stage="${id}" aria-label="Etapa de ${name}">${options}</select></td>
+      <td data-label="Etapa"><select data-stage="${id}" aria-label="Etapa de ${name}"${refusalRecorded ? ' disabled' : ''}>${options}</select></td>
       <td><div class="actions">
         <button class="mini primary" type="button" data-site="${id}">Criar 3 sites</button>
         <button class="mini" type="button" data-edit="${id}">Editar empresa</button>
         ${previewUrl ? '<a class="mini" target="_blank" rel="noopener noreferrer" href="' + esc(previewUrl) + '">Ver prévia</a>' : ''}
-        ${canContact ? '<button class="mini" type="button" data-wa="' + id + '">Preparar mensagem</button>' : ''}
+        ${contactBlocked(lead) ? '' : '<button class="mini" type="button" data-wa="' + id + '">Preparar mensagem</button>'}
       </div></td>
     </tr>`;
   }).join('') || '<tr><td colspan="5" class="empty">Nenhuma empresa neste filtro.</td></tr>';
@@ -340,11 +385,12 @@ $('#leadRows').addEventListener('change', event => {
   const lead = leads.find(item => String(item.id) === id);
   if (!lead) return;
   lead.stage = event.target.value;
-  lead.optedOut = lead.stage === 'Não contatar';
+  lead.optedOut = lead.stage === 'Não contatar' || contactRefused(lead);
   lead.archivedAt = lead.stage === 'Arquivado' ? lead.archivedAt || new Date().toISOString() : null;
   save();
 });
 $('#tpl').value = readTemplate();
+$('#refreshCommercial').addEventListener('click', () => void window.PortalCRM?.refreshCommercial());
 $('#saveTpl').addEventListener('click', () => {
   try {
     localStorage.setItem(templateKey, $('#tpl').value.trim() || defaultTemplate);

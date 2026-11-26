@@ -7,6 +7,7 @@ const plain=s=>String(s||'').trim();
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let cfg=null,account=null,cloudRows=new Map(),persistTimer=null,syncing=false,bookmarks=[];
 let loadingCRM=null,pendingPersist=false;
+let metricsRequest;
 let statusText='Dados locais — faça login para sincronizar com a nuvem.';
 function inform(text){statusText=text;const node=el('crmSyncStatus');if(node)node.textContent=text;}
 function token(){try{return JSON.parse(sessionStorage.getItem(KEY)||'null')?.access_token||''}catch{return ''}}
@@ -22,7 +23,7 @@ async function request(path,method='GET',body,prefer){
  const headers={apikey:c.publishableKey,Authorization:'Bearer '+jwt};
  if(body!==undefined)headers['Content-Type']='application/json';
  if(prefer)headers.Prefer=prefer;
- const r=await fetch(c.supabaseUrl+path,{method,headers,body:body===undefined?undefined:JSON.stringify(body),cache:'no-store'});
+ const r=await fetch(c.supabaseUrl+path,{method,headers,body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',signal:AbortSignal.timeout(10000)});
  let j=null;const t=await r.text();if(t){try{j=JSON.parse(t)}catch{j={message:t}}}
  if(!r.ok)throw Error(j?.message||j?.error||('Erro '+r.status));
  return j;
@@ -52,7 +53,8 @@ const fromRow=r=>({
  city:r.city,phone:r.phone,whatsapp:r.whatsapp||'',whatsappUsePhone:r.whatsapp_use_phone!==false,address:r.address,website:r.website,
  stage:r.stage,origin:r.origin,previewSlug:r.preview_slug||'',
  proposalSentAt:r.proposal_sent_at,messageOpenedAt:r.message_opened_at,archivedAt:r.archived_at,
- optedOut:!!r.opted_out,operatorConfirmed:!!r.operator_confirmed,notes:r.notes,
+ optedOut:!!r.opted_out,privateProposalRefusedAt:r.private_proposal_refused_at||null,
+ operatorConfirmed:!!r.operator_confirmed,notes:r.notes,
  updatedAt:r.updated_at
 });
 function approved(l){return !!(l.name&&(l.operatorConfirmed||(!l.googleId&&l.origin!=='google-places')))}
@@ -90,16 +92,21 @@ function decorated(){
    const stageSelect=tr.querySelector('[data-stage]');if(!stageSelect)continue;
    const l=find(stageSelect.dataset.stage);if(!l)continue;
    const td=tr.querySelector('td:first-child');if(!td)continue;
-   const notice=l.proposalSentAt?'✓ Proposta enviada em '+new Date(l.proposalSentAt).toLocaleDateString('pt-BR'):
+   const refusal = contactRefused(l);
+   const privateProposal = !contactBlocked(l) && activePrivateProposal(l.id);
+   const notice=refusal?'Contato recusado pela empresa':l.proposalSentAt?'✓ Proposta enviada em '+new Date(l.proposalSentAt).toLocaleDateString('pt-BR'):
     l.messageOpenedAt?'WhatsApp aberto — envio ainda não confirmado':
-    l.previewSlug?'Site publicado · mensagem pendente':'Aguardando proposta';
+    privateProposal?'Link privado ativo':hasPrivateProposal(l.id)?'Proposta privada no histórico':l.previewSlug?'Site publicado · mensagem pendente':'Aguardando proposta';
    td.insertAdjacentHTML('beforeend','<div class="crm-lead-note '+(l.proposalSentAt?'crm-sent':'')+'">'+escape(notice)+'</div>');
    const actions=tr.querySelector('.actions');
    if(actions){
     if(l.proposalSentAt)actions.insertAdjacentHTML('beforeend','<button class="mini" data-crm-sent="'+escape(l.id)+'">✓ Enviada</button>');
-    else if(l.previewSlug||l.messageOpenedAt)actions.insertAdjacentHTML('beforeend','<button class="mini" data-crm-confirm="'+escape(l.id)+'">Confirmar envio</button>');
-    if(l.stage==='Arquivado')actions.insertAdjacentHTML('beforeend','<button class="mini" data-crm-restore="'+escape(l.id)+'">Restaurar</button>');
-    else actions.insertAdjacentHTML('beforeend','<button class="mini" data-crm-archive="'+escape(l.id)+'">Arquivar</button>');
+    else if(hasPrivateProposal(l.id)||l.previewSlug||l.messageOpenedAt)actions.insertAdjacentHTML('beforeend','<button class="mini" data-crm-confirm="'+escape(l.id)+'">Confirmar envio</button>');
+    if(privateProposal)actions.insertAdjacentHTML('beforeend','<button class="mini" type="button" data-crm-revoke="'+escape(l.id)+'">Revogar link privado</button>');
+    if(!refusal){
+     if(l.stage==='Arquivado')actions.insertAdjacentHTML('beforeend','<button class="mini" data-crm-restore="'+escape(l.id)+'">Restaurar</button>');
+     else actions.insertAdjacentHTML('beforeend','<button class="mini" data-crm-archive="'+escape(l.id)+'">Arquivar</button>');
+    }
     if(l.origin==='google-places'&&!l.operatorConfirmed)actions.insertAdjacentHTML('beforeend','<button class="mini" data-crm-review="'+escape(l.id)+'">Confirmar dados</button>');
    }
   }
@@ -109,15 +116,16 @@ function decorated(){
  document.querySelectorAll('[data-crm-archive]').forEach(e=>e.onclick=()=>archive(e.dataset.crmArchive));
  document.querySelectorAll('[data-crm-restore]').forEach(e=>e.onclick=()=>restore(e.dataset.crmRestore));
  document.querySelectorAll('[data-crm-review]').forEach(e=>e.onclick=()=>reviewOld(e.dataset.crmReview));
+ document.querySelectorAll('[data-crm-revoke]').forEach(e=>e.onclick=()=>revokePrivate(e.dataset.crmRevoke));
  renderSent();
  inform(statusText);
 }
 rememberState();
 render=function(){originalRender();decorated()};
 function find(id){return leads.find(l=>String(l.id)===String(id))}
-function archive(id){const l=find(id);if(!l)return;if(!confirm('Arquivar '+l.name+'? Ela sairá da lista de oportunidades ativas, mas continuará no histórico.'))return;l.stage='Arquivado';l.archivedAt=new Date().toISOString();save()}
+function archive(id){const l=find(id);if(!l||contactRefused(l))return;if(!confirm('Arquivar '+l.name+'? Ela sairá da lista de oportunidades ativas, mas continuará no histórico.'))return;l.stage='Arquivado';l.archivedAt=new Date().toISOString();save()}
 function restore(id){
- const l=find(id);if(!l)return;
+ const l=find(id);if(!l||contactRefused(l))return;
  if(l.optedOut)l.stage='Não contatar';
  else if(l.proposalSentAt)l.stage='Proposta enviada';
  else if(l.messageOpenedAt)l.stage='Proposta pronta';
@@ -129,14 +137,42 @@ function reviewOld(id){
  const l=find(id);if(!l)return;
  confirmGoogleLead(l,l.category,()=>{l.operatorConfirmed=true;save()},true);
 }
+
+function revokePrivate(leadId) {
+ const lead = find(leadId);
+ const proposal = activePrivateProposal(leadId);
+ if (contactBlocked(lead) || !proposal) return;
+ modal('Revogar link privado', '<p>O link de <strong>' + escape(lead.name)
+  + '</strong> será desativado e as três prévias serão excluídas.</p>', async () => {
+  const accessToken = token();
+  if (!accessToken) return modalError('Entre na sua conta para revogar o link.');
+  const submission = el('confirm');
+  const message = el('modalBody').firstElementChild;
+  submission.disabled = true;
+  try {
+   await privateRequest(accessToken, `/${encodeURIComponent(proposal.id)}/revoke`, 'POST');
+   if (token() !== accessToken) return;
+   proposal.revoked_at = new Date().toISOString();
+   if (message.isConnected && !el('modal').classList.contains('hidden')) closeModal();
+   metricsRequest = null;
+   render();
+   await refreshMetrics();
+   if (token() === accessToken) inform('Link privado revogado. As três prévias foram excluídas.');
+  } catch (error) {
+   if (message.isConnected && !el('modal').classList.contains('hidden')) modalError(error.message);
+  } finally {
+   submission.disabled = false;
+  }
+ }, { confirm: 'Revogar e excluir prévias' });
+}
 function confirmSent(id){
  const l=find(id);if(!l)return;
  if(l.proposalSentAt){alert('Já existe um registro de proposta enviada para esta empresa.');return}
- if(!l.previewSlug&&!publishedLink(id)){alert('Publique uma prévia de site antes de registrar uma proposta enviada.');return}
+ if(!hasPrivateProposal(id)&&!l.previewSlug&&!publishedLink(id)){alert('Crie uma proposta antes de registrar o envio.');return}
  modal('Confirmar proposta enviada','<p>Marque como enviada <strong>somente se você já clicou em Enviar no WhatsApp</strong>. Abrir a conversa não confirma a entrega.</p><p>Empresa: <strong>'+escape(l.name)+'</strong></p><p>O registro ficará salvo com a data de hoje e aparecerá na aba Propostas enviadas.</p><label><input id="sent-confirm-checkbox" type="checkbox" style="width:auto"> Confirmo que enviei a mensagem para a empresa</label>',()=>{
   if(!el('sent-confirm-checkbox')?.checked)return modalError('Confirme que realmente enviou a mensagem.');
   l.proposalSentAt=new Date().toISOString();
-  if(l.stage!=='Arquivado'&&l.stage!=='Não contatar')l.stage='Proposta enviada';
+  if(!contactBlocked(l))l.stage='Proposta enviada';
   save();closeModal();
  },{confirm:'Registrar envio'});
 }
@@ -151,28 +187,63 @@ function publishedLink(id){
 }
 function composeMessage(id){
  const l=find(id);if(!l)return;
- if(l.optedOut||l.stage==='Não contatar'||l.stage==='Arquivado')return alert('Esta oportunidade está arquivada ou sinalizada para não receber propostas.');
+ if(contactBlocked(l))return alert('Esta oportunidade está arquivada ou sinalizada para não receber propostas.');
  if(l.proposalSentAt){
   modal('Proposta já enviada','<p>Uma proposta para <strong>'+escape(l.name)+'</strong> já foi registrada como enviada em '+escape(new Date(l.proposalSentAt).toLocaleString('pt-BR'))+'.</p>',closeModal,{confirm:'Entendi'});return;
  }
- const link=publishedLink(id);
+ const link=hasPrivateProposal(id) ? null : publishedLink(id);
  if(!link){
-  modal('Site ainda não publicado','<p>Escolha uma proposta no estúdio e publique a prévia. O link será incluído na mensagem.</p>',()=>openStudioForLead(l),{confirm:'Ir para o estúdio'});
+  modal('Preparar um link privado','<p>No Studio, gere três opções e selecione Preparar link privado para abrir a mensagem comercial.</p>',()=>openStudioForLead(l),{confirm:'Ir para o Studio'});
   return;
  }
  const number=window.ProspectLinks.whatsappNumber(l);
  if(!number){alert('Informe o WhatsApp com DDD em Editar empresa.');return}
  const msg=formatProposalMessage(l,link);
  modal('Mensagem personalizada · '+l.name,
-  '<p>Confira os dados e o link. Esta ação apenas <strong>abre o WhatsApp com a mensagem pronta</strong>, sem enviar automaticamente.</p><textarea id="message">'+escape(msg)+'</textarea><label><input id="permit" type="checkbox" style="width:auto"> Tenho motivo legítimo para contatar esta empresa e respeitarei qualquer recusa.</label>'+
-  '<p class="muted">Depois de enviar no WhatsApp, volte à aba Oportunidades e clique em <strong>Confirmar envio</strong>. Nenhum envio é presumido.</p>',()=>{
-   if(!el('permit')?.checked)return modalError('Confirme que o contato é apropriado antes de prosseguir.');
-   const url='https://wa.me/'+number+'?text='+encodeURIComponent(el('message').value);
-   window.open(url,'_blank','noopener,noreferrer');
-   l.messageOpenedAt=new Date().toISOString();
-   if(['Novo','Em análise','Site criado'].includes(l.stage))l.stage='Proposta pronta';
-   save();closeModal();
-  },{confirm:'Abrir WhatsApp'});
+  '<p>Confira os dados e o link. A mensagem será aberta no WhatsApp para envio manual.</p><textarea id="message" aria-label="Mensagem para a empresa">'+escape(msg)+'</textarea><label><input id="permit" type="checkbox" style="width:auto"> A empresa autorizou previamente o contato comercial por WhatsApp no número +'+escape(number)+'.</label>'+
+  '<p class="muted">Depois de enviar, volte a Oportunidades e clique em <strong>Confirmar envio</strong>.</p>',
+  () => openAuthorizedWhatsApp(l, number), {confirm:'Abrir WhatsApp'});
+}
+
+async function openAuthorizedWhatsApp(lead, number) {
+ const consent = el('permit');
+ if (!consent?.checked) return modalError('Confirme a autorização prévia da empresa para continuar.');
+ const message = el('message').value.trim();
+ if (!message) return modalError('Preencha a mensagem antes de abrir o WhatsApp.');
+ if (contactBlocked(lead)) return modalError('Esta oportunidade está bloqueada para contato.');
+ const accessToken = token();
+ if (!accessToken) return modalError('Entre na sua conta para verificar se a empresa permite contato.');
+ const popup = window.open('', '_blank');
+ if (!popup) return modalError('Permita a abertura de uma nova aba para continuar.');
+ popup.opener = null;
+ const submit = el('confirm');
+ submit.disabled = true;
+ try {
+  const query = new URLSearchParams({ id: `eq.${lead.id}`, select: 'id,opted_out,archived_at,stage', limit: '1' });
+  const [row] = await request('/rest/v1/prospect_crm_leads?' + query);
+  if (token() !== accessToken || !consent.isConnected || el('modal').classList.contains('hidden')) return popup.close();
+  const current = find(lead.id);
+  if (row?.id !== lead.id || contactBlocked(fromRow(row)) || contactBlocked(current)) {
+   popup.close();
+   if (current && row?.id === current.id && row.opted_out) {
+    current.optedOut = true;
+    current.stage = row.stage;
+    save();
+   }
+   return modalError('Esta oportunidade está bloqueada ou não pôde ser confirmada na nuvem.');
+  }
+  if (popup.closed) return;
+  popup.location.replace('https://wa.me/'+number+'?text='+encodeURIComponent(message));
+  current.messageOpenedAt = new Date().toISOString();
+  if (['Novo', 'Em análise', 'Site criado'].includes(current.stage)) current.stage = 'Proposta pronta';
+  save();
+  closeModal();
+ } catch {
+  popup.close();
+  if (consent.isConnected && !el('modal').classList.contains('hidden')) modalError('Não foi possível verificar o contato. Tente novamente.');
+ } finally {
+  submit.disabled = false;
+ }
 }
 function confirmGoogleLead(x,category,callback,existing=false,searchCity='',placeId=x?.googleId){
  const source=x||{};
@@ -219,8 +290,19 @@ async function syncChanges(){
   const rows=leads.filter(approved).map(l=>toRow(l,account));
   const delta=rows.filter(r=>{const remote=cloudRows.get(r.id);return !remote||Date.parse(r.updated_at)>Date.parse(remote.updated_at||'1970-01-01')});
   if(delta.length){
-   await request('/rest/v1/prospect_crm_leads?on_conflict=id','POST',delta,'resolution=merge-duplicates,return=representation');
-   for(const row of delta)cloudRows.set(row.id,row);
+   const saved = await request('/rest/v1/prospect_crm_leads?on_conflict=id','POST',delta,'resolution=merge-duplicates,return=representation');
+   let blocked = false;
+   for (const row of saved || []) {
+    cloudRows.set(row.id, row);
+    const lead = find(row.id);
+    if (lead && row.opted_out && (!lead.optedOut || lead.stage !== row.stage || (row.private_proposal_refused_at && !lead.privateProposalRefusedAt))) {
+     lead.optedOut = true;
+     lead.stage = row.stage;
+     if (row.private_proposal_refused_at) lead.privateProposalRefusedAt = row.private_proposal_refused_at;
+     blocked = true;
+    }
+   }
+   if (blocked) { rememberState(); originalSave(); }
   }
   inform('Sincronizado com Supabase · '+rows.length+' oportunidades confirmadas salvas.');
  }catch(e){inform('Armazenamento local ativo · falha na nuvem: '+e.message)}
@@ -237,24 +319,30 @@ function sync(){
 async function loadCRM(){
  try{
   const authorized=await authorize();
-  if(account?.id!==authorized?.id)cloudRows.clear();
+  if(account?.id!==authorized?.id) { cloudRows.clear(); savedSearchIds = []; }
   account=authorized;
-  if(!account){inform('Entre com sua conta para recuperar as oportunidades da nuvem.');return}
+  if(!account){inform('Entre com sua conta para recuperar as oportunidades da nuvem.');return false}
   const rows=await request('/rest/v1/prospect_crm_leads?select=*&order=updated_at.desc&limit=1000');
   for(const row of rows||[]){
    cloudRows.set(row.id,row);
    const i=leads.findIndex(l=>l.id===row.id);
    if(i<0)leads.push(fromRow(row));
    else if(Date.parse(row.updated_at||'1970-01-01')>=Date.parse(leads[i].updatedAt||'1970-01-01'))leads[i]={...leads[i],...fromRow(row)};
+   else if (row.private_proposal_refused_at) Object.assign(leads[i], {
+    optedOut: true, stage: 'Não contatar', privateProposalRefusedAt: row.private_proposal_refused_at
+   });
   }
   // Preserve existing manually confirmed local records from the older version.
   rememberState();originalSave();
-  await syncChanges();await loadHistory();
- }catch(e){inform('Falha ao recuperar oportunidades: '+e.message)}
+  await syncChanges();await refreshMetrics();
+  return true;
+ }catch(e){inform('Falha ao recuperar oportunidades: '+e.message);return false}
 }
 async function recordSearch(term,city,rows){
  const ids=[...new Set((rows||[]).map(x=>plain(x.googleId)).filter(Boolean))].slice(0,20);
  if(!ids.length)return;
+ for (const id of ids) sessionSearchIds.add(id);
+ renderOverview();
  if(!account){try{account=await authorize()}catch{}}
  if(!account)return;
  try{
@@ -264,10 +352,69 @@ async function recordSearch(term,city,rows){
 }
 async function loadHistory(){
  if(!account)return;
+ const accessToken = token();
  try{
   const result=await request('/rest/v1/prospect_search_bookmarks?select=id,search_term,search_city,place_ids,created_at&order=created_at.desc&limit=30');
+  if (token() !== accessToken) return;
   bookmarks=Array.isArray(result)?result:[];renderHistory();
+  savedSearchIds = bookmarks.flatMap(bookmark => Array.isArray(bookmark.place_ids) ? bookmark.place_ids : []);
+  renderOverview();
  }catch(e){inform('Não foi possível carregar o histórico de buscas: '+e.message)}
+}
+
+async function privateRequest(accessToken, suffix = '', method = 'GET') {
+ const response = await fetch('/api/studio/proposals' + suffix, {
+  method, headers: { Authorization: 'Bearer ' + accessToken }, cache: 'no-store', signal: AbortSignal.timeout(10000)
+ });
+ const result = await response.json().catch(() => ({}));
+ if (!response.ok) throw Error(result.error || 'O serviço de propostas está indisponível.');
+ return result;
+}
+
+function refreshMetrics() {
+ const accessToken = token();
+ const status = el('commercialStatus');
+ if (!accessToken) {
+  metricsRequest = null;
+  proposalMetrics = cloudProjectIds = null;
+  savedSearchIds = [];
+  el('refreshCommercial').removeAttribute('aria-busy');
+  status.textContent = 'Entre na sua conta para consultar projetos e propostas na nuvem.';
+  renderOverview();
+  return Promise.resolve();
+ }
+ if (metricsRequest?.token === accessToken) return metricsRequest.run;
+ const refresh = el('refreshCommercial');
+ refresh.setAttribute('aria-busy', 'true');
+ status.textContent = 'Atualizando indicadores…';
+ const proposals = privateRequest(accessToken).then(result => {
+  if (!Array.isArray(result.proposals)) throw Error('Dados de propostas indisponíveis');
+  return result.proposals;
+ });
+ const activeProjects = request('/rest/v1/rpc/prospect_studio_current_projects?select=project_id&snapshot=not.is.null');
+ const run = Promise.allSettled([proposals, activeProjects, loadHistory()]).then(([privateRows, projectRows]) => {
+  if (token() !== accessToken || metricsRequest?.run !== run) return;
+  proposalMetrics = privateRows.status === 'fulfilled' ? privateRows.value : null;
+  cloudProjectIds = projectRows.status === 'fulfilled' && Array.isArray(projectRows.value)
+   ? projectRows.value.filter(row => row.snapshot !== null).map(row => row.project_id).filter(Boolean) : null;
+  status.textContent = proposalMetrics && cloudProjectIds
+   ? 'Indicadores atualizados.'
+   : 'Alguns indicadores da nuvem estão indisponíveis.';
+  render();
+ }).finally(() => {
+  if (metricsRequest?.run === run) {
+   metricsRequest = null;
+   refresh.removeAttribute('aria-busy');
+  }
+ });
+ metricsRequest = { token: accessToken, run };
+ return run;
+}
+
+async function refreshCommercial() {
+ if (!token()) return refreshMetrics();
+ el('commercialStatus').textContent = 'Atualizando indicadores…';
+ if (!(await sync())) el('commercialStatus').textContent = 'Não foi possível atualizar os indicadores da nuvem.';
 }
 function renderHistory(){
  const target=el('storedSearches');if(!target)return;
@@ -280,7 +427,8 @@ function renderHistory(){
   page('search');el('searchBtn').click();
  });
 }
-window.PortalCRM={sync,recordSearch,composeMessage,confirmGoogleLead,confirmSent,renderHistory,archive,restore,publishedLink,hasSent:id=>!!find(id)?.proposalSentAt};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{render();if(token())sync()});
-else{render();if(token())sync()}
+window.PortalCRM={sync,refreshMetrics,refreshCommercial,recordSearch,composeMessage,confirmGoogleLead,confirmSent,renderHistory,archive,restore,publishedLink,hasSent:id=>!!find(id)?.proposalSentAt};
+function initialize() { render(); if (token()) void sync(); else void refreshMetrics(); }
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initialize);
+else initialize();
 })();

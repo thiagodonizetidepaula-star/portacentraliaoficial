@@ -11,9 +11,11 @@
  <script src="/social-profiles.js" defer></script>
  <script src="/prospect-links.js" defer></script>
  <script src="/biblioteca-data.js" defer></script>
+ <script src="/studio-composition.js" defer></script>
  <script src="/biblioteca.js" defer></script>
  <script src="/studio-projects.js" defer></script>
  <script src="/studio-brand.js" defer></script>
+ <script src="/studio-private.js" defer></script>
  <script src="/studio-flow.js" defer></script>
  <script src="/studio-publish.js" defer></script>
 </head>
@@ -114,6 +116,9 @@
     <div class="studio-submit">
      <button id="generateThree" type="submit" class="button accent">Gerar 3 propostas</button>
      <button id="studioAiConnect" type="button" class="button secondary" hidden>Entrar para usar IA</button>
+     <div class="studio-image-options">
+      <label class="control-check"><input id="studioAllowReferences" type="checkbox"> Usar imagens e sugestões ilustrativas no rascunho</label>
+     </div>
      <div id="studioImageOptions" class="studio-image-options" hidden>
       <label class="control-check"><input id="studioGenerateImages" type="checkbox"> Gerar uma imagem ilustrativa com IA para cada proposta</label>
      </div>
@@ -121,6 +126,7 @@
    </form>
    <div id="studioStep" class="studio-status" role="status"></div>
    <div id="threeProposals" class="three-proposals"></div>
+   <button id="privateProposalStart" class="button secondary" type="button" hidden>Preparar link privado</button>
   </section>
   <section id="galleryView">
    <div class="catalog-tools">
@@ -309,6 +315,7 @@
   </details>
   <label>Mensagem para a empresa<textarea id="publicMessage" rows="6"></textarea></label>
   <p id="publishContactStatus" class="muted-copy">Revise a mensagem antes de abrir o WhatsApp.</p>
+  <label class="publish-check"><input id="publishConsent" type="checkbox"> A empresa autorizou previamente o contato comercial por WhatsApp neste número.</label>
   <label id="publishDuplicate" class="publish-check" hidden><input id="publishRepeat" type="checkbox"> Quero preparar outra mensagem para esta empresa.</label>
   <div class="publish-buttons">
    <button id="openBusinessWhatsapp" class="button accent" type="button">Preparar WhatsApp</button>
@@ -317,6 +324,28 @@
   </div>
  </div>
  <p id="publishStatus" role="status" class="publish-status"></p>
+</dialog>
+<dialog id="privateProposalDialog" class="publish-overlay" aria-labelledby="privateProposalTitle">
+ <div class="publish-head"><h2 id="privateProposalTitle">Proposta privada</h2><button id="privateProposalClose" type="button" class="plain-btn">Fechar</button></div>
+ <form id="privateProposalForm">
+  <p class="muted-copy">O link permite visualizar os três sites, consultar os valores e recusar novos contatos. Compartilhe somente com a empresa autorizada.</p>
+  <label>Validade em dias<input type="number" id="privateProposalDays" min="1" max="30" value="7" required></label>
+  <label>Valor comercial<input id="privateProposalPrice" maxlength="80" placeholder="Ex. R$ 1.500" required></label>
+  <label>Condições da proposta<textarea id="privateProposalTerms" maxlength="1200" rows="4" required></textarea></label>
+  <label class="publish-check"><input id="privateProposalConsent" type="checkbox" required> A empresa autorizou previamente o contato comercial para receber esta proposta.</label>
+  <label class="publish-check"><input id="privateProposalReviewed" type="checkbox" required> Revisei as três versões e confirmei os dados, a identidade e a autorização de uso dos materiais.</label>
+  <button class="button accent" id="privateProposalGenerate" type="submit">Validar e gerar link</button>
+ </form>
+ <div id="privateProposalResult" hidden>
+  <label>Link privado<input id="privateProposalLink" readonly></label>
+  <div class="publish-buttons">
+   <button id="privateProposalCopy" class="button secondary" type="button">Copiar link</button>
+   <a id="privateProposalOpen" class="button secondary" target="_blank" rel="noopener noreferrer">Ver apresentação</a>
+   <button id="privateProposalRevoke" class="button secondary" type="button">Revogar link</button>
+  </div>
+  <button id="privateProposalWhatsapp" class="button accent" type="button" hidden>Preparar mensagem no WhatsApp</button>
+ </div>
+ <p id="privateProposalStatus" role="status" class="publish-status"></p>
 </dialog>
 <dialog id="versionsOverlay" class="version-dialog" aria-labelledby="versionsTitle">
  <div class="publish-head"><h2 id="versionsTitle">Versões do projeto</h2><button id="closeVersions" type="button" class="plain-btn">Fechar</button></div>

@@ -55,7 +55,14 @@
     </header>
 
     <section id="dashboard" data-screen aria-labelledby="title">
-      <div class="stats" id="stats"></div>
+      <section class="commercial-metrics" aria-labelledby="commercialTitle">
+        <div class="panel-heading">
+          <h2 id="commercialTitle">Indicadores comerciais</h2>
+          <button id="refreshCommercial" class="btn subtle" type="button">Atualizar indicadores</button>
+        </div>
+        <p id="commercialStatus" class="metrics-status" role="status"></p>
+        <div class="stats" id="stats"></div>
+      </section>
       <div class="dashboard-grid">
         <article class="panel">
           <h2>Presença digital</h2>

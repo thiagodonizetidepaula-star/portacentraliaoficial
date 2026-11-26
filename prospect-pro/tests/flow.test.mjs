@@ -217,6 +217,7 @@ async function openSampleStudio(page, origin) {
   await page.locator('#studioCompany').fill(business.displayName.text);
   await page.locator('#studioSegment').fill('Salão de beleza');
   await page.locator('#studioCity').fill('Mauá, SP');
+  await page.locator('#studioAllowReferences').check();
   await page.locator('#generateThree').click();
   const choices = page.locator('#threeProposals .proposal-card [data-choose]');
   await choices.nth(2).waitFor();
@@ -430,11 +431,49 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   assert.equal(await page.locator('#studioWhatsApp').inputValue(),'');
   await page.locator('#generateThree').click();
   assert.equal(await automaticPreview.locator('.hero-button').getAttribute('href'),'tel:+5511900000001');
+  const privatePath = '/proposta/1234567890abc_def';
+  const privateId = 'e030eab5-6dd2-4a2c-84a7-91f249a35b5f';
+  let publishedPrivate;
+  let revokedPrivate = false;
+  await page.route(origin + '/api/studio/proposals', async route => {
+    if (route.request().method() !== 'POST') return route.continue();
+    publishedPrivate = route.request().postDataJSON();
+    await route.fulfill({status:201, json:{id:privateId, path:privatePath}});
+  });
+  await page.route(origin + '/api/studio/proposals/' + privateId + '/revoke', async route => {
+    revokedPrivate = route.request().method() === 'POST';
+    await route.fulfill({json:{ok:true}});
+  });
+  await page.locator('#privateProposalStart').click();
+  const privateForm = page.locator('#privateProposalForm');
+  await privateForm.waitFor();
+  await page.locator('#privateProposalPrice').fill('R$ 1500');
+  await page.locator('#privateProposalTerms').fill('Pagamento em duas parcelas.');
+  await page.locator('#privateProposalReviewed').check();
+  await page.locator('#privateProposalGenerate').click();
+  assert.equal(publishedPrivate, undefined);
+  await page.locator('#privateProposalConsent').check();
+  await page.locator('#privateProposalGenerate').click();
+  await page.locator('#privateProposalResult').waitFor();
+  assert.equal(await page.locator('#privateProposalLink').inputValue(), origin + privatePath);
+  assert.equal(publishedPrivate.leadId, lead.id);
+  assert.equal(publishedPrivate.expiresInDays, 7);
+  assert.equal(publishedPrivate.contactAuthorized, true);
+  assert.equal(publishedPrivate.offer.price, 'R$ 1500');
+  assert.equal(new Set(publishedPrivate.variants.map(variant => variant.label)).size, 3);
+  assert.ok(publishedPrivate.variants.every(variant => variant.html.includes('Salão Aurora')));
+  const revokePrompt = page.waitForEvent('dialog').then(prompt => prompt.accept());
+  await page.locator('#privateProposalRevoke').click();
+  await revokePrompt;
+  await visibleText(page.locator('#privateProposalStatus'), 'Link revogado.');
+  assert.equal(revokedPrivate, true);
+  await page.locator('#privateProposalClose').click();
   await page.locator('#studioWhatsAppConfirmed').check();
   await page.locator('details summary').filter({hasText: /horário.*redes sociais.*mapa/i}).click();
   await page.locator('#studioHours').fill('Segunda a sexta, 09:00 às 18:00');
   await page.locator('#studioEmail').fill('recepcao+site@aurora.example.test');
   await page.locator('#studioInstagram').fill('https://www.instagram.com/salaoaurora.example/');
+  await page.locator('#studioAllowReferences').check();
   await page.locator('#generateThree').click();
   await proposals.nth(2).waitFor();
   assert.equal(await proposals.count(), 3);
@@ -490,7 +529,7 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   await page.locator('#closeEditor').click();
 
   await page.goto(origin);
-  await page.locator('a[href="/studio?view=projects"]').click();
+  await page.getByRole('link', {name: 'Meus projetos', exact: true}).click();
   await page.waitForURL('**/studio?view=projects');
   await visibleText(page.locator('#projectsView'), business.displayName.text);
   await page.locator('#projectsView [data-load]').click();
@@ -531,6 +570,8 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
 
   assert.match(await page.locator('#publicMessage').inputValue(), /Salão Aurora/);
   assert.ok((await page.locator('#publicMessage').inputValue()).includes(link));
+  assert.equal(await page.locator('#openBusinessWhatsapp').isDisabled(), true);
+  await page.locator('#publishConsent').check();
   await page.locator('#openBusinessWhatsapp').click();
   await eventually(() => openedUrls.some(url => url.hostname === 'wa.me'), 'O WhatsApp simulado não foi aberto.');
   const whatsapp = openedUrls.find(url => url.hostname === 'wa.me');
@@ -583,8 +624,9 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   const exported=await secondBrowser.context.newPage();
   await exported.route(origin+'/exportado.html',route=>route.fulfill({contentType:'text/html',body:finalHtml}));
   await exported.goto(origin+'/exportado.html');
-  await exported.locator('nav a[href="#servicos"]').click();
-  await exported.locator('#servicos:target .service-name').first().waitFor();
+  assert.equal(await exported.locator('nav a[href="#servicos"]').count(), 0);
+  await exported.locator('nav a[href="#contato"]').first().click();
+  await exported.locator('#contato:target').waitFor();
   await exported.close();
   assert.ok(finalHtml.includes('property="og:title"'));
   assert.doesNotMatch(finalHtml, /Proposta de site ·|noindex|Demonstração Portal Central IA/);
@@ -630,6 +672,7 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   await page.locator('#studioSegment').fill('Oficina mecânica');
   await page.locator('#studioCity').fill('São Caetano do Sul, SP');
   await page.locator('#studioServices').fill('Revisão preventiva | Conferência de freios e fluidos\nDiagnóstico de motor');
+  await page.locator('#studioAllowReferences').check();
   await page.locator('#generateThree').click();
   const workshop = page.locator('#threeProposals .proposal-card').first().frameLocator('iframe');
   await visibleText(workshop.locator('body'), 'Oficina Pinheiro');
@@ -658,10 +701,19 @@ test('Abas do site e WhatsApp funcionam na miniatura, no editor e na prévia com
   await page.locator('#studioPhone').fill('(11) 3333-3333');
   assert.equal(await page.locator('#studioWhatsApp').inputValue(),'(11) 3333-3333');
   await page.locator('#studioWhatsApp').fill('https://wa.me/5511900000001');
+  await page.locator('#studioAllowReferences').check();
   await page.locator('#generateThree').click();
   const card=page.locator('.proposal-card').first();
   const miniature=card.frameLocator('iframe');
-  await miniature.locator('nav a[href="#servicos"]').click();
+  await card.scrollIntoViewIfNeeded();
+  const miniatureBox=await card.locator('iframe').boundingBox();
+  const target=await miniature.locator('nav a[href="#servicos"]').evaluate(link=>{
+    const {x,y,width,height}=link.getBoundingClientRect();
+    return {x:x+width/2,y:y+height/2,viewportWidth:innerWidth};
+  });
+  // Playwright reports the child's unscaled coordinates inside a transformed iframe.
+  const scale=miniatureBox.width/target.viewportWidth;
+  await page.touchscreen.tap(miniatureBox.x+target.x*scale,miniatureBox.y+target.y*scale);
   await miniature.locator('#servicos:target .service-name').first().waitFor();
   await card.getByRole('button',{name:'Ver site completo'}).click();
   const full=page.frameLocator('#fullSiteFrame');
@@ -825,7 +877,8 @@ test('No celular, confirma a unidade e aplica a marca nas prévias, no rascunho 
   for(let i=0;i<3;i++){
     const frame=page.locator('.proposal-card').nth(i).frameLocator('iframe');
     assert.equal(await frame.locator('.brand-logo').getAttribute('src'),mark);
-    assert.equal(await frame.locator('.hero img').first().getAttribute('src'),photos[i%2]);
+    if(i<photos.length) assert.equal(await frame.locator('.hero img').first().getAttribute('src'),photos[i]);
+    else assert.equal(await frame.locator('.hero .composition-graphic').isVisible(),true);
     assert.equal(await frame.locator('[data-contact=instagram]').getAttribute('href'),'https://www.instagram.com/salaoaurora/');
     assert.ok(!(await frame.locator('body').textContent()).includes('Outra cidade'));
   }
@@ -835,12 +888,13 @@ test('No celular, confirma a unidade e aplica a marca nas prévias, no rascunho 
   assert.equal(snapshot.googlePlaceId,business.id); assert.equal(snapshot.logo,mark);
   assert.ok(snapshot.brandSources.includes('https://www.instagram.com/p/example1/'));
   const html=await page.evaluate(()=>{const {data,template}=window.PortalSiteStudio.getCurrent();return window.PortalSiteStudio.buildSite(data,template);});
-  assert.ok(html.includes(mark)); assert.ok(html.includes('Galeria de fotos'));
+  assert.ok(html.includes(mark)); assert.ok(html.includes(photos[0]));
+  assert.ok(!html.includes(photos[1]),'Cada foto autorizada é reservada a uma direção.');
   assert.ok(!html.includes('cdninstagram.com')); assert.ok(!html.includes('/p/example1/'));
   await page.locator('#saveProject').click();
   await eventually(()=>providers.state.projectVersions.size===1,'O rascunho da marca não foi salvo.');
   const [versions]=providers.state.projectVersions.values();
-  assert.equal(versions[0].snapshot.brandGallery,photos.join('\n'));
+  assert.equal(versions[0].snapshot.brandGallery,photos[0]);
   await page.locator('#closeEditor').click();
   await page.locator('#studioCompany').fill('Outro negócio');
   assert.equal(await page.locator('#brandLogo').inputValue(),'');
@@ -849,7 +903,7 @@ test('No celular, confirma a unidade e aplica a marca nas prévias, no rascunho 
   await page.goto(origin+'/studio?view=projects');
   await page.locator('#projectsView [data-load]').click();
   assert.equal(await page.locator('#logoUrl').inputValue(),mark);
-  assert.equal(await page.locator('#brandGallery').inputValue(),photos.join('\n'));
+  assert.equal(await page.locator('#brandGallery').inputValue(),photos[0]);
   assert.ok(await page.locator('#brandEvidence a').count()>=1);
   await page.locator('#closeEditor').click();
   await page.goto(origin+'/?view=search');
@@ -971,5 +1025,53 @@ test('O pacote do Instagram expõe apenas fotos de publicações selecionadas', 
   await options.first().check();await page.getByRole('button',{name:'Usar fotos selecionadas'}).click();
   await eventually(()=>providers.state.uploadedImages.size===1,'Uma única foto escolhida deve chegar ao armazenamento.');
   await page.locator('#generateThree').click();const frame=page.locator('.proposal-card').first().frameLocator('iframe');
-  assert.equal(await frame.locator('.portfolio-strip img').count(),1);assert.ok((await frame.locator('.portfolio-strip img').getAttribute('src')).startsWith(providers.publicOrigin));
+  assert.equal(await frame.locator('.hero img').count(),1);
+  assert.ok((await frame.locator('.hero img').getAttribute('src')).startsWith(providers.publicOrigin));
+  assert.equal(await frame.locator('.portfolio-strip img').count(),0);
+});
+
+test('O modo padrão gera três composições com dados confirmados e sem fotos de referência', {timeout:30000}, async t=>{
+  const providers=await startProviders(); t.after(providers.close);
+  const origin=await startApp(t,providers,false);
+  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});
+  t.after(()=>browser.close());
+  const {context,openedUrls}=await browserContext(browser,origin,providers,{viewport:{width:1440,height:950}});
+  const studio=await context.newPage();
+  await studio.goto(origin+'/studio');
+  await studio.locator('#studioCompany').fill('Salão de Teste');
+  await studio.locator('#studioSegment').fill('Salão de beleza');
+  await studio.locator('#studioCity').fill('Mauá');
+  await studio.locator('#studioAddress').fill('Vila Bocaina');
+  await studio.locator('#generateThree').click();
+  await studio.locator('.proposal-card').nth(2).waitFor();
+  const drafts=await studio.locator('.proposal-card iframe').evaluateAll(frames=>frames.map(frame=>
+    frame.srcdoc.replace('<base href="about:srcdoc">','')));
+  assert.equal(drafts.length,3);
+  for(const width of [390,1440]){
+    const page=await context.newPage();
+    await page.setViewportSize({width,height:900});
+    const fonts=[], graphics=[], motion=[];
+    for(const html of drafts){
+      await page.emulateMedia({reducedMotion:'no-preference'});
+      await page.setContent(html);
+      assert.equal(await page.locator('h1').textContent(),'Salão de Teste');
+      assert.equal(await page.locator('img,#servicos,#sobre,.business-hours').count(),0);
+      assert.equal(await page.locator('meta[name=robots]').getAttribute('content'),'noindex,nofollow,noarchive');
+      assert.equal(await page.locator('.composition-graphic').isVisible(),true);
+      assert.equal(await page.locator('html').evaluate(el=>el.scrollWidth<=el.clientWidth),true);
+      assert.equal(await page.locator('a[href^="#"]').evaluateAll(links=>
+        links.every(a=>document.getElementById(a.hash.slice(1)))),true);
+      fonts.push(await page.locator('h1').evaluate(el=>getComputedStyle(el).fontFamily));
+      graphics.push(await page.locator('.composition-graphic').getAttribute('class'));
+      motion.push(await page.locator('.composition-graphic i').evaluateAll(parts=>
+        parts.map(el=>getComputedStyle(el).animationName).filter(name=>name!=='none').join('|')));
+      await page.emulateMedia({reducedMotion:'reduce'});
+      assert.equal(await page.locator('.composition-graphic i').evaluateAll(parts=>
+        parts.every(el=>getComputedStyle(el).animationName==='none')),true);
+    }
+    for(const choices of [fonts,graphics,motion]) assert.equal(new Set(choices).size,3);
+    await page.close();
+  }
+  assert.deepEqual(openedUrls,[]);
+  assert.deepEqual(providers.state.messages,[]);
 });

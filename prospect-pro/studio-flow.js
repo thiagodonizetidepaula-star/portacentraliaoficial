@@ -4,6 +4,8 @@ if(!/^\/studio\/?$/.test(location.pathname))return;
 
 const $=id=>document.getElementById(id);
 const app=window.PortalSiteStudio;
+const composition=window.ProspectComposition;
+const {blend}=composition;
 const search=new URLSearchParams(location.search);
 const projectMode=search.get('view')==='projects';
 const leadKey=search.get('lead');
@@ -48,7 +50,7 @@ function sessionToken(){
 function reflectOptions(){
  const connected=Boolean(sessionToken());
  $('studioAiConnect').hidden=!(capability.text||capability.images)||connected;
- $('studioImageOptions').hidden=!capability.images||!connected;
+ $('studioImageOptions').hidden=!capability.images||!connected||!$('studioAllowReferences').checked;
  brandPanel.refresh();
 }
 
@@ -98,14 +100,6 @@ function fillClient(company) {
 
 function matchTemplate(value) { return window.ProspectMatchSegment?.(value)||null; }
 
-function blend(color, other, weight) {
- const parts=[1,3,5].map(index=>{
-  const first=parseInt(color.slice(index,index+2),16),second=parseInt(other.slice(index,index+2),16);
-  return Math.round(first*(1-weight)+second*weight).toString(16).padStart(2,'0');
- });
- return '#'+parts.join('');
-}
-
 const visualDirections=[
  {
   id:'assinatura',title:'Identidade',description:'Apresentação da empresa, com espaço para a marca e os serviços.',
@@ -127,6 +121,7 @@ function makeProposals(client) {
  const match=matchTemplate(client.category)||matchTemplate(client.name);
  const base=match||{id:'generico',category:'Outros',layout:'directory',accent:'#50677d',bg:'#f7f8fa',ink:'#172533',photo:'',photos:[]};
  const category=client.category;
+ const sourcesOnly=!client.allowReferences;
  const profile=match?base.profile:{
   experience:'Como funciona o atendimento',practical:'Serviços e atendimento',
   services:'Serviços',action:'Falar com a empresa',contact:'Entre em contato',
@@ -140,7 +135,7 @@ function makeProposals(client) {
  const next=client.whatsapp||client.phone||client.email?'Consulte os canais de atendimento.':'';
  const summaries=[client.summary||overview||match?.summary||identity,
   client.summary||profile.story||overview||identity,client.summary||overview||next||identity];
- const suggested=!client.services.length;
+ const suggested=!sourcesOnly&&!client.services.length;
  const services=suggested?match?.services||[]:client.services.map(item=>item.split('|')[0].trim()).filter(Boolean);
  const serviceDetails=client.services.filter(item=>item.includes('|')).join('\n');
  const crmPlace=lead?.googlePlaceId||lead?.googleId||'';
@@ -150,17 +145,22 @@ function makeProposals(client) {
  const seed=Array.from(norm(client.name+' '+client.city)).reduce((hash,c)=>(Math.imul(hash,31)+c.charCodeAt(0))>>>0,0);
  const ownPhotos=brand.photos;
  const recent=app.otherCovers(client.name,client.city);
- const groups=window.ProspectImageLibrary.allocate(base.id,client.name+' '+client.city,ownPhotos,recent);
+ const groups=sourcesOnly?composition.authorizedGroups(ownPhotos):
+  window.ProspectImageLibrary.allocate(base.id,client.name+' '+client.city,ownPhotos,recent);
  const about=client.about||[profile.story!==summaries[0]?profile.story:'',overview].filter(Boolean).join('\n')||identity;
  return visualDirections.map((direction,index)=>{
   const group=groups[index], cover=group.cover;
   const signatureLayout=visualDirections[0].layout(base);
-  const layout=index===1?(signatureLayout==='immersive'?'artisan':'immersive'):direction.layout(base);
+  const defaultLayout=index===1?(signatureLayout==='immersive'?'artisan':'immersive'):direction.layout(base);
+  const layout=sourcesOnly?composition.layout(base.id,index,defaultLayout):defaultLayout;
+  const colors=sourcesOnly?composition.colors(base,index,brand.color):
+   direction.colors(brand.color?{...base,accent:brand.color}:base);
   const template={
    id:base.id+'-studio-'+index,
    label:category,category:base.category,example:client.name,profile,
-   direction:direction.id,motionStyle:direction.id==='experiencia'?'strong':'soft',layout,...direction.colors(brand.color?{...base,accent:brand.color}:base),
-   headline:headlines[index],summary:summaries[index].slice(0,320),services,
+   direction:direction.id,motionStyle:direction.id==='experiencia'?'strong':'soft',layout,...colors,
+   headline:sourcesOnly?client.name:headlines[index],
+   summary:(sourcesOnly?client.summary:summaries[index]).slice(0,320),services,
    photo:cover,photos:group.photos,exclusivePhotos:true,stockPhotos:group.stock,
    detailPhoto:group.photos[1]||'',
    photoOrigin:group.real.includes(cover)?'business':'reference',brandColor:brand.color||'',
@@ -171,13 +171,13 @@ function makeProposals(client) {
    name:client.name,industry:category,city:client.city,address:client.address,
    phone:client.phone,whatsapp:client.whatsapp,whatsappUsePhone:client.whatsappUsePhone,website:client.website,
    hours:client.hours,email:client.email,instagram:client.instagram,socialLinks:client.socialLinks,mapsUrl:client.mapsUrl,googlePlaceId,
-   about,serviceDetails,servicesSuggested:suggested,photoOrigin:template.photoOrigin,
+   about:sourcesOnly?client.about:about,serviceDetails,servicesSuggested:suggested,photoOrigin:template.photoOrigin,
    logo:brand.logo,brandGallery:group.real.join('\n'),brandSources:brand.sources,photoCaptions:brand.captions,
    variant:String((seed+index)%3),
-   companyFacts:{summary:client.summary,about:client.about,services:client.services},
+   companyFacts:{summary:client.summary,about:client.about,services:client.services},sourcesOnly,
    leadId,templateSnapshot:template
   };
-  return {template,data,direction};
+  return {template,data,direction:sourcesOnly?composition.direction(direction,base.id,index):direction};
  });
 }
 
@@ -203,6 +203,7 @@ function renderProposals(proposals) {
   cards.append(card);
  });
  result.replaceChildren(cards);
+ window.ProspectPrivateStudio?.setProposals(proposals);
 }
 
 function refreshCard(proposal,index){
@@ -211,6 +212,10 @@ function refreshCard(proposal,index){
 }
 
 function showProposalsStatus(client,proposals){
+ if(!client.allowReferences){
+  status.textContent='Três propostas para '+client.name+'. Cada uma usa os dados informados, com composições gráficas próprias quando faltam fotos autorizadas.';
+  return;
+ }
  const suggestion=proposals[0].data.servicesSuggested&&proposals[0].template.services.length
   ?' Confira as opções sugeridas antes de publicar.':'';
  const limited=proposals.some(p=>p.template.photos.length<3)?' Acervo limitado: algumas propostas terão menos fotos, sem repetir imagens entre modelos.':'';
@@ -230,7 +235,7 @@ function readClient(brand){
   address:formValue('studioAddress'),website:account||window.ProspectLinks.whatsappLinkNumber(website)?'':website,
   mapsUrl:formValue('studioGoogleMapsUrl'),hours:formValue('studioHours'),
   email:formValue('studioEmail'),instagram:window.ProspectLinks.instagram(formValue('studioInstagram'))||profile,socialLinks:networks.map(v=>v.url).join('\n'),
-  summary:formValue('studioSummary'),about:formValue('studioAbout'),brand,
+  summary:formValue('studioSummary'),about:formValue('studioAbout'),brand,allowReferences:$('studioAllowReferences').checked,
   services:formValue('studioServices').split(/\r?\n/).map(service=>service.trim()).filter(Boolean).slice(0,8)
  };
 }
@@ -328,7 +333,7 @@ function previewThree(enhance=false) {
  renderProposals(proposals);
  showProposalsStatus(client,proposals);
  const active=generation;
- if(enhance)enhanceProposals(client,proposals,active).catch(()=>{
+ if(enhance&&client.allowReferences)enhanceProposals(client,proposals,active).catch(()=>{
   if(!active.signal.aborted)status.textContent='As propostas estão disponíveis. A IA não pôde concluir os ajustes.';
  });
 }
@@ -342,6 +347,7 @@ form.addEventListener('submit',async event=>{
  previewThree(true);
 });
 form.addEventListener('input',event=>{
+ if(event.target.id==='studioAllowReferences')reflectOptions();
  if(event.target.id==='studioWebsite'){
   const number=window.ProspectLinks.whatsappLinkNumber(formValue('studioWebsite'));
   if(number){
@@ -358,6 +364,7 @@ form.addEventListener('input',event=>{
  generation?.abort();
  if(!result.childElementCount)return;
  result.replaceChildren();
+ window.ProspectPrivateStudio?.setProposals([]);
  status.textContent='Dados alterados. Gere as propostas para atualizar as prévias.';
 });
 $('publishOverlay').addEventListener('close',reflectOptions);
