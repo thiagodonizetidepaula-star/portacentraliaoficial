@@ -126,7 +126,11 @@
    </form>
    <div id="studioStep" class="studio-status" role="status"></div>
    <div id="threeProposals" class="three-proposals"></div>
-   <button id="privateProposalStart" class="button secondary" type="button" hidden>Preparar link privado</button>
+   <div class="proposal-review-actions" id="privateProposalActions" hidden>
+    <button id="privateProposalStart" class="button secondary" type="button" hidden>Preparar link privado</button>
+    <button id="privateProposalDownload" class="button secondary" type="button">Baixar prévias para revisão</button>
+   </div>
+   <p id="privateProposalDownloadStatus" class="studio-status" role="status"></p>
   </section>
   <section id="galleryView">
    <div class="catalog-tools">

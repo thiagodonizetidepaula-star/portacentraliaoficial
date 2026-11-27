@@ -49,10 +49,25 @@ A suíte legada foi executada em Chromium sobre uma cópia isolada do commit em 
 ## Ordem de implantação
 
 1. Validar a branch de desenvolvimento com navegadores e serviços simulados. A referência para restaurar o código do serviço é o commit `81ac2071c7c7`.
-2. Aplicar somente `20261126234436_prospect_private_proposals.sql` no ambiente aprovado. Verificar a funcionalidade com a mesma separação de papéis e permissões do Supabase. A migração usa o CRM existente e cria uma tabela separada para os documentos privados.
+2. Aplicar `20261126234436_prospect_private_proposals.sql` e depois `20261127001107_prospect_expired_proposal_cleanup.sql` no ambiente aprovado. A primeira migração usa o CRM existente e cria uma tabela separada para os documentos privados. A segunda registra uma limpeza a cada 15 minutos quando o Supabase Cron já está habilitado. A expiração bloqueia o acesso no prazo, com ou sem cron. [Supabase Cron](https://supabase.com/docs/guides/cron)
 3. No Render, vincular `SUPABASE_SECRET_KEY` ou `SUPABASE_SERVICE_ROLE_KEY` como segredo do servidor para as propostas privadas. A importação oficial já aceita `INSTAGRAM_BUSINESS_ACCOUNT_ID`, `INSTAGRAM_GRAPH_ACCESS_TOKEN` e `FACEBOOK_GRAPH_ACCESS_TOKEN`. O titular concede as permissões no painel Meta. Confirmar o estado em `/api/studio/brand/status`. [Documentação oficial da Meta](https://developers.facebook.com/docs/instagram-platform/)
-4. Validar uma proposta privada sem contato externo, incluindo validade, dois tamanhos de tela, acesso sem token e exclusão. Confirmar que o dashboard recebe os eventos administrativos e que as prévias antigas mantêm suas URLs.
-5. Incorporar as mudanças à branch acompanhada pelo Render após a aprovação visual e operacional. Confirmar o commit ativo e repetir os testes de saúde e de privacidade.
+4. Incorporar as mudanças à branch acompanhada pelo Render após a aprovação visual e operacional. Confirmar o commit ativo e a resposta de `/health`.
+5. Com login de operador, conferir `/api/studio/proposals/availability`. O campo `configured` indica a presença da configuração do banco, e `ready` confirma acesso à tabela privada. Validar uma proposta com cadastro de teste em duas larguras, incluindo acesso sem token, expiração e exclusão. Confirmar que o painel mostra os eventos e que as prévias antigas mantêm suas URLs. Usar um WhatsApp simulado durante a validação.
+
+## Revisão de layouts
+
+No Studio, gere as três propostas com dados confirmados e use **Baixar prévias para revisão**. O ZIP contém os três HTMLs que passam pela mesma preparação do link privado. Ele pode ser revisado localmente enquanto a hospedagem está indisponível.
+
+Para gerar as capturas da revisão em uma máquina com Node e Chromium, execute a partir de `prospect-pro`.
+
+```sh
+npm ci
+npm install --no-save --no-package-lock playwright-core@1.61.0
+npx playwright-core install chromium
+node scripts/review-proposals.mjs /caminho/empresa-revisao.zip /caminho/capturas
+```
+
+O comando gera seis capturas em 390 e 1440 px e um relatório JSON. Ele verifica dimensões, carregamento de imagens, destinos internos, movimento reduzido, tamanho do HTML e carregamento local. Links de WhatsApp e outros destinos comerciais não são acionados. O tempo local indica a carga no navegador de teste e a revisão visual continua com o operador.
 
 ## Direção visual e dependências
 

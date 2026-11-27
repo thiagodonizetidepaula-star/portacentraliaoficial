@@ -5,15 +5,23 @@ const $ = id => document.getElementById(id);
 const dialog = $('privateProposalDialog');
 const form = $('privateProposalForm');
 const start = $('privateProposalStart');
+const download = $('privateProposalDownload');
 const status = message => { $('privateProposalStatus').textContent = message; };
+const downloadStatus = message => { $('privateProposalDownloadStatus').textContent = message; };
 const base = '/api/studio/proposals';
 const limit = 2 * 1024 * 1024;
 let proposals = [];
 let active;
 let busy = false;
+let exporting = false;
+let available = false;
+
+function canReview(items) {
+ return items.length === 3 && items.every(item => item.data.sourcesOnly);
+}
 
 function canPrepare(items) {
- return items.length === 3 && Boolean(items[0].data.leadId) && items.every(item => item.data.sourcesOnly);
+ return canReview(items) && Boolean(items[0].data.leadId);
 }
 
 function token() {
@@ -21,7 +29,7 @@ function token() {
  catch { return ''; }
 }
 
-async function request(path = '', body) {
+async function request(path = '', body, signal) {
  const authorization = token();
  if (!authorization) throw Error('Entre na sua conta para preparar a proposta.');
  const response = await fetch(base + path, {
@@ -29,7 +37,7 @@ async function request(path = '', body) {
   headers: { Authorization: 'Bearer ' + authorization, 'Content-Type': 'application/json' },
   body: body === undefined ? undefined : JSON.stringify(body),
   cache: 'no-store',
-  signal: AbortSignal.timeout(20000)
+  signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(20000)]) : AbortSignal.timeout(20000)
  });
  const result = await response.json().catch(() => ({}));
  if (!response.ok) throw Error(result.error || 'O serviço de propostas está indisponível.');
@@ -90,7 +98,11 @@ async function checkViewport(html, width, height) {
 async function prepare(proposal, cache) {
  const html = window.PortalSiteStudio.buildSite(proposal.data, proposal.template, { finalSite: true });
  const doc = new DOMParser().parseFromString(html, 'text/html');
- doc.querySelectorAll('script,meta[property^="og:"],meta[name^="twitter:"],meta[http-equiv],link[rel="canonical"]').forEach(item => item.remove());
+ doc.querySelectorAll('script,meta[property^="og:"],meta[name^="twitter:"],meta[name="robots"],meta[http-equiv],link[rel="canonical"]').forEach(item => item.remove());
+ const robots = doc.createElement('meta');
+ robots.name = 'robots';
+ robots.content = 'noindex,nofollow,noarchive';
+ doc.head.append(robots);
  for (const link of doc.querySelectorAll('.portfolio-strip figure a')) link.replaceWith(...link.childNodes);
  const assets = [...doc.querySelectorAll('img[src],link[rel="icon"],link[rel="apple-touch-icon"]')];
  for (const asset of assets) {
@@ -121,7 +133,18 @@ function setBusy(value) {
  $('privateProposalWhatsapp').disabled = value;
 }
 
-start.onclick = () => {
+async function prepareVariants(items, announce) {
+ const cache = new Map();
+ const variants = [];
+ for (const proposal of items) {
+  announce('Verificando ' + proposal.direction.title + ' no celular e no computador…');
+  try { variants.push(await prepare(proposal, cache)); }
+  catch (error) { throw Error(proposal.direction.title + '. ' + error.message); }
+ }
+ return variants;
+}
+
+start.onclick = async () => {
  if (!canPrepare(proposals)) return;
  if (!token()) {
   $('manageProjectAccount').click();
@@ -129,10 +152,28 @@ start.onclick = () => {
  }
  if (!active) {
   $('privateProposalResult').hidden = true;
-  form.hidden = false;
-  status('');
+  form.hidden = true;
  }
  dialog.showModal();
+ if (active) return;
+ available = false;
+ status('Conferindo o acesso às propostas privadas…');
+ const controller = new AbortController();
+ const cancel = () => controller.abort();
+ dialog.addEventListener('close', cancel, {once: true});
+ try {
+  const { configured, ready } = await request('/availability', undefined, controller.signal);
+  if (controller.signal.aborted || !dialog.open) return;
+  available = ready === true;
+  form.hidden = !available;
+  status(available ? '' : configured
+   ? 'O banco de propostas privadas está indisponível. Feche e abra novamente para tentar.'
+   : 'A hospedagem ainda precisa ativar os links privados. Você pode baixar as prévias para revisar.');
+ } catch (error) {
+  if (!controller.signal.aborted && dialog.open) status(error.message);
+ } finally {
+  dialog.removeEventListener('close', cancel);
+ }
 };
 
 $('privateProposalClose').onclick = () => dialog.close();
@@ -140,17 +181,11 @@ dialog.addEventListener('cancel', event => { if (busy) event.preventDefault(); }
 
 form.onsubmit = async event => {
  event.preventDefault();
- if (busy || !canPrepare(proposals)) return;
+ if (busy || !available || !canPrepare(proposals)) return;
  const selection = [...proposals];
  setBusy(true);
  try {
-  const variants = [];
-  const cache = new Map();
-  for (const proposal of selection) {
-   status('Verificando ' + proposal.direction.title + ' no celular e no computador…');
-   try { variants.push(await prepare(proposal, cache)); }
-   catch (error) { throw Error(proposal.direction.title + '. ' + error.message); }
-  }
+  const variants = await prepareVariants(selection, status);
   const data = selection[0].data;
   const result = await request('', {
    leadId: data.leadId,
@@ -226,10 +261,41 @@ function clearResult() {
  form.hidden = false;
 }
 
+download.onclick = async () => {
+ if (exporting || !canReview(proposals)) return;
+ const selection = proposals;
+ exporting = download.disabled = true;
+ try {
+  const variants = await prepareVariants(selection, downloadStatus);
+  const {strToU8, zipSync} = await import('/vendor/fflate.mjs');
+  if (selection !== proposals) throw Error('Os dados mudaram. Gere as propostas e tente de novo.');
+  const models = variants.map(({label}, index) => ({label, file: 'modelo-' + (index + 1) + '.html'}));
+  const files = Object.fromEntries(models.map(({file}, index) => [file, strToU8(variants[index].html)]));
+  files['revisao.json'] = strToU8(JSON.stringify({version: 1, models}, null, 2) + '\n');
+  const url = URL.createObjectURL(new Blob([zipSync(files)], {type: 'application/zip'}));
+  const link = document.createElement('a');
+  const filename = selection[0].data.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+   .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  link.href = url;
+  link.download = (filename || 'empresa') + '-revisao.zip';
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  downloadStatus('Arquivo com as três prévias pronto para revisão.');
+ } catch (error) {
+  downloadStatus(error.message);
+ } finally {
+  exporting = download.disabled = false;
+ }
+};
+
 window.ProspectPrivateStudio = {
  setProposals(items) {
   proposals = items;
+  $('privateProposalActions').hidden = !canReview(items);
   start.hidden = !canPrepare(items);
+  if (!exporting) downloadStatus('');
   if (!busy) clearResult();
  }
 };

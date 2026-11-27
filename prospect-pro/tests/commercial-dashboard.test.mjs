@@ -33,6 +33,9 @@ test('Indicadores comerciais, confirmação privada e bloqueio de contato no nav
   ];
   const external = [];
   const revocations = [];
+  let proposalResponse = { json: { proposals } };
+  let availabilityResponse = { json: { configured: false, ready: false } };
+  let availabilityChecks = 0;
   const staticFiles = new Map([
     ['/', 'index.html'], ['/social-profiles.js', 'social-profiles.cjs'],
     ...['prospect-links.js', 'prospect-dashboard.js', 'prospect-crm.js', 'prospect-radar.js',
@@ -55,7 +58,11 @@ test('Indicadores comerciais, confirmação privada e bloqueio de contato no nav
     if (path === '/api/quota') return route.fulfill({ json: { enabled: true, used: 5 } });
     assert.equal(request.headers().authorization, 'Bearer ' + token);
     if (path === '/auth/v1/user') return route.fulfill({ json: { id: 'operator', app_metadata: { prospect_operator: true } } });
-    if (path === '/api/studio/proposals') return route.fulfill({ json: { proposals } });
+    if (path === '/api/studio/proposals') return route.fulfill(proposalResponse);
+    if (path === '/api/studio/proposals/availability') {
+      availabilityChecks += 1;
+      return route.fulfill(availabilityResponse);
+    }
     if (path === '/api/studio/proposals/pd/revoke') {
       assert.equal(request.method(), 'POST');
       revocations.push('pd');
@@ -138,5 +145,36 @@ test('Indicadores comerciais, confirmação privada e bloqueio de contato no nav
   assert.match(prepared.searchParams.get('text'), /Empresa f/);
   assert.deepEqual(external, [prepared.href]);
   assert.equal(leads.get('f').proposal_sent_at ?? null, null);
+
+  assert.equal(availabilityChecks, 0);
+  proposalResponse = { status: 503, json: { error: 'Serviço de teste desativado' } };
+  await page.locator('.nav[data-page="dashboard"]').click();
+  const commercialStatus = page.locator('#commercialStatus');
+  const figure = label => page.locator('#stats .stat-card').filter({ hasText: label }).locator('strong').textContent();
+  await commercialStatus.filter({ hasText: 'Propostas privadas aguardam a configuração do serviço.' }).waitFor();
+  assert.equal(availabilityChecks, 1);
+  assert.equal(await figure('Propostas visualizadas'), '—');
+  assert.equal(await figure('Propostas enviadas'), '3');
+  assert.equal(await figure('Sites criados'), '3');
+
+  await page.locator('.nav[data-page="leads"]').click();
+  await page.locator('#privateProposalConnectionStatus').filter({ hasText: 'Propostas privadas aguardam a configuração do serviço.' }).waitFor();
+  availabilityResponse = { json: { configured: true, ready: false } };
+  await page.locator('.nav[data-page="dashboard"]').click();
+  await commercialStatus.filter({ hasText: 'O serviço de propostas privadas está configurado e ainda indisponível.' }).waitFor();
+  assert.equal(availabilityChecks, 2);
+  assert.equal(await figure('Propostas visualizadas'), '—');
+
+  availabilityResponse = { status: 503 };
+  await page.getByRole('button', { name: 'Atualizar indicadores' }).click();
+  await commercialStatus.filter({ hasText: 'Não foi possível consultar as propostas privadas.' }).waitFor();
+  assert.equal(availabilityChecks, 3);
+
+  proposalResponse = { json: { proposals: [] } };
+  await page.getByRole('button', { name: 'Atualizar indicadores' }).click();
+  await commercialStatus.filter({ hasText: 'Indicadores atualizados.' }).waitFor();
+  assert.equal(await figure('Propostas visualizadas'), '0');
+  assert.equal(availabilityChecks, 3);
+  assert.equal(await page.locator('#privateProposalConnectionStatus').getAttribute('hidden'), '');
   assert.deepEqual(errors, []);
 });

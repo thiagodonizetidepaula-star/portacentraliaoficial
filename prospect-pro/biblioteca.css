@@ -139,7 +139,9 @@
 .studio-submit p, .studio-status, .project-cloud-status { margin: 0; color: #57647c; font-size: 13px; line-height: 1.5 }
 .studio-status { padding: 18px 0 }
 .studio-status:empty, .project-cloud-status:empty { display: none }
-#privateProposalStart, #privateProposalWhatsapp { margin-top: 16px }
+.proposal-review-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px }
+.proposal-review-actions[hidden] { display: none }
+#privateProposalWhatsapp { margin-top: 16px }
 .three-proposals {
  display: grid;
  grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -170,7 +170,7 @@ export function createPrivateProposals({endpoint, serviceKey, authorizedOperator
       method: options.method || 'GET',
       headers: {...headers, ...options.headers},
       body: options.body === undefined ? undefined : JSON.stringify(options.body),
-      signal: AbortSignal.timeout(12000)
+      signal: AbortSignal.timeout(options.timeout ?? 12000)
     });
 
     if ([404, 409, 422].includes(response.status)) {
@@ -178,13 +178,27 @@ export function createPrivateProposals({endpoint, serviceKey, authorizedOperator
       if (result?.code === 'PT' + response.status) throw new RequestError(response.status, result.message);
     }
     if (!response.ok) throw new RequestError(503, 'Não foi possível acessar as propostas privadas.');
-    return response.status === 204 ? null : response.json();
+    return options.method === 'HEAD' || response.status === 204 ? null : response.json();
   }
 
   const rpc = (procedure, body) => database('rpc/prospect_' + procedure + '_private_proposal', {method: 'POST', body});
 
   async function admin(req, res, pathname) {
     const owner = await authorizedOperator(getToken(req), AbortSignal.timeout(10000));
+    if (pathname === api + '/availability') {
+      if (req.method !== 'GET') {
+        res.setHeader('Allow', 'GET');
+        return json(res, 405, {error: 'Método não permitido.'});
+      }
+      if (!endpoint || !serviceKey) return json(res, 200, {configured: false, ready: false});
+      const query = new URLSearchParams({owner_id: 'eq.' + owner, select: 'id', limit: '1'});
+      try {
+        await database('prospect_private_proposals?' + query, {method: 'HEAD', timeout: 4000});
+        return json(res, 200, {configured: true, ready: true});
+      } catch {
+        return json(res, 200, {configured: true, ready: false});
+      }
+    }
     if (req.method === 'GET' && pathname === api) {
       const proposals = [];
       const pageSize = 500;

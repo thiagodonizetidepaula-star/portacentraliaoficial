@@ -2,9 +2,12 @@
 // CHROMIUM_PATH=/usr/bin/chromium node --test tests/flow.test.mjs
 // Usa o servidor da aplicação com serviços simulados em loopback.
 import assert from 'node:assert/strict';
-import {spawn} from 'node:child_process';
+import {execFile, spawn} from 'node:child_process';
 import {once} from 'node:events';
-import {readFile} from 'node:fs/promises';
+import {mkdtemp, readFile, rm, stat} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {promisify} from 'node:util';
 import {unzipSync, strFromU8} from 'fflate';
 import {createServer} from 'node:net';
 import {createServer as createHttpServer} from 'node:http';
@@ -435,6 +438,10 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   const privateId = 'e030eab5-6dd2-4a2c-84a7-91f249a35b5f';
   let publishedPrivate;
   let revokedPrivate = false;
+  let privateReady = false;
+  await page.route(origin + '/api/studio/proposals/availability', async route => {
+    await route.fulfill({json: {configured: privateReady, ready: privateReady}});
+  });
   await page.route(origin + '/api/studio/proposals', async route => {
     if (route.request().method() !== 'POST') return route.continue();
     publishedPrivate = route.request().postDataJSON();
@@ -446,6 +453,11 @@ test('Prospecção, três propostas, edição, publicação e confirmação de e
   });
   await page.locator('#privateProposalStart').click();
   const privateForm = page.locator('#privateProposalForm');
+  await visibleText(page.locator('#privateProposalStatus'), 'A hospedagem ainda precisa ativar os links privados.');
+  assert.equal(await privateForm.isVisible(), false);
+  await page.locator('#privateProposalClose').click();
+  privateReady = true;
+  await page.locator('#privateProposalStart').click();
   await privateForm.waitFor();
   await page.locator('#privateProposalPrice').fill('R$ 1500');
   await page.locator('#privateProposalTerms').fill('Pagamento em duas parcelas.');
@@ -1047,6 +1059,26 @@ test('O modo padrão gera três composições com dados confirmados e sem fotos 
   const drafts=await studio.locator('.proposal-card iframe').evaluateAll(frames=>frames.map(frame=>
     frame.srcdoc.replace('<base href="about:srcdoc">','')));
   assert.equal(drafts.length,3);
+  assert.equal(await studio.locator('#privateProposalStart').isVisible(), false);
+  const downloading = studio.waitForEvent('download');
+  await studio.locator('#privateProposalDownload').click();
+  const archive = await downloading;
+  assert.equal(archive.suggestedFilename(), 'salao-de-teste-revisao.zip');
+  const files = unzipSync(await readFile(await archive.path()));
+  assert.deepEqual(Object.keys(files), ['modelo-1.html', 'modelo-2.html', 'modelo-3.html', 'revisao.json']);
+  const manifest = JSON.parse(strFromU8(files['revisao.json']));
+  assert.deepEqual(manifest.models.map(item => item.label), ['Editorial', 'Espelho', 'Localização']);
+  for (const {file} of manifest.models) assert.doesNotMatch(strFromU8(files[file]), /<script\b/);
+  const output = await mkdtemp(join(tmpdir(), 'prospect-capturas-teste-'));
+  t.after(() => rm(output, {recursive: true, force: true}));
+  const verifier = fileURLToPath(new URL('../scripts/review-proposals.mjs', import.meta.url));
+  await promisify(execFile)(process.execPath, [verifier, await archive.path(), output], {timeout: 14000});
+  const screenshots = JSON.parse(await readFile(join(output, 'relatorio.json'), 'utf8'));
+  assert.equal(screenshots.length, 6);
+  for (const entry of screenshots) {
+    assert.deepEqual(entry.problemas, []);
+    assert.ok((await stat(join(output, entry.captura))).size > 0);
+  }
   for(const width of [390,1440]){
     const page=await context.newPage();
     await page.setViewportSize({width,height:900});

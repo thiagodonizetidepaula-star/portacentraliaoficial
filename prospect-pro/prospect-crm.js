@@ -367,8 +367,33 @@ async function privateRequest(accessToken, suffix = '', method = 'GET') {
   method, headers: { Authorization: 'Bearer ' + accessToken }, cache: 'no-store', signal: AbortSignal.timeout(10000)
  });
  const result = await response.json().catch(() => ({}));
- if (!response.ok) throw Error(result.error || 'O serviço de propostas está indisponível.');
+ if (!response.ok) throw Object.assign(Error(result?.error || 'O serviço de propostas está indisponível.'), { status: response.status });
  return result;
+}
+
+async function readPrivateMetrics(accessToken) {
+ try {
+  const { proposals } = await privateRequest(accessToken);
+  if (!Array.isArray(proposals)) throw Error('Dados de propostas indisponíveis');
+  return { rows: proposals, issue: '' };
+ } catch (error) {
+  if (error.status === 401) return { rows: null, issue: 'Entre novamente para consultar as propostas privadas.' };
+  if (error.status === 403) return { rows: null, issue: 'A consulta de propostas privadas exige acesso de operador.' };
+ }
+ const availability = await privateRequest(accessToken, '/availability').catch(() => null);
+ if (availability?.configured === false && availability?.ready === false) {
+  return { rows: null, issue: 'Propostas privadas aguardam a configuração do serviço.' };
+ }
+ if (availability?.configured === true && availability?.ready === false) {
+  return { rows: null, issue: 'O serviço de propostas privadas está configurado e ainda indisponível.' };
+ }
+ return { rows: null, issue: 'Não foi possível consultar as propostas privadas. Atualize os indicadores para tentar novamente.' };
+}
+
+function showPrivateMetricsIssue(issue) {
+ const notice = el('privateProposalConnectionStatus');
+ notice.textContent = issue;
+ notice.hidden = !issue;
 }
 
 function refreshMetrics() {
@@ -379,6 +404,7 @@ function refreshMetrics() {
   proposalMetrics = cloudProjectIds = null;
   savedSearchIds = [];
   el('refreshCommercial').removeAttribute('aria-busy');
+  showPrivateMetricsIssue('');
   status.textContent = 'Entre na sua conta para consultar projetos e propostas na nuvem.';
   renderOverview();
   return Promise.resolve();
@@ -387,19 +413,15 @@ function refreshMetrics() {
  const refresh = el('refreshCommercial');
  refresh.setAttribute('aria-busy', 'true');
  status.textContent = 'Atualizando indicadores…';
- const proposals = privateRequest(accessToken).then(result => {
-  if (!Array.isArray(result.proposals)) throw Error('Dados de propostas indisponíveis');
-  return result.proposals;
- });
- const activeProjects = request('/rest/v1/rpc/prospect_studio_current_projects?select=project_id&snapshot=not.is.null');
- const run = Promise.allSettled([proposals, activeProjects, loadHistory()]).then(([privateRows, projectRows]) => {
+ const activeProjects = request('/rest/v1/rpc/prospect_studio_current_projects?select=project_id&snapshot=not.is.null').catch(() => null);
+ const run = Promise.all([readPrivateMetrics(accessToken), activeProjects, loadHistory()]).then(([privateMetrics, projectRows]) => {
   if (token() !== accessToken || metricsRequest?.run !== run) return;
-  proposalMetrics = privateRows.status === 'fulfilled' ? privateRows.value : null;
-  cloudProjectIds = projectRows.status === 'fulfilled' && Array.isArray(projectRows.value)
-   ? projectRows.value.filter(row => row.snapshot !== null).map(row => row.project_id).filter(Boolean) : null;
-  status.textContent = proposalMetrics && cloudProjectIds
-   ? 'Indicadores atualizados.'
-   : 'Alguns indicadores da nuvem estão indisponíveis.';
+  proposalMetrics = privateMetrics.rows;
+  cloudProjectIds = Array.isArray(projectRows)
+   ? projectRows.filter(row => row.snapshot !== null).map(row => row.project_id).filter(Boolean) : null;
+  showPrivateMetricsIssue(privateMetrics.issue);
+  const issues = [privateMetrics.issue, cloudProjectIds ? '' : 'Não foi possível consultar os projetos na nuvem.'].filter(Boolean);
+  status.textContent = issues.join(' ') || 'Indicadores atualizados.';
   render();
  }).finally(() => {
   if (metricsRequest?.run === run) {

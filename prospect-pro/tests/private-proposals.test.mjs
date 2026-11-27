@@ -30,7 +30,7 @@ async function listen(t, handler) {
   return 'http://127.0.0.1:' + server.address().port;
 }
 
-async function setup(t) {
+async function setup(t, {configured = true} = {}) {
   const state = {writes: 0, blocked: false, expired: false};
   function respond(res, status, data) {
     res.writeHead(status, {'Content-Type': 'application/json'});
@@ -88,6 +88,11 @@ async function setup(t) {
       }
       if (url.pathname.endsWith('/prospect_private_proposals')) {
         assert.equal(url.searchParams.get('owner_id'), 'eq.' + fixtureOwner);
+        if (req.method === 'HEAD') {
+          assert.equal(url.searchParams.get('select'), 'id');
+          assert.equal(url.searchParams.get('limit'), '1');
+          return respond(res, state.unready ? 404 : 200, null);
+        }
         const proposal = state.proposal;
         if (req.method === 'PATCH') {
           if (url.searchParams.has('expires_at')) {
@@ -117,7 +122,7 @@ async function setup(t) {
   t.after(() => assert.equal(state.fixtureFailure, undefined));
 
   const route = createPrivateProposals({
-    endpoint, serviceKey, authorizedOperator: studioOperator(endpoint, 'publishable-key-fixture'),
+    endpoint, serviceKey: configured ? serviceKey : '', authorizedOperator: studioOperator(endpoint, 'publishable-key-fixture'),
     getToken: req => req.headers.authorization?.slice(7) || ''
   });
   const origin = await listen(t, (req, res) => route(req, res, new URL(req.url, endpoint).pathname));
@@ -133,6 +138,25 @@ async function setup(t) {
 
   return {get, send, auth, valid, state, origin};
 }
+
+test('diagnóstico privado exige operador e verifica configuração sem escrever no banco', async t => {
+  const {get, auth, state} = await setup(t);
+  const path = api + '/availability';
+  assert.equal((await get(path)).status, 401);
+  assert.equal((await get(path, {headers: {authorization: 'Bearer viewer-session'}})).status, 403);
+  const ready = await get(path, {headers: auth});
+  assert.equal(ready.status, 200);
+  assert.match(ready.headers.get('cache-control'), /no-store/);
+  assert.deepEqual(await ready.json(), {configured: true, ready: true});
+
+  state.unready = true;
+  assert.deepEqual(await (await get(path, {headers: auth})).json(), {configured: true, ready: false});
+  assert.equal(state.writes, 0);
+
+  const disabled = await setup(t, {configured: false});
+  assert.deepEqual(await (await disabled.get(path, {headers: auth})).json(), {configured: false, ready: false});
+  assert.equal(disabled.state.writes, 0);
+});
 
 test('cria um link privado com três HTMLs isolados, registra interação real e exclui materiais na recusa', async t => {
   const {get, send, auth, state} = await setup(t);
