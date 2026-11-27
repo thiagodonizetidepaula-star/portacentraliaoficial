@@ -41,3 +41,23 @@ Dê ao nome comercial uma posição principal. Use a marca gráfica com texto al
 Planeje o movimento em função da interação. Faça a abertura combinar o título com a fotografia, mostre a chegada à aba escolhida e dê retorno ao toque nos botões e ao abrir uma pergunta. Use CSS em prévias que bloqueiam scripts. Diferencie a opção suave da marcante por duração e deslocamento. Preserve movimento reduzido e a opção Sem animação. Confira troca de abas, links sociais, fontes dos horários e imagens no HTML servido e no arquivo de entrega.
 
 Consulte [Frontend Design](https://github.com/anthropics/skills/tree/main/skills/frontend-design) e [Impeccable](https://github.com/pbakaus/impeccable). Use os critérios de tipografia, composição e interação para orientar decisões próprias da empresa.
+
+
+## Direção de movimento premium — referências de engenharia de design
+
+Adote estas três direções para as propostas, respeitando a identidade e os materiais autorizados:
+- Assinatura: composição editorial, entrada curta do título seguida do texto e da ação; fotografia com enquadramento e ritmo contidos.
+- Experiência: abertura imersiva, fotografia como protagonista e revelação coordenada dos elementos; não sacrifique legibilidade ou tempo de carregamento.
+- Prático: hierarquia direta de serviços e contato, resposta imediata aos controles e transições discretas.
+
+Escolha os efeitos conforme a tarefa, não a quantidade de animações. Faça transições de entrada desacelerarem ao chegar ao repouso; priorize transform e opacity, movimento reduzido e conteúdo visível sem JavaScript. Evite animações repetitivas, efeitos que atrasem o clique e rolagem forçada. Não descreva um objeto como 3D interativo se esse recurso não estiver disponível. Use fotos reais autorizadas como base; não gere modelos que inventem detalhes comerciais.
+
+### Referências para o agente de desenvolvimento (não executadas no navegador nem pelo gerador de texto)
+
+- GSAP: https://github.com/greensock/gsap-skills — consultar gsap-core, gsap-timeline, gsap-scrolltrigger e gsap-performance antes de implementar movimento em código confiável.
+- Emil Kowalski: https://github.com/emilkowalski/skills — consultar emil-design-eng, animate, choreograph, animation-performance e review-animations para orientar o ritmo e verificar interações.
+- img2threejs: https://github.com/img2threejs/img2threejs — avaliar uma imagem autorizada, reconstruir o objeto com geometria procedural em Three.js, comparar o resultado com a referência e validar antes de integrar. O resultado é uma aproximação, não uma digitalização exata.
+
+A instalação das skills pertence ao ambiente de desenvolvimento (por exemplo, Codex), após conferir versão, licença e scripts. As skills não são bibliotecas de execução nem tornam o aplicativo capaz de produzir modelos 3D por si sós. A resposta de texto do gerador deve respeitar o esquema existente; não retornar scripts ou comandos.
+
+A política atual das prévias impede execução de scripts. Preserve-a. Não habilite scripts provenientes de conteúdo externo ou gerado por IA, nem afrouxe a CSP para obter efeitos. Para uma etapa futura com GSAP/Three.js, use um renderizador confiável, isolado, dependências versionadas e cenas revisadas, carregamento sob demanda, alternativa estática e testes no celular. Não publique material de terceiros sem autorização. Não envie propostas durante os testes.
