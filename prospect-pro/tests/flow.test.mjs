@@ -717,15 +717,8 @@ test('Abas do site e WhatsApp funcionam na miniatura, no editor e na prévia com
   await page.locator('#generateThree').click();
   const card=page.locator('.proposal-card').first();
   const miniature=card.frameLocator('iframe');
-  await card.scrollIntoViewIfNeeded();
-  const miniatureBox=await card.locator('iframe').boundingBox();
-  const target=await miniature.locator('nav a[href="#servicos"]').evaluate(link=>{
-    const {x,y,width,height}=link.getBoundingClientRect();
-    return {x:x+width/2,y:y+height/2,viewportWidth:innerWidth};
-  });
-  // Playwright reports the child's unscaled coordinates inside a transformed iframe.
-  const scale=miniatureBox.width/target.viewportWidth;
-  await page.touchscreen.tap(miniatureBox.x+target.x*scale,miniatureBox.y+target.y*scale);
+  // Mobile thumbnails use the native viewport; use real touch input with auto-scrolling.
+  await miniature.locator('nav a[href="#servicos"]').tap();
   await miniature.locator('#servicos:target .service-name').first().waitFor();
   await card.getByRole('button',{name:'Ver site completo'}).click();
   const full=page.frameLocator('#fullSiteFrame');
