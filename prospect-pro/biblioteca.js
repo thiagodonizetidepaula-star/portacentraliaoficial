@@ -1113,8 +1113,8 @@ function buildSite(info,t,{finalSite=false}={}) {
  const heroAction=requestedAction||(whatsapp?profile.action:telephone?'Ligar para a empresa'
   :hasServices?profile.services:map?'Ver localização':hasContact?'Ver contatos':'Conheça a empresa');
  const defaultHeroHref=whatsapp||(telephone?'tel:'+telephone:hasServices?'#servicos':hasContact?'#contato':!sourcesOnly||text(info.about)?'#sobre':'');
- const locationFirst=sourcesOnly&&direction==='pratico'&&map;
- const servicesFirst=sourcesOnly&&direction==='assinatura'&&hasServices;
+ const locationFirst=sourcesOnly&&!premiumVisuals&&direction==='pratico'&&map;
+ const servicesFirst=sourcesOnly&&!premiumVisuals&&direction==='assinatura'&&hasServices;
  const heroHref=locationFirst?map:servicesFirst?'#servicos':defaultHeroHref;
  const actionLabel=requestedAction||(
   locationFirst?'Abrir no Google Maps':servicesFirst?'Conhecer '+serviceNav.toLocaleLowerCase('pt-BR'):
