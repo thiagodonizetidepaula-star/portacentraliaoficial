@@ -1,0 +1,40 @@
+name: Prospect PRO premium validation
+on:
+  push:
+    branches: [prospect-premium-ci-20261127]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Restore pinned skill
+        run: bash prospect-pro/scripts/install-img2threejs.sh
+      - name: Install, build and validate
+        working-directory: prospect-pro
+        run: |
+          npm ci
+          npm run build:premium-art
+          git diff --exit-code -- studio-premium-art.js
+          for f in biblioteca-data.js biblioteca.js studio-composition.js studio-premium-art.js server.js scripts/*.mjs; do node --check "$f" || exit 1; done
+          node --test tests/*.test.mjs
+      - name: Run browser demos
+        working-directory: prospect-pro
+        run: |
+          npm install --no-save --package-lock=false playwright-core
+          npx playwright-core install chromium --with-deps
+          export CHROMIUM_PATH="$(node -p "require('playwright-core').chromium.executablePath()")"
+          PORT=3000 npm start > /tmp/prospect-server.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/studio >/dev/null && break; sleep 1; done
+          node scripts/generate-premium-demos.mjs http://127.0.0.1:3000 /tmp/prospect-demos
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prospect-premium-demos
+          path: /tmp/prospect-demos
