@@ -1,0 +1,36 @@
+name: Professional generator validation
+on:
+  push:
+    branches: [prospect-professional-ci-20261128]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install dependencies and validate source
+        working-directory: prospect-pro
+        run: |
+          npm ci
+          npm run build:premium-art
+          git diff --exit-code -- studio-premium-art.js
+          for f in biblioteca-data.js biblioteca.js studio-flow.js studio-composition.js server.js tests/flow.test.mjs; do node --check "$f" || exit 1; done
+          npm install --no-save --package-lock=false playwright-core@1.61.0
+          npx playwright-core install chromium --with-deps
+          echo "CHROMIUM_PATH=$(node -p "require('playwright-core').chromium.executablePath()")" >> "$GITHUB_ENV"
+      - name: Premium pet shop and confirmed-source mode
+        working-directory: prospect-pro
+        run: node --test --test-name-pattern='Modo premium padrão|O modo somente fontes confirmadas' tests/flow.test.mjs
+      - name: Complete regression suite
+        if: ${{ !cancelled() }}
+        working-directory: prospect-pro
+        env:
+          PROSPECT_PLAYWRIGHT_MODULE: playwright-core
+        run: node --test tests/*.test.mjs
