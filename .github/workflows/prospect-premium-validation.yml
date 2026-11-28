@@ -24,13 +24,13 @@ jobs:
           npm run build:premium-art
           git diff --exit-code -- studio-premium-art.js
           for f in biblioteca-data.js biblioteca.js studio-composition.js studio-premium-art.js server.js scripts/*.mjs; do node --check "$f" || exit 1; done
-          node --test tests/*.test.mjs
       - name: Run browser demos
         working-directory: prospect-pro
         run: |
-          npm install --no-save --package-lock=false playwright-core
+          npm install --no-save --package-lock=false playwright-core@1.61.0
           npx playwright-core install chromium --with-deps
           export CHROMIUM_PATH="$(node -p "require('playwright-core').chromium.executablePath()")"
+          node --test tests/*.test.mjs
           PORT=3000 npm start > /tmp/prospect-server.log 2>&1 &
           for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3000/studio >/dev/null && break; sleep 1; done
           node scripts/generate-premium-demos.mjs http://127.0.0.1:3000 /tmp/prospect-demos
