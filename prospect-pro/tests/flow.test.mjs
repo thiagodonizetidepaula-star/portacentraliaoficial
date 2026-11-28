@@ -862,6 +862,7 @@ test('No celular, confirma a unidade e aplica a marca nas prévias, no rascunho 
   const page=await context.newPage();
   const errors=[]; page.on('pageerror',e=>errors.push(e.message));
   await page.goto(origin+'/studio');
+  await page.locator('#studioUseStock').uncheck();
   await page.locator('#studioCompany').fill('Salão Aurora');
   await page.locator('#studioSegment').fill('Salão de beleza');
   await page.locator('#studioCity').fill('Mauá');
@@ -1035,7 +1036,7 @@ test('O pacote do Instagram expõe apenas fotos de publicações selecionadas', 
   assert.equal(await frame.locator('.portfolio-strip img').count(),0);
 });
 
-test('O modo padrão gera três composições com dados confirmados e sem fotos de referência', {timeout:30000}, async t=>{
+test('O modo somente fontes confirmadas gera três composições sem fotos de referência', {timeout:30000}, async t=>{
   const providers=await startProviders(); t.after(providers.close);
   const origin=await startApp(t,providers,false);
   const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});
@@ -1043,6 +1044,7 @@ test('O modo padrão gera três composições com dados confirmados e sem fotos 
   const {context,openedUrls}=await browserContext(browser,origin,providers,{viewport:{width:1440,height:950}});
   const studio=await context.newPage();
   await studio.goto(origin+'/studio');
+  await studio.locator('#studioUseStock').uncheck();
   await studio.locator('#studioCompany').fill('Salão de Teste');
   await studio.locator('#studioSegment').fill('Salão de beleza');
   await studio.locator('#studioCity').fill('Mauá');
@@ -1098,5 +1100,49 @@ test('O modo padrão gera três composições com dados confirmados e sem fotos 
     await page.close();
   }
   assert.deepEqual(openedUrls,[]);
+  assert.deepEqual(providers.state.messages,[]);
+});
+
+test('Modo premium padrão: três sites de pet shop com fotos distintas e sem serviços inventados', {timeout:30000}, async t=>{
+  const providers=await startProviders(); t.after(providers.close);
+  const origin=await startApp(t,providers,false);
+  const browser=await chromium.launch({executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium'});
+  t.after(()=>browser.close());
+  const {context}=await browserContext(browser,origin,providers,{viewport:{width:390,height:844},reducedMotion:'reduce'});
+  const studio=await context.newPage();
+  await studio.goto(origin+'/studio');
+  assert.equal(await studio.locator('#studioUseStock').isChecked(),true);
+  assert.equal(await studio.locator('#studioAllowReferences').isChecked(),false);
+  await studio.locator('#studioCompany').fill('Petshop Exemplo');
+  await studio.locator('#studioSegment').fill('Petshop');
+  await studio.locator('#studioCity').fill('Mauá');
+  await studio.locator('#studioPhone').fill('(11) 3333-3333');
+  await studio.locator('#generateThree').click();
+  await studio.locator('.proposal-card').nth(2).waitFor();
+  const drafts=await studio.locator('.proposal-card iframe').evaluateAll(frames=>frames.map(frame=>frame.srcdoc));
+  const photos=new Set(),layouts=new Set();
+  for(const html of drafts){
+    const page=await context.newPage();
+    for(const width of [390,1440]){
+      await page.setViewportSize({width,height:900});
+      await page.setContent(html);
+      assert.equal(await page.locator('main h1').textContent(),'Petshop Exemplo');
+      assert.ok(await page.locator('.hero img').first().isVisible());
+      assert.equal(await page.locator('.composition-graphic').count(),0);
+      assert.equal(await page.locator('.hero figcaption').first().innerText(),'Imagem ilustrativa');
+      assert.ok(await page.locator('.premium-inquiries').isVisible());
+      assert.match(await page.locator('.premium-inquiries').innerText(),/Consulte a empresa para confirmar/);
+      assert.equal(await page.locator('html').evaluate(el=>el.scrollWidth<=el.clientWidth+2),true);
+      assert.equal(await page.locator('.hero img').first().evaluate(img=>window.top===window && img.complete),true);
+      assert.equal(await page.locator('meta[name=robots]').getAttribute('content'),'noindex,nofollow,noarchive');
+      assert.match(await page.locator('.hero-button').getAttribute('href'),/^https:\/\/wa.me\//);
+    }
+    const sources=await page.locator('main img').evaluateAll(imgs=>[...new Set(imgs.map(img=>img.src.split('?')[0]))]);
+    for(const src of sources){assert.ok(!photos.has(src),'Imagens compartilhadas entre propostas');photos.add(src);}
+    layouts.add(await page.locator('.hero').getAttribute('class'));
+    await page.close();
+  }
+  assert.equal(layouts.size,3);
+  assert.ok(photos.size>=3);
   assert.deepEqual(providers.state.messages,[]);
 });
