@@ -33,6 +33,8 @@ jobs:
           echo "CHROMIUM_PATH=$CHROMIUM_PATH" >> "$GITHUB_ENV"
       - name: Regression suite
         working-directory: prospect-pro
+        env:
+          PROSPECT_PLAYWRIGHT_MODULE: playwright-core
         run: node --test tests/*.test.mjs
       - name: Run browser demos independently of regression failures
         if: ${{ !cancelled() }}
