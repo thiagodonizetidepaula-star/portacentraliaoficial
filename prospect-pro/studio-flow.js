@@ -122,6 +122,7 @@ function makeProposals(client) {
  const base=match||{id:'generico',category:'Outros',layout:'directory',accent:'#50677d',bg:'#f7f8fa',ink:'#172533',photo:'',photos:[]};
  const category=client.category;
  const sourcesOnly=!client.allowReferences;
+ const premiumVisuals=client.useStock;
  const profile=match?base.profile:{
   experience:'Como funciona o atendimento',practical:'Serviços e atendimento',
   services:'Serviços',action:'Falar com a empresa',contact:'Entre em contato',
@@ -145,22 +146,23 @@ function makeProposals(client) {
  const seed=Array.from(norm(client.name+' '+client.city)).reduce((hash,c)=>(Math.imul(hash,31)+c.charCodeAt(0))>>>0,0);
  const ownPhotos=brand.photos;
  const recent=app.otherCovers(client.name,client.city);
- const groups=sourcesOnly?composition.authorizedGroups(ownPhotos):
+ const groups=!premiumVisuals?composition.authorizedGroups(ownPhotos):
   window.ProspectImageLibrary.allocate(base.id,client.name+' '+client.city,ownPhotos,recent);
  const about=client.about||[profile.story!==summaries[0]?profile.story:'',overview].filter(Boolean).join('\n')||identity;
  return visualDirections.map((direction,index)=>{
   const group=groups[index], cover=group.cover;
   const signatureLayout=visualDirections[0].layout(base);
   const defaultLayout=index===1?(signatureLayout==='immersive'?'artisan':'immersive'):direction.layout(base);
-  const layout=sourcesOnly?composition.layout(base.id,index,defaultLayout):defaultLayout;
-  const colors=sourcesOnly?composition.colors(base,index,brand.color):
+  const premiumLayouts=base.id==='petshop'?['editorial','immersive','serene']:base.id==='salao'?['editorial','immersive','serene']:base.id==='hamburgueria'?['catalog','kinetic','editorial']:['editorial','immersive','directory'];
+  const layout=premiumVisuals?premiumLayouts[index]:sourcesOnly?composition.layout(base.id,index,defaultLayout):defaultLayout;
+  const colors=premiumVisuals?composition.colors(base,index,brand.color):sourcesOnly?composition.colors(base,index,brand.color):
    direction.colors(brand.color?{...base,accent:brand.color}:base);
   const template={
    id:base.id+'-studio-'+index,
    label:category,category:base.category,example:client.name,profile,
    direction:direction.id,motionStyle:direction.id==='experiencia'?'strong':'soft',layout,...colors,
    headline:sourcesOnly?client.name:headlines[index],
-   summary:(sourcesOnly?client.summary:summaries[index]).slice(0,320),services,
+   summary:(sourcesOnly?(client.summary|| (premiumVisuals?[identity,client.address].filter(Boolean).join(' · '):'')):summaries[index]).slice(0,320),services,
    photo:cover,photos:group.photos,exclusivePhotos:true,stockPhotos:group.stock,
    detailPhoto:group.photos[1]||'',
    photoOrigin:group.real.includes(cover)?'business':'reference',brandColor:brand.color||'',
@@ -175,9 +177,9 @@ function makeProposals(client) {
    logo:brand.logo,brandGallery:group.real.join('\n'),brandSources:brand.sources,photoCaptions:brand.captions,
    variant:String((seed+index)%3),
    companyFacts:{summary:client.summary,about:client.about,services:client.services},sourcesOnly,
-   leadId,templateSnapshot:template
+   premiumVisuals,leadId,templateSnapshot:template
   };
-  return {template,data,direction:sourcesOnly?composition.direction(direction,base.id,index):direction};
+  return {template,data,direction:premiumVisuals?{...direction,title:['Comercial premium','Criativo e animado','Editorial sofisticado'][index],description:['Abertura fotográfica, informações e contato.','Fotografia imersiva e movimento.','Design editorial com imagens e tipografia refinada.'][index]}:sourcesOnly?composition.direction(direction,base.id,index):direction};
  });
 }
 
@@ -212,14 +214,15 @@ function refreshCard(proposal,index){
 }
 
 function showProposalsStatus(client,proposals){
- if(!client.allowReferences){
+ if(!client.allowReferences&&!client.useStock){
   status.textContent='Três propostas para '+client.name+'. Cada uma usa os dados informados, com composições gráficas próprias quando faltam fotos autorizadas.';
   return;
  }
  const suggestion=proposals[0].data.servicesSuggested&&proposals[0].template.services.length
   ?' Confira as opções sugeridas antes de publicar.':'';
+ const missing=proposals.some(p=>!p.template.photo)?' Algumas propostas não têm fotografia disponível; adicione fotos autorizadas antes de enviar.':'';
  const limited=proposals.some(p=>p.template.photos.length<3)?' Acervo limitado: algumas propostas terão menos fotos, sem repetir imagens entre modelos.':'';
- status.textContent='Três identidades visuais para '+client.name+', com conjuntos de fotos independentes. Escolha uma para personalizar.'+limited+suggestion;
+ status.textContent='Três identidades visuais para '+client.name+', com conjuntos de fotos independentes. Escolha uma para personalizar.'+limited+suggestion+missing;
 }
 
 function readClient(brand){
@@ -235,7 +238,7 @@ function readClient(brand){
   address:formValue('studioAddress'),website:account||window.ProspectLinks.whatsappLinkNumber(website)?'':website,
   mapsUrl:formValue('studioGoogleMapsUrl'),hours:formValue('studioHours'),
   email:formValue('studioEmail'),instagram:window.ProspectLinks.instagram(formValue('studioInstagram'))||profile,socialLinks:networks.map(v=>v.url).join('\n'),
-  summary:formValue('studioSummary'),about:formValue('studioAbout'),brand,allowReferences:$('studioAllowReferences').checked,
+  summary:formValue('studioSummary'),about:formValue('studioAbout'),brand,allowReferences:$('studioAllowReferences').checked,useStock:$('studioUseStock').checked,
   services:formValue('studioServices').split(/\r?\n/).map(service=>service.trim()).filter(Boolean).slice(0,8)
  };
 }
@@ -347,7 +350,7 @@ form.addEventListener('submit',async event=>{
  previewThree(true);
 });
 form.addEventListener('input',event=>{
- if(event.target.id==='studioAllowReferences')reflectOptions();
+ if(event.target.id==='studioAllowReferences'||event.target.id==='studioUseStock')reflectOptions();
  if(event.target.id==='studioWebsite'){
   const number=window.ProspectLinks.whatsappLinkNumber(formValue('studioWebsite'));
   if(number){
