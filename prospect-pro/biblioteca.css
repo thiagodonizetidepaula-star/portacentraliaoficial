@@ -421,7 +421,8 @@
  .intro { display: block; padding: 24px 0 10px }
  .intro-stats { border: 0; margin-top: 13px; padding-left: 0 }
  .three-proposals { grid-template-columns: minmax(0, 1fr) }
- .proposal-preview { --preview-scale: .41; height: clamp(195px, 48vw, 300px) }
+ .proposal-preview { --preview-scale: 1; height: clamp(280px, 64vw, 380px) }
+ .proposal-preview iframe { width:100%; height:100%; transform:none }
  .editor-bar { min-height: 0; flex-wrap: wrap; gap: 8px; padding: 7px 12px }
  .editor-brand { gap: 8px }
  .editor-tools { width: 100%; flex: 1 0 100% }
@@ -441,7 +442,6 @@
  .catalog-tools { flex-direction: column }
  .catalog-tools select { min-height: 42px }
  .custom-strip { flex-direction: column; align-items: flex-start }
- .proposal-preview { --preview-scale: .32 }
  .studio-client input, .studio-client textarea, .form-grid input, .form-grid textarea, .form-grid select,
  .project-search input, .publish-overlay input, .publish-overlay textarea, .assistant-panel textarea { font-size: 16px }
 }
