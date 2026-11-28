@@ -29,8 +29,11 @@ function renderCatalog(){
  $('catalogInfo').textContent=list.length+' modelos profissionais disponíveis · O layout, a tipografia e a composição mudam conforme o segmento';
  $('catalog').innerHTML=list.map(t=>{
  const bg=palette(t.bg),accent=palette(t.accent),fg=palette(t.ink),inv=fg==='#ffffff'?'#131925':bg;
+ const image=photo(t.photo).replace(/w=1600&q=82/,'w=680&q=68');
+ const visual=image?'<img class="template-photo" src="'+esc(image)+'" loading="lazy" decoding="async" alt="" width="680" height="440">':
+  t.id==='solar'&&window.ProspectPremiumArt?'<div class="template-photo" aria-hidden="true">'+window.ProspectPremiumArt.model+'</div>':'';
  return '<article class="template-card" style="--model-bg:'+bg+';--model-accent:'+accent+';--model-fg:'+fg+';--model-btntext:'+inv+'">'+
- '<div class="template-visual" data-layout="'+esc(t.layout)+'"><img class="template-photo" src="'+esc(photo(t.photo).replace(/w=1600&q=82/,'w=680&q=68'))+'" loading="lazy" decoding="async" alt="" width="680" height="440">'+
+ '<div class="template-visual" data-layout="'+esc(t.layout)+'">'+visual+
  '<div class="mock-header"><span>'+esc(t.example.toUpperCase())+'</span><i></i></div><div class="mock-content"><div class="mock-overline">'+esc(t.category.toUpperCase())+'</div><strong>'+esc(t.headline)+'</strong><span class="mock-cta">Conhecer mais</span></div><span class="mock-label">'+esc(t.layout.toUpperCase())+'</span></div>'+
  '<div class="card-info"><div class="card-line"><h3>'+esc(t.label)+'</h3><span class="category">'+esc(t.category)+'</span></div><p>'+esc(t.summary)+'</p><div class="card-footer"><span class="design-tag">'+esc({editorial:'Editorial',technical:'Industrial',serene:'Minimalista',immersive:'Imersivo',artisan:'Artesanal',catalog:'Galeria',kinetic:'Dinâmico',corporate:'Corporativo'}[t.layout])+'</span><button class="open-model" data-open="'+esc(t.id)+'">Personalizar →</button></div></div></article>';
  }).join('')||'<div class="custom-strip"><strong>Nenhum modelo encontrado.</strong> Tente outra palavra ou escolha o modelo personalizado.</div>';
@@ -1145,8 +1148,9 @@ function buildSite(info,t,{finalSite=false}={}) {
  const heroImage=layout==='catalog'
   ?'<figure class="catalog-gallery">'+mainPhoto+supportingPhoto(secondary)+supportingPhoto(tertiary)+figureCaption(galleryCaption)+'</figure>'
   :'<figure class="hero-image">'+mainPhoto+figureCaption(imageCaption)+'</figure>';
- const graphicHero=sourcesOnly&&!image&&direction;
- const hero=graphicHero?'<section class="hero composition-hero">'+heroBody+window.ProspectComposition.graphic(direction)+'</section>':
+ const solarGraphic=base?.id==='solar'&&!image&&Boolean(window.ProspectPremiumArt);
+ const graphicHero=(sourcesOnly||solarGraphic)&&!image&&(direction||(solarGraphic?'assinatura':''));
+ const hero=graphicHero?'<section class="hero composition-hero">'+heroBody+window.ProspectComposition.graphic(graphicHero,base?.id)+'</section>':
   '<section class="hero '+(layout==='catalog'?'catalog-hero':layout)+(image?'':' no-stock-photo')+'">'+heroBody+(image?heroImage:'')+'</section>';
 
  const serviceSection=hasServices?servicesMarkup(rawServices,profile,info,isSuggested):'';
@@ -1241,7 +1245,8 @@ function buildSite(info,t,{finalSite=false}={}) {
   ':root{--accent:'+accent+';--surface:'+bg+';--ink:'+ink+';--dark:'+dark+
   ';--buttonInk:'+buttonInk+';--muted:'+muted+';--line:'+line+';--display:'+(graphicHero?'system-ui,sans-serif':font.family)+
   ';--material:'+(t.brandColor?accent:artStyle.material)+';--material-ink:'+(t.brandColor?buttonInk:artStyle.ink)+'}'+compositionCss+premiumCss+navigationCss+motionCss +qualityCss+motionEnhancements+distinctCss+motionCraftCss+'.hero.no-stock-photo{display:block!important;height:auto!important;min-height:0!important;background:var(--surface);color:var(--ink);padding:0}.hero.no-stock-photo::after{display:none}.hero.no-stock-photo .hero-text{position:relative!important;inset:auto!important;padding:clamp(28px,7vw,90px);max-width:100%;text-align:left}'+
-  (sourcesOnly?window.ProspectComposition.styles:'')+designOverrides;
+  (sourcesOnly||solarGraphic?window.ProspectComposition.styles:'')+
+  (solarGraphic?window.ProspectPremiumArt.css:'')+designOverrides;
 
  const title=name;
  const brandLogo=brandImage(logo);
@@ -1266,7 +1271,7 @@ function buildSite(info,t,{finalSite=false}={}) {
   (sourcesOnly&&!finalSite?'<meta name="robots" content="noindex,nofollow,noarchive">':'')+
   '<title>'+esc(title)+'</title>'+favicon+social+
   '<script type="application/ld+json">'+schemaSafe+'</script><style>'+pageStyle+'</style></head>'+
-  '<body class="variant-'+variant+(direction?' direction-'+direction:'')+spacing+' art-'+art+(sourcesOnly?' composition composition-'+art:'')+' motion-'+(['strong','none'].includes(info.motionStyle)?info.motionStyle:'soft')+'" data-direction="'+direction+'">'+
+  '<body class="variant-'+variant+((direction||graphicHero)?' direction-'+(direction||graphicHero):'')+spacing+' art-'+art+(sourcesOnly||solarGraphic?' composition composition-'+art:'')+' motion-'+(['strong','none'].includes(info.motionStyle)?info.motionStyle:'soft')+'" data-direction="'+direction+'">'+
   '<a class="skip-link" href="#inicio">Ir para o conteúdo</a>'+
   '<header class="site-header container"><a class="brand" href="#inicio">'+
   (logo?'<img class="brand-logo" src="'+esc(logo)+'" width="140" height="52" alt="'+esc(name)+'">':esc(name))+'</a><nav aria-label="Navegação principal">'+siteNav+'</nav></header>'+

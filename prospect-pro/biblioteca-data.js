@@ -13,6 +13,7 @@ const source = [
 ["veterinaria","Clínica veterinária","Pets","serene","Vida Animal","Carinho e cuidado com seu melhor amigo.","Atenção veterinária com respeito a cada animal.","Consultas veterinárias|Cuidados preventivos|Orientações para tutores","photo-1517849845537-4d257902454a","#4d907d","#f2f8f5","#263d37"],
 ["petshop","Pet shop","Pets","kinetic","Pata & Cia","Tudo para quem faz parte da família.","Produtos, serviços e carinho para o dia a dia do seu pet.","Banho e tosa|Produtos para pets|Acessórios","photo-1583337130417-3346a1be7dee","#ee8750","#fff5ec","#403126"],
 ["hamburgueria","Hamburgueria","Gastronomia","immersive","Brasa Burger","O sabor que faz você voltar.","Hambúrgueres artesanais, combinações marcantes e uma experiência feita para reunir.","Hambúrgueres especiais|Combos e acompanhamentos|Pedidos e retirada","photo-1568901346375-23c9450c58cd","#e3ac63","#231810","#fff8ee"],
+["solar","Energia solar","Casa e imóveis","technical","Limiar Solar","Energia solar para o seu espaço.","Conheça as etapas de um projeto fotovoltaico.","Estudo de viabilidade|Projeto fotovoltaico|Instalação",null,"#00726d","#eaf4ed","#102d32"],
 ["restaurante","Restaurante","Gastronomia","immersive","Mesa & Brasa","Sabores que viram encontros.","Uma experiência feita para reunir e surpreender à mesa.","Pratos da casa|Almoço e jantar|Reservas e eventos","photo-1517248135467-4c7edcad34c4","#e8bd82","#261911","#fff9f1"],
 ["pizzaria","Pizzaria","Gastronomia","immersive","Forno 72","A pizza que reúne todo mundo.","Massa, forno e bons momentos em cada fatia.","Pizzas tradicionais|Pizzas especiais|Pedidos e retirada","photo-1579751626657-72bc17010498","#e7a14d","#301b16","#fff3e6"],
 ["cafeteria","Cafeteria","Gastronomia","artisan","Café da Esquina","Um café muda o ritmo do dia.","Aroma, conversa e pequenas pausas que fazem bem.","Cafés especiais|Doces e sobremesas|Salgados artesanais","photo-1442512595331-e89e73853f31","#ad7750","#f4e9d9","#3b2b23"],
@@ -53,6 +54,7 @@ const segmentAliases = {
  veterinaria:['veterinár'],
  petshop:['pet shop','petshop','banho e tosa'],
  hamburgueria:['hambúrg','burger'],
+ solar:['energia fotovoltaica','sistema fotovoltaico','instalacao de paineis solares','solar fotovoltaica'],
  restaurante:['restaurante','churrasc','lanchonete','sushi','bistrô'],
  pizzaria:['pizza'],
  cafeteria:['café','cafeteria','coffee shop'],
@@ -164,6 +166,7 @@ const segmentCopy = {
  odontologia:{experience:'Converse sobre os cuidados com seu sorriso.', practical:'Informações para sua próxima consulta odontológica.'},
  restaurante:{experience:'Sua próxima boa conversa começa à mesa.', practical:'Conheça as opções para sua próxima refeição.'},
  hamburgueria:{experience:'Abra o apetite para o próximo burger.', practical:'Encontre seu próximo hambúrguer.'},
+ solar:{experience:'Do estudo à instalação.', practical:'Conheça as etapas do projeto.', services:'Soluções fotovoltaicas', action:'Conversar sobre o projeto', ask:'Gostaria de saber como avaliar um projeto solar para meu imóvel.'},
  pizzaria:{experience:'O próximo encontro pede pizza.', practical:'Escolha o sabor da vez.'},
  cafeteria:{experience:'Uma pausa com aroma de café.', practical:'Descubra o que acompanha seu café.'},
  padaria:{experience:'O dia começa com cheiro de pão.', practical:'Descubra as opções da padaria.'},
@@ -289,7 +292,7 @@ const serviceGuidance = {
  const photoKey=url=>String(url||'').split('?')[0];
  const uniquePhotos=urls=>[...new Map(urls.filter(Boolean).map(url=>[photoKey(url),url])).values()];
  const stockPools=Object.fromEntries(source.map(row=>[row[0],uniquePhotos([
- stockUrl(row[8]),...(stockPexels[row[0]]||[]).map(pexelsUrl),...(referencePhotos[row[0]]||[]).map(stockUrl)
+ row[8]?stockUrl(row[8]):'',...(stockPexels[row[0]]||[]).map(pexelsUrl),...(referencePhotos[row[0]]||[]).map(stockUrl)
  ])]));
  window.ProspectImageLibrary=Object.freeze({
   select(id,identity='',used=new Set(),count=12){
@@ -319,12 +322,12 @@ const serviceGuidance = {
   count:id=>(stockPools[id]||[]).length,
   owners(url){const key=photoKey(url);return Object.keys(stockPools).filter(id=>stockPools[id].some(photo=>photoKey(photo)===key));}
  });
- window.SITE_TEMPLATES = source.map(([id,label,category,layout,example,headline,summary,serviceList,mainPhoto,accent,bg,ink])=>{
+ window.SITE_TEMPLATES = source.map(([id,label,category,layout,example,headline,summary,serviceList,,accent,bg,ink])=>{
  const services=serviceList.split('|');
  const photos=stockPools[id].slice();
  return {
   id,label,category,layout,example,headline,summary,services,
-  photo:photos[0],photos,accent,bg,ink,aliases:[...(segmentAliases[id]||[]),...(extraSegmentAliases[id]||[])],
+  photo:photos[0]||'',photos,accent,bg,ink,aliases:[...(segmentAliases[id]||[]),...(extraSegmentAliases[id]||[])],
   profile:{
    ...sectorCopy[category],...sectorEditorial[category],...segmentCopy[id],...segmentEditorial[id],
    serviceDescriptions:Object.fromEntries(services.map((service,index)=>[service,serviceGuidance[id]?.[index]||'']))

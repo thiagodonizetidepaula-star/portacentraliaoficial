@@ -7,6 +7,7 @@ const editorial = {
  barbearia: ['technical','artisan','directory'],
  restaurante: ['artisan','immersive','directory'],
  hamburgueria: ['immersive','kinetic','directory'],
+ solar: ['technical','immersive','directory'],
  pizzaria: ['artisan','catalog','directory'],
  petshop: ['kinetic','catalog','directory'],
  clinica: ['serene','corporate','directory'],
@@ -51,7 +52,9 @@ function authorizedGroups(photos) {
  });
 }
 
-function graphic(direction) {
+function graphic(direction, segment) {
+ if(segment==='solar'&&window.ProspectPremiumArt)return '<div class="composition-graphic composition-graphic-'+direction+' composition-solar" aria-hidden="true">'+window.ProspectPremiumArt.model+'</div>';
+ if(segment==='hamburgueria'&&direction==='experiencia')return '<div class="composition-graphic composition-burger" aria-hidden="true"><span><i></i><i></i><i></i><i></i><i></i></span></div>';
  // Decorative geometry is original CSS. Use the business name as a text wordmark.
  const shapes = '<i></i><i></i><i></i>';
  return '<div class="composition-graphic composition-graphic-'+direction+'" aria-hidden="true">'+shapes+'</div>';
@@ -130,6 +133,38 @@ const styles=`
 }
 @keyframes composition-glide{from{transform:translateY(0)}to{transform:translateY(65%)}}
 
+.composition-graphic.composition-solar{display:grid;place-items:center;min-height:clamp(210px,34vw,480px);border:1px solid #698e8b35;border-radius:4px;background:radial-gradient(ellipse at 50% 36%,#f5fff6,#bbd9d4)}
+.composition-solar svg{display:block;width:100%;height:auto;max-height:470px}
+.direction-experiencia .composition-hero:has(.composition-solar){width:min(1310px,100% - 9vw);grid-template-columns:minmax(0,1fr) minmax(0,1fr);text-align:left;gap:clamp(22px,4vw,55px);min-height:0;padding:clamp(30px,6vw,80px) 0}
+.direction-experiencia .composition-hero:has(.composition-solar) .hero-text{grid-area:auto;max-width:100%}
+.direction-experiencia .composition-hero:has(.composition-solar) .hero-text>*{margin-inline:0}
+.direction-experiencia .composition-hero:has(.composition-solar) h1{text-shadow:none}
+.direction-experiencia .composition-solar{position:relative;inset:auto;width:100%}
+.direction-experiencia .composition-hero:has(.composition-burger){grid-template-columns:minmax(0,1fr) minmax(0,1fr);text-align:left;gap:25px;min-height:0;padding:clamp(28px,6vw,88px) 5vw;background:#241711}
+.direction-experiencia .composition-hero:has(.composition-burger) .hero-text{grid-area:auto;width:min(100%,620px)}
+.direction-experiencia .composition-hero:has(.composition-burger) .hero-text>*{margin-inline:0}
+.direction-experiencia .composition-hero:has(.composition-burger) .hero-actions{justify-content:flex-start}
+.direction-experiencia .composition-hero:has(.composition-burger) h1{font-weight:870;text-transform:uppercase;font-size:clamp(58px,8vw,142px);text-shadow:none}
+.composition-burger{display:grid;place-items:center;width:100%;min-height:clamp(230px,38vw,490px);background:radial-gradient(closest-side,#d16a2a 69%,#a5481c 70% 72%,transparent 73%);isolation:isolate}
+.composition-burger span{display:grid;gap:clamp(3px,1.2vw,13px);width:65%;transform:rotate(-12deg);filter:drop-shadow(14px 22px 14px #39180565)}
+.composition-burger i{position:static;width:100%;margin:auto;border-radius:50px;background:#4b2117;height:clamp(13px,3vw,38px)}
+.composition-burger i:first-child{border-radius:65% 65% 18% 18% / 100% 100% 22% 22%;height:clamp(39px,9vw,118px);background:radial-gradient(ellipse at 33% 42%,#fff0b9 0 2%,transparent 2.5%),radial-gradient(ellipse at 58% 24%,#fff0b9 0 2%,transparent 2.5%),radial-gradient(ellipse at 73% 51%,#fff0b9 0 2%,transparent 2.5%),linear-gradient(#ffcd71,#dc7d2a)}
+.composition-burger i:nth-child(2){background:#5f7a38;height:clamp(8px,1.3vw,21px);width:104%;border-radius:40%}
+.composition-burger i:nth-child(3){background:#f5ba43;clip-path:polygon(0 0,100% 0,100% 36%,62% 36%,42% 100%,34% 36%,0 36%);margin-bottom:-4%}
+.composition-burger i:last-child{border-radius:20% 20% 60% 60%;background:linear-gradient(#eda63d,#aa4f1f);height:clamp(19px,4vw,48px)}
+.composition .faq-items summary:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+.composition .faq-items details[open] summary{text-decoration:underline;text-underline-offset:.25em}
+
+@media(prefers-reduced-motion:no-preference){
+ body:not(.motion-none) .composition-solar svg{animation:prospect-solar-rise var(--entry-time) 90ms linear both}
+ body:not(.motion-none) .composition-burger span{animation:composition-burger-arrival var(--entry-time) 120ms var(--curve) both}
+ @supports(animation-timeline:view()){
+  body.composition:not(.motion-none) main:not(:has(>section:target)) .services .service-card{animation:composition-service-arrival linear both;animation-timeline:view();animation-range:entry 0% entry 70%}
+ }
+}
+@keyframes composition-service-arrival{from{transform:translateY(12px)}to{transform:translateY(0)}}
+@keyframes composition-burger-arrival{from{opacity:.65;transform:translateY(24px) rotate(-16deg) scale(.96)}to{opacity:1;transform:rotate(-12deg) scale(1)}}
+
 @media(max-width:760px){
  .composition .site-header.container{display:flex;align-items:center;gap:10px;padding:8px 5vw;min-height:60px}
  .composition .site-header .brand{font-size:16px}
@@ -150,6 +185,8 @@ const styles=`
  .composition-graphic-pratico i:last-child{width:24%}
  .composition .contact,.composition .contact.composition-contact-compact{padding:38px 0}
  .composition .footer{width:90%}
+ .direction-experiencia .composition-hero:has(.composition-solar){grid-template-columns:minmax(0,1fr)}
+ .direction-experiencia .composition-hero:has(.composition-burger){grid-template-columns:minmax(0,1fr);gap:12px}
 }
 `;
 

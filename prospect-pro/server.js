@@ -138,6 +138,7 @@ http.createServer(async(req,res)=>{
   '/biblioteca.css':['./biblioteca.css','text/css; charset=utf-8'],
   '/biblioteca.js':['./biblioteca.js','text/javascript; charset=utf-8'],
   '/biblioteca-data.js':['./biblioteca-data.js','text/javascript; charset=utf-8'],
+  '/studio-premium-art.js':['./studio-premium-art.js','text/javascript; charset=utf-8'],
   '/studio-composition.js':['./studio-composition.js','text/javascript; charset=utf-8'],
   '/studio-flow.js':['./studio-flow.js','text/javascript; charset=utf-8'],
   '/studio-brand.js':['./studio-brand.js','text/javascript; charset=utf-8'],
