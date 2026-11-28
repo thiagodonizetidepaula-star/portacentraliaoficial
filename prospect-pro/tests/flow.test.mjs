@@ -92,8 +92,8 @@ async function browserContext(browser, origin, providers, options = {}) {
       await route.fulfill({contentType: 'text/html', body: '<title>Destino externo simulado</title>'});
       return;
     }
-    if (route.request().resourceType() === 'image') {
-      await route.fulfill({contentType: 'image/png', body: fakeImage});
+    if (route.request().resourceType() === 'image' || (route.request().method()==='GET' && ['images.pexels.com','images.unsplash.com'].includes(url.hostname))) {
+      await route.fulfill({contentType: 'image/png', headers:{'Access-Control-Allow-Origin':'*'}, body: fakeImage});
       return;
     }
     await route.abort();
