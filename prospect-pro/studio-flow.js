@@ -151,6 +151,7 @@ function makeProposals(client) {
  const about=client.about||[profile.story!==summaries[0]?profile.story:'',overview].filter(Boolean).join('\n')||identity;
  return visualDirections.map((direction,index)=>{
   const group=groups[index], cover=group.cover;
+  const photos=group.photos.slice(0,Math.max(3,group.real.length));
   const signatureLayout=visualDirections[0].layout(base);
   const defaultLayout=index===1?(signatureLayout==='immersive'?'artisan':'immersive'):direction.layout(base);
   const premiumLayouts=base.id==='petshop'?['editorial','immersive','serene']:base.id==='salao'?['editorial','immersive','serene']:base.id==='hamburgueria'?['catalog','kinetic','editorial']:['editorial','immersive','directory'];
@@ -163,7 +164,7 @@ function makeProposals(client) {
    direction:direction.id,motionStyle:direction.id==='experiencia'?'strong':'soft',layout,...colors,
    headline:sourcesOnly?client.name:headlines[index],
    summary:(sourcesOnly?(client.summary|| (premiumVisuals?[identity,client.address].filter(Boolean).join(' · '):'')):summaries[index]).slice(0,320),services,
-   photo:cover,photos:group.photos,exclusivePhotos:true,stockPhotos:group.stock,
+   photo:cover,photos,exclusivePhotos:true,stockPhotos:group.stock.filter(url=>photos.includes(url)),
    detailPhoto:group.photos[1]||'',
    photoOrigin:group.real.includes(cover)?'business':'reference',brandColor:brand.color||'',
    logo:brand.logo,brandGallery:group.real.join('\n')
